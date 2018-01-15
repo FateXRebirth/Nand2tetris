@@ -46,31 +46,41 @@ public class Assembler {
 
         // line number corresponds to code
         int lineCounter = 0;
-        Map<String, Integer> codeToLine = new HashMap<String, Integer>();
-        
+
         // get assemble code from .asm file
         List<String> content = Files.readAllLines(Paths.get("fill.asm"));
 
         // first-pass
-        for(String line : content) {                     
-            // handle comments and white-space
+        for(String line : content) {
+            // handle empty and comments
             if(!line.startsWith("//") && !line.isEmpty() && !line.endsWith(" ")) {
+                // handle label
                 if(line.startsWith("(")) {
                     int start = 0;
                     int end = line.indexOf(")");
                     String label = line.substring(start+1, end);
-                    table.put(label, lineCounter);
+                    if(!isExist(label)) table.put(label, lineCounter+2);
                 }
-                else {
-                    System.out.println(String.valueOf(lineCounter) + " " + line);
-                    codeToLine.put(line, lineCounter);
-                    lineCounter++;
-                    contents.add(line);
+                lineCounter+=1;
+                System.out.println(String.valueOf(lineCounter) + " " + line);
+            }
+        }
+
+        // second-pass
+        for(String line : content) {
+            // handle empty and comments
+            if(!line.startsWith("//") && !line.isEmpty() && !line.endsWith(" ")) {
+                // handle variable
+                if(line.indexOf("@")!= -1) {
+                    int start = line.indexOf("@");
+                    String label = line.substring(start+1);
+                    if(!isExist(label) && !label.matches("[0-9]*")) table.put(label, symbolCounter++);
                 }
             }
         }
 
         // watch table
+        System.out.println("------TABLE-------");
         for(Map.Entry<String, Integer> entry : table.entrySet()) {
             String key = entry.getKey();
             int value = entry.getValue();
@@ -80,5 +90,9 @@ public class Assembler {
         Charset utf8 = StandardCharsets.UTF_8;
         Files.write(Paths.get("output.text"), contents, utf8);
     }    
+
+    static boolean isExist(String key) {
+        return table.containsKey(key);
+    }
 }
 
