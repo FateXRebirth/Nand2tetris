@@ -53,13 +53,13 @@ public class Assembler {
         // first-pass
         for(String line : content) {
             // handle empty and comments
-            if(!line.startsWith("//") && !line.isEmpty() && !line.endsWith(" ")) {
+            if(makeSense(line)) {
                 // handle label
                 if(line.startsWith("(")) {
                     int start = 0;
                     int end = line.indexOf(")");
                     String label = line.substring(start+1, end);
-                    if(!isExist(label)) table.put(label, lineCounter+2);
+                    if(!isExist(label)) table.put(label, lineCounter);
                 }
                 lineCounter+=1;
                 System.out.println(String.valueOf(lineCounter) + " " + line);
@@ -69,12 +69,35 @@ public class Assembler {
         // second-pass
         for(String line : content) {
             // handle empty and comments
-            if(!line.startsWith("//") && !line.isEmpty() && !line.endsWith(" ")) {
+            if(makeSense(line)) {
                 // handle variable
                 if(line.indexOf("@")!= -1) {
                     int start = line.indexOf("@");
                     String label = line.substring(start+1);
                     if(!isExist(label) && !label.matches("[0-9]*")) table.put(label, symbolCounter++);
+                }
+            }
+        }
+
+        // result
+        String result = "";
+
+        //tanslate 
+        for(String line : content) {
+            if(makeSense(line)) {
+                // handle A instruction
+                if(line.indexOf("@") != -1) {
+                    result = translateA(line);
+                    contents.add(result);
+                }
+                // handle orther instruction
+                else if(line.indexOf("(") != -1) {
+                    // Do nothing
+                }
+                // handle C instruction
+                else {
+                    result = translateC(line);
+                    contents.add(result);
                 }
             }
         }
@@ -86,13 +109,50 @@ public class Assembler {
             int value = entry.getValue();
             System.out.println(key + " < --- > " + String.valueOf(value));
         }
-
+        
+        // output to .hack file
         Charset utf8 = StandardCharsets.UTF_8;
         Files.write(Paths.get("output.text"), contents, utf8);
     }    
 
+    // check if this key is already exist in table 
     static boolean isExist(String key) {
         return table.containsKey(key);
     }
+
+    // check if this line does makesense
+    static boolean makeSense(String line) {
+        return !line.startsWith("//") && !line.isEmpty() && !line.endsWith(" ");
+    }
+
+    // complete the remaining zero
+    static String makeComplete(int length) {
+        int times = 15-length;
+        String zeros = "";
+        for(int i = 0 ; i < times ; i++) {
+            zeros+= "0";
+        }
+        return "0" + zeros;
+    }
+
+    // translate A instruction
+    static String translateA(String line) { 
+        int start = line.indexOf("@");
+        String result = "";
+        String label = line.substring(start+1);
+        if(isExist(label)) {
+            result =  Integer.toBinaryString(table.get(label));
+            return makeComplete(result.length()) + result;
+        } else {
+            result = Integer.toBinaryString(Integer.parseInt(label));
+            return makeComplete(result.length()) + result;
+        }
+    }
+
+    // translate C instruction
+    static String translateC(String line) {
+        return line + " C ";
+    }
+
 }
 
