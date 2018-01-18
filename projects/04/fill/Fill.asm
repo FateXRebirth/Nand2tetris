@@ -14,47 +14,45 @@
 // Put your code here.
 
 (MAIN)
-	@count
-	M=0
-	@KBD
-	D=M
-	@BLACK
-	D;JNE
-	@WHITE
-	D;JEQ
-	@MAIN
-	0;JMP
-
+   @count
+   M=0
+   @KBD
+   D=M
+   @BLACK
+   D;JNE
+   @WHITE
+   D;JEQ
+   @MAIN
+   0;JMP
 (BLACK)
-	@8192
-	D=A
-	@count
-	D=D-M
-	@MAIN
-	D;JEQ
-	@SCREEN
-	D=A
-	@count
-	A=M+D
-	M=-1
-	@count
-	M=M+1
-	@BLACK
-	0;JMP
-
+   @8192
+   D=A
+   @count
+   D=D-M
+   @MAIN
+   D;JEQ
+   @SCREEN
+   D=A
+   @count
+   A=M+D
+   M=-1
+   @count
+   M=M+1
+   @BLACK
+   0;JMP
 (WHITE)
-	@8192
-	D=A
-	@count
-	D=D-M
-	@MAIN
-	D;JEQ
-	@SCREEN
-	D=A
-	@count
-	A=M+D
-	M=0
-	@count
-	M=M+1
-	@WHITE
-	0;JMP
+   @8192
+   D=A
+   @count
+   D=D-M
+   @MAIN
+   D;JEQ
+   @SCREEN
+   D=A
+   @count
+   A=M+D
+   M=0
+   @count
+   M=M+1
+   @WHITE
+   0;JMP
