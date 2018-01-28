@@ -37,19 +37,33 @@ public class SymbolTable {
         
     }
 
-    public static void addEntry(String symbol, int address) throws NoSuchFieldException {
-        if(contains(symbol)) throw new NoSuchFieldException("This symbol has already existed in SymbolTable");
-        symbolTable.put(symbol, address);
+    public static void addEntry(String symbol, int address) {
+        if(!contains(symbol)) {
+            symbolTable.put(symbol, address);
+            symbolCounter++;
+        }
     }
 
     public static boolean contains(String symbol) {
         return symbolTable.containsKey(symbol);
     }
 
-    public static int GetAddress(String symbol) throws NoSuchFieldException {
-        if(!contains(symbol)) throw new NoSuchFieldException("No such symbol key in SymbolTable");
+    public static int GetAddress(String symbol) {
+        try {
+            if(!contains(symbol)) throw new NoSuchFieldException("No such symbol key in SymbolTable");
+        } catch (NoSuchFieldException e) {
+            System.out.println(e.getMessage());
+        }
         return symbolTable.get(symbol);
     }
 
+    public static void showSymbolTable() {
+        System.out.println("------TABLE-------");
+        for(Map.Entry<String, Integer> entry : symbolTable.entrySet()) {
+            String key = entry.getKey();
+            int value = entry.getValue();
+            System.out.println(key + " --- > " + String.valueOf(value));
+        } 
+    }
 }
 

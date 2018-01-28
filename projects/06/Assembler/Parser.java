@@ -3,9 +3,9 @@ import java.io.File;
 import java.util.Scanner;
 
 public class Parser {
-
-    private static String currentCommand;
+    
     private static Scanner scanner;
+    private static String currentCommand;
     private static String symbol;
     private static String dest;
     private static String comp;
@@ -18,35 +18,50 @@ public class Parser {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
     }
 
     public static boolean hasMoreCommands() {
         return scanner.hasNext();
     }
 
+    public static String purify(String input) {
+        String source = "";
+        source = input.replace(" ", "");
+        if(source.indexOf("/") != -1) {
+            source = source.substring(0, source.indexOf("/"));
+        }
+        return source;
+    }
+
     public static void advance() {
-        scanner.nextLine();
+        currentCommand = purify(scanner.nextLine());
     }
 
     public static void handle() {
-        String result = "";
-        result = currentCommand.replace(" ", "");
-        if(result.indexOf("/") != -1) {
-            result = result.substring(0, result.indexOf("/"));
-        }
-
         switch(commandType()) {
             case "A_Command":
-                symbol = "";
+                int index = currentCommand.indexOf("@");
+                symbol = currentCommand.substring(index+1);
                 break;
             case "C_Command":
-                dest = "";
-                comp = "";
-                jump = "";
+                int equalSignPosition = currentCommand.indexOf("=");
+                int semiColonPosition = currentCommand.indexOf(";");
+                if(equalSignPosition != -1) {
+                    dest = currentCommand.substring(0, equalSignPosition);
+                    comp = currentCommand.substring(equalSignPosition+1);
+                    jump = "000";
+                } else if(semiColonPosition != -1) {
+                    comp = currentCommand.substring(0, semiColonPosition);
+                    jump = currentCommand.substring(semiColonPosition+1);
+                    dest = "000";
+                } else {
+                    // suppose to not have this case
+                }
                 break;
             case "L_Commnad":
-                symbol = "";
+                int start = 0;
+                int end = currentCommand.indexOf(")");
+                symbol = currentCommand.substring(start+1, end);
                 break;
             default:
                 break;
@@ -54,17 +69,18 @@ public class Parser {
     }
 
     public static String commandType() {
-        if (currentCommand.indexOf("@") !=- 1) {
-            return "A_Command";
-        }
-        else if (currentCommand.indexOf("(") != -1) {
-            return "L_Command";
-        }
-        else if (currentCommand.startsWith("//") || currentCommand.isEmpty()) {
-            return "N_Command";        
-        }
-        else {
-            return "C_Command";
+        if (currentCommand.startsWith("//") || currentCommand.isEmpty()) {
+            return "N_Command";
+        } else {
+            if (currentCommand.indexOf("@") !=- 1) {
+                return "A_Command";
+            }
+            else if (currentCommand.indexOf("(") != -1) {
+                return "L_Command";
+            }
+            else {
+                return "C_Command";        
+            }
         }
     }
 
@@ -83,7 +99,6 @@ public class Parser {
     public static String jump() {
         return jump;
     }
-
 }
 
 
