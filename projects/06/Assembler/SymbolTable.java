@@ -37,10 +37,16 @@ public class SymbolTable {
         
     }
 
-    public static void addEntry(String symbol, int address) {
+    public static void addEntry(String type, String symbol, int address) {
         if(!contains(symbol)) {
-            symbolTable.put(symbol, address);
-            symbolCounter++;
+            switch(type) {
+                case "A_Command":
+                    symbolTable.put(symbol, symbolCounter++);
+                    break;
+                case "L_Command":
+                    symbolTable.put(symbol, address);
+                    break;
+            }
         }
     }
 

@@ -54,11 +54,9 @@ public class Parser {
                     comp = currentCommand.substring(0, semiColonPosition);
                     jump = currentCommand.substring(semiColonPosition+1);
                     dest = "000";
-                } else {
-                    // suppose to not have this case
                 }
                 break;
-            case "L_Commnad":
+            case "L_Command":
                 int start = 0;
                 int end = currentCommand.indexOf(")");
                 symbol = currentCommand.substring(start+1, end);
@@ -66,6 +64,7 @@ public class Parser {
             default:
                 break;
         }
+        /* System.out.println("Symbol -> " + symbol +  ", Dest -> " + dest +  ", Comp -> " + comp + ", Jump -> " + jump);  */
     }
 
     public static String commandType() {
