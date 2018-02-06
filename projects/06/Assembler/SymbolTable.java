@@ -63,6 +63,7 @@ public class SymbolTable {
         return symbolTable.get(symbol);
     }
 
+    // Development Tool for Developer
     public static void showSymbolTable() {
         System.out.println("------TABLE-------");
         for(Map.Entry<String, Integer> entry : symbolTable.entrySet()) {

@@ -14,14 +14,18 @@ public class Parser {
     public Parser(String input) {
         try {
             scanner = new Scanner(new File(input));
-            System.out.println("Ready to parser...");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
     }
 
     public static boolean hasMoreCommands() {
-        return scanner.hasNext();
+        boolean hasNext = scanner.hasNext();
+        if(!hasNext) {
+            scanner.close();
+            return hasNext;
+        }
+        return hasNext;
     }
 
     public static String purify(String input) {
@@ -64,7 +68,6 @@ public class Parser {
             default:
                 break;
         }
-        /* System.out.println("Symbol -> " + symbol +  ", Dest -> " + dest +  ", Comp -> " + comp + ", Jump -> " + jump);  */
     }
 
     public static String commandType() {
@@ -97,6 +100,13 @@ public class Parser {
 
     public static String jump() {
         return jump;
+    }
+
+    public static void reset() {
+        symbol = "";
+        dest = "";
+        comp = "";
+        jump = "";
     }
 }
 

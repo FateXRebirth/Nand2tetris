@@ -1,7 +1,5 @@
-import java.util.List;
+import java.io.*;
 import java.util.ArrayList;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.Charset;
 
 public class Assembler {
     
@@ -17,19 +15,21 @@ public class Assembler {
         // set output filename
         String output = source.replace(".asm", ".hack");
         
-        // code without white-space and comments (pure)
+        // Store generated code 
         ArrayList<String> contents = new ArrayList<String>();
 
         // line number corresponds to code
         int lineCounter = 0;
 
+        // Parser for first-pass
         Parser firstPassParser = new Parser(source);
+        // SymbolTable
         SymbolTable symbolTable = new SymbolTable();
 
+        // first-pass
         while(firstPassParser.hasMoreCommands()) {
             firstPassParser.advance();
             String type = firstPassParser.commandType();
-            System.out.println(String.valueOf(lineCounter) + " " + type);
             if(type == "N_Command" || type == "L_Command") {
                 if(type == "L_Command") {
                     firstPassParser.handle();
@@ -41,27 +41,67 @@ public class Assembler {
             }
         }
 
-        if(args.length > 1) symbolTable.showSymbolTable();
+        // Parser for second-pass
+        Parser secondPassParser = new Parser(source);
+        // useful variable
+        String result = "";
+        String code = "";
+        String symbol = "";
+        String dest = "";
+        String comp = "";
+        String jump = "";
+        String zeros;
+        int times;
+
+        // second-pass
+        while(secondPassParser.hasMoreCommands()) {
+            secondPassParser.advance();
+            String type = secondPassParser.commandType();
+            secondPassParser.handle();
+            switch(type) {
+                case "A_Command":
+                    symbol = secondPassParser.symbol();
+                    if(symbol.matches("[0-9]*")) {
+                        result = Integer.toBinaryString(Integer.valueOf(symbol));
+                    } else {
+                        if(!symbolTable.contains(symbol)) symbolTable.addEntry("A_Command", symbol, 0);
+                        result = Integer.toBinaryString(symbolTable.GetAddress(symbol));
+                    }
+                    // complete the remaining zeros
+                    times = 15-result.length();
+                    zeros = "";
+                    for(int i = 0 ; i < times ; i++) {
+                        zeros+= "0";
+                    }
+                    code = "0" + zeros + result;
+                    break;
+                case "C_Command":
+                    comp = secondPassParser.comp();
+                    dest = secondPassParser.dest();
+                    jump = secondPassParser.jump();
+                    code = "111" + Code.Comp(comp) + Code.Dest(dest) + Code.Jump(jump);
+                    break;
+                default:
+                    break;
+            }
+            if(code != "") contents.add(code);
+            // reset
+            code = "";
+            secondPassParser.reset();
+        }
 
         // output to .hack file
-        // Charset utf8 = StandardCharsets.UTF_8;
-        // Files.write(Paths.get(output), contents, utf8);
-    }    
-
-    // complete the remaining zero
-    static String makeComplete(int length) {
-        int times = 15-length;
-        String zeros = "";
-        for(int i = 0 ; i < times ; i++) {
-            zeros+= "0";
+        try {
+            FileWriter fileWriter = new FileWriter(output);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            for(String content : contents) {
+                bufferedWriter.write(content);
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
-        return "0" + zeros;
-    }
-
-    // translate A instruction
-    /* result =  Integer.toBinaryString(table.get(label)); */
-    /* return makeComplete(result.length()) + result; */
-    /* result = Integer.toBinaryString(Integer.parseInt(label)); */
-    /* return makeComplete(result.length()) + result; */
+    }    
 }
 

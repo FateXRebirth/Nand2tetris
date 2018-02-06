@@ -1,6 +1,5 @@
 public class Code {
 
-    // handle destination
     public static String Dest(String dest) {
         String result = "";
         switch(dest) {
@@ -30,8 +29,7 @@ public class Code {
          }
          return result;
     }
-
-    // handle compute 
+    
     public static String Comp(String comp) {
         String result = "";
         switch(comp) {
@@ -134,7 +132,6 @@ public class Code {
         return result;
     }
 
-    // handle jump
     public static String Jump(String jump) {
         String result = "";
         switch(jump) {
