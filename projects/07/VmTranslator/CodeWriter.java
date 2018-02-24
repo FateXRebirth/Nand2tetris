@@ -6,93 +6,188 @@ public class CodeWriter {
 	public static class CodeGenerator {
 
 		public void Push_Command(String segment, int index) {
-			code.add("@"+ String.valueOf(index));
-			code.add("D=A");
-			code.add("@SP");
-			code.add("A=M");
-			code.add("M=D");
-			code.add("@SP");
-			code.add("M=M+1");
+			if ( (segment.equals("static")) || (segment.equals("constant"))
+				|| (segment.equals("temp")) || (segment.equals("pointer"))  ) {
+				
+				code.add("@" + String.valueOf(index));
+				code.add("D=A");
+				code.add("@SP");
+				code.add("A=M");
+				code.add("M=D");
+				code.add("@SP");
+				code.add("M=M+1");
+
+			} else if ( (segment.equals("local")) || (segment.equals("argument")) 
+				|| (segment.equals("this")) || (segment.equals("that"))) {
+				
+				switch(segment) {
+					case "local":
+						code.add("@LCL");
+						break;
+					case "argument":
+						code.add("@ARG");
+						break;
+					case "this":
+						code.add("@THIS");
+						break;
+					case "that":
+						code.add("@THAT");
+						break;
+					default:
+						System.out.println("Push_Command Error");
+						break;
+				}
+				code.add("D=M");
+				code.add("@" + String.valueOf(index));
+				code.add("A=D+A");
+				code.add("D=M");
+				code.add("@SP");
+				code.add("A=M");
+				code.add("M=D");
+				code.add("@SP");
+				code.add("M=M+1");
+			} 		
 		}
 
 		public void Pop_Command(String segment, int index) {
-			code.add("@SP");
-			code.add("M=M-1");
-			code.add("@SP");
-			code.add("A=M");
-			code.add("D=M");
-			code.add("M=0");
-			code.add("@"+ String.valueOf(index));
-			code.add("M=D");
+			if ( (segment.equals("static")) || (segment.equals("constant"))
+				|| (segment.equals("temp")) || (segment.equals("pointer"))  ) {
+				
+				code.add("@SP");
+				code.add("AM=M-1");
+				code.add("D=M");
+				code.add("@"+ String.valueOf(index));
+				code.add("M=D");
+
+			} else if ( (segment.equals("local")) || (segment.equals("argument")) 
+				|| (segment.equals("this")) || (segment.equals("that"))) {
+
+				switch(segment) {
+					case "local":
+						code.add("@LCL");
+						break;
+					case "argument":
+						code.add("@ARG");
+						break;
+					case "this":
+						code.add("@THIS");
+						break;
+					case "that":
+						code.add("@THAT");
+						break;
+					default:
+						System.out.println("Push_Command Error");
+						break;
+				}
+				code.add("D=M");
+				code.add("@"+ String.valueOf(index));
+				code.add("D=D+A");
+				code.add("@R13");
+				code.add("M=D");
+				code.add("@SP");
+				code.add("AM=M-1");
+				code.add("D=M");
+				code.add("@R13");
+				code.add("A=M");
+				code.add("M=D");
+			}
 		}
 
 		public void Add_Sub_And_Or_Command(String type) {
 			code.add("@SP");
-			code.add("M=M-1");
-			code.add("@SP");
-			code.add("A=M");
+			code.add("AM=M-1");
 			code.add("D=M");
-			code.add("@SP");
-			code.add("M=M-1");
-			code.add("@SP");
-			code.add("A=M");
-			code.add("A=M");
+			code.add("A=A-1");
 			switch(type) {
 				case "Add":
-					code.add("D=A+D");
+					code.add("M=M+D");
 					break;
 				case "Sub":
-					code.add("D=A-D");
+					code.add("M=M-D");
 					break;
 				case "And":
-					code.add("D=D&A");
+					code.add("M=M&D");
 					break;
 				case "Or":
-					code.add("D=D|A");
+					code.add("M=M|D");
 					break;
 				default:
 					System.out.println("Add_Sub_And_Or_Command Error");
 					break;
 			}
-			code.add("@SP");
-			code.add("A=M");
-			code.add("M=D");
-			code.add("@SP");
-			code.add("M=M+1");
 		}
 
 		public void Neg_Not_Command(String type) {
 			code.add("@SP");
-			code.add("M=M-1");
-			code.add("@SP");
-			code.add("A=M");
-			code.add("D=M");
+			code.add("A=M-1");
 			switch(type) {
 				case "Not":
-					code.add("D=!D");
+					code.add("M=!M");
 					break;
 				case "Neg":
-					code.add("D=-D");
+					code.add("M=-M");
 					break;
 				default:
 					System.out.println("Neg_Not_Command Error");
 					break;
 			}
-			code.add("@SP");
-			code.add("A=M");
-			code.add("M=D");
-			code.add("@SP");
-			code.add("M=M+1");
 		}
 
 		public void Compare_Command(String type) {
+			code.add("@SP");
+			code.add("AM=M-1");
+			code.add("D=M");
+			code.add("A=A-1");
+			code.add("D=M-D");
+			code.add(CreateFalseStart(labelCounter));
+			switch(type) {
+				case "Eq":
+					code.add("D;JNE");
+					break;
+				case "Gt":
+					code.add("D;JLE");
+					break;
+				case "Lt":
+					code.add("D;JGE");
+					break;
+				default:
+					System.out.println("Compare_Command Error");
+					break;
+			}
+			code.add("@SP");
+			code.add("A=M-1");
+			code.add("M=-1");
+			code.add(CreateContinueStart(labelCounter));
+			code.add("0;JMP");
+			code.add(CreateFalseEnd(labelCounter));
+			code.add("@SP");
+			code.add("A=M-1");
+			code.add("M=0");
+			code.add(CreateContinueEnd(labelCounter));
+			labelCounter = labelCounter + 1;
+		}
 
+		public String CreateFalseStart(int index) {
+			return "@" + "FALSE" + String.valueOf(index);
+		}
+
+		public String CreateFalseEnd(int index) {
+			return "(" + "FALSE" + String.valueOf(index) + ")";
+		}
+
+		public String CreateContinueStart(int index) {
+			return "@" + "CONTINUE" + String.valueOf(index);
+		}
+
+		public String CreateContinueEnd(int index) {
+			return "(" + "CONTINUE" + String.valueOf(index) + ")";
 		}
 	}
 
 	private static CodeGenerator codeGenerator;
 	private static FileWriter fileWriter;
 	private static BufferedWriter bufferWriter;
+	private static int labelCounter;
 
 	// Store generated code 
     private static ArrayList<String> code;
@@ -102,6 +197,7 @@ public class CodeWriter {
 		try {
 			codeGenerator = new CodeGenerator();
 			code = new ArrayList<String>();
+			labelCounter = 0;
             fileWriter = new FileWriter(output);
             bufferWriter = new BufferedWriter(fileWriter);          
         } catch (IOException ex) {
@@ -109,7 +205,7 @@ public class CodeWriter {
         }
 	}
 
-	public static void writeArithmetic(String command) {
+	public static void WriteArithmetic(String command) {
 		switch(command) {
 			case "add":
 				codeGenerator.Add_Sub_And_Or_Command("Add");
@@ -139,13 +235,13 @@ public class CodeWriter {
 				codeGenerator.Neg_Not_Command("Not");
 				break;
 			default:
-				System.out.println("writeArithmetic Error");
+				System.out.println("WriteArithmetic Error");
 				break;
 		}
-		write();
+		Write();
 	}
 
-	public static void writePushPop(String command, String segment, int index) {
+	public static void WritePushPop(String command, String segment, int index) {
 		switch(command) {
 			case "push":
 				codeGenerator.Push_Command(segment, index);
@@ -154,13 +250,13 @@ public class CodeWriter {
 				codeGenerator.Pop_Command(segment, index);
 				break;
 			default:
-				System.out.println("writePushPop Error");
+				System.out.println("WritePushPop Error");
 				break;
 		}
-		write();
+		Write();
 	}
 
-	public static void write() {
+	public static void Write() {
 		try {
 			for(String content : code) {
 				bufferWriter.write(content);
@@ -172,10 +268,24 @@ public class CodeWriter {
 		code.clear();
 	}
 
-	public static void close() {
+	public static void Close() {
 		try {
+			labelCounter = 0;
 			bufferWriter.close();
 			fileWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// Debugger 
+	public static void PrintOutCommand(String command) {
+		try {
+			bufferWriter.newLine();
+			bufferWriter.write("--------");
+			bufferWriter.write(command);
+			bufferWriter.write("--------");
+			bufferWriter.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
