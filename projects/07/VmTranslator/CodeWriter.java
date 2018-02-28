@@ -189,7 +189,6 @@ public class CodeWriter {
 	private static BufferedWriter bufferWriter;
 	private static int labelCounter;
 
-	// Store generated code 
     private static ArrayList<String> code;
 	
 
