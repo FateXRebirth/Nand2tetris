@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.ArrayList;
 
-public class VmTranslator2 {
+public class VmTranslator {
 
     public static void main(String[] args) {
         
@@ -26,7 +26,13 @@ public class VmTranslator2 {
             }
             files.add(fileIn);
             fileOutPath = fileIn.getAbsolutePath().substring(0, fileIn.getAbsolutePath().lastIndexOf(".")) + ".asm";
-        } 
+        } else if( fileIn.isDirectory() ) {
+            files = GetFiles(fileIn);
+            if( files.size() == 0 ) {
+                throw new IllegalArgumentException("No vm file in this directory!");
+            }
+            fileOutPath = fileIn.getAbsolutePath() + "/" +  fileIn.getName() + ".asm";
+        }
 
         fileOut = new File(fileOutPath);
         CodeWriter codewriter = new CodeWriter(fileOut);
@@ -62,4 +68,14 @@ public class VmTranslator2 {
         }
     }
 
+    public static ArrayList<File> GetFiles(File dir){
+        File[] files = dir.listFiles();
+        ArrayList<File> result = new ArrayList<File>();
+        for ( File file : files ){
+            if ( file.getName().endsWith(".vm") ){
+                result.add(file);
+            }
+        }
+        return result;
+    }
 }
