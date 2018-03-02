@@ -238,7 +238,7 @@ public class CodeWriter {
     private static ArrayList<String> code;
 	
 
-	public CodeWriter(String output) {
+	public CodeWriter(File output) {
 		try {
 			codeGenerator = new CodeGenerator();
 			code = new ArrayList<String>();

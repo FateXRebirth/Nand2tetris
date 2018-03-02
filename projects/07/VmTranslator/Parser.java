@@ -10,7 +10,7 @@ public class Parser {
     private static String arg1;
     private static int arg2;
 
-    public Parser(String input) {
+    public Parser(File input) {
         try {
             fileReader = new FileReader(input);
             bufferReader = new BufferedReader(fileReader);
@@ -84,7 +84,7 @@ public class Parser {
     }
 
     public static void Handle() {
-      String[] lex = currentCommand.split(" ");
+      String[] lex = removeComment(currentCommand).split(" ");
       if(lex.length == 1) {
         type = lex[0];
       } else if (lex.length == 2) {
@@ -95,6 +95,13 @@ public class Parser {
         arg1 = lex[1];
         arg2 = Integer.valueOf(lex[2]);
       }
+    }
+
+    public static String removeComment(String input) {
+        if(input.indexOf("/") != -1) {
+            return input.substring(0, input.indexOf("/"));    
+        }
+        return input;
     }
 
     // Debugger 
