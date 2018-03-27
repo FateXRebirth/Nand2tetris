@@ -216,7 +216,7 @@ public class CodeWriter {
 
 
 		public void Label_Command(String label) {
-			code.add("(" + label + ")");
+			code.add("(" + GetFileName() + "$" + label + ")");
 		}
 
 		public void If_Goto_Command(String label) {
@@ -224,12 +224,12 @@ public class CodeWriter {
 			code.add("AM=M-1");
 			code.add("D=M");
 			code.add("A=A-1");
-			code.add("@" + label);
+			code.add("@" + GetFileName() + "$" + label);
 			code.add("D;JNE");
 		}
 
 		public void Goto_Command(String label) {
-			code.add("@" + label);
+			code.add("@" + GetFileName() + "$" + label);
 			code.add("0;JMP");
 		}
 
@@ -255,6 +255,7 @@ public class CodeWriter {
 	private static FileWriter fileWriter;
 	private static BufferedWriter bufferWriter;
 	private static int labelCounter;
+	private static String fileName;
 	private static ArrayList<String> code;
 	
 
@@ -263,11 +264,23 @@ public class CodeWriter {
 			codeGenerator = new CodeGenerator();
 			code = new ArrayList<String>();
 			labelCounter = 0;
+			fileName = "";
             fileWriter = new FileWriter(output);
             bufferWriter = new BufferedWriter(fileWriter);          
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+	}
+
+	public static void SetFileName(String name) {
+		fileName = name;
+		if(name.indexOf(".vm") != -1) {
+			fileName = name.substring(0, name.indexOf(".vm"));
+		}
+	}
+
+	public static String GetFileName() {
+		return fileName;
 	}
 
 	public static void WriteArithmetic(String command) {

@@ -39,6 +39,7 @@ public class VmTranslator {
         
         for( File file : files ) {
             Parser parser = new Parser(file);
+            codewriter.SetFileName(file.getName());
             while(parser.HasMoreCommands()) {
                 parser.Advance();
                 String type = parser.CommandType();
