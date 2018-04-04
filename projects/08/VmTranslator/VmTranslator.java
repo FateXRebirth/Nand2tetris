@@ -62,6 +62,15 @@ public class VmTranslator {
                         case "C_IF":
                             codewriter.WriteIf(parser.Arg1());
                             break;
+                        case "C_FUNCTION":
+                            codewriter.WriteFunction(parser.Arg1(), parser.Arg2());
+                            break;
+                        case "C_RETURN":
+                            codewriter.WriteReturn();
+                            break;
+                        case "C_CALL":
+                            codewriter.WriteCall(parser.Arg1(), parser.Arg2());
+                            break;
                         case "C_ARITHMETIC":
                             codewriter.WriteArithmetic(parser.Type());
                             break;
@@ -72,7 +81,7 @@ public class VmTranslator {
                 }
             }
         }
-            
+        
         codewriter.Close();
     }
 
