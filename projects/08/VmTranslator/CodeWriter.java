@@ -233,6 +233,85 @@ public class CodeWriter {
 			code.add("0;JMP");
 		}
 
+		public void Call_Command(String functionName, int Args) {
+			
+		}
+
+		public void Function_Command(String functionName, int locals) {
+			code.add("(" + functionName + ")");
+			for(int i = 0 ; i < locals ; i++) {
+				code.add("@0");
+				code.add("D=A");
+				code.add("@SP");
+				code.add("A=M");
+				code.add("M=D");
+				code.add("@SP");
+				code.add("M=M+1");
+			}
+		}
+
+		public void Return_Command() {
+			// frame = LCL
+			code.add("@LCL");
+			code.add("D=M");
+			code.add("@R14");
+			code.add("M=D");
+			// retAddr = *(frame - 5)
+			code.add("@5");
+			code.add("A=D-A");
+			code.add("D=M");
+			code.add("@R15");
+			code.add("M=D");
+			// *ARG = pop
+			code.add("@SP");
+			code.add("AM=M-1");
+			code.add("D=M");
+			code.add("@ARG");
+			code.add("A=M");
+			code.add("M=D");
+			// SP = ARG + 1
+			code.add("@ARG");
+			code.add("D=M+1");
+			code.add("@SP");
+			code.add("M=D");
+			// THAT = *(frame - 1)
+			code.add("@R14");
+			code.add("D=M");
+			code.add("@1");
+			code.add("A=D-A");
+			code.add("D=M");
+			code.add("@THAT");
+			code.add("M=D");
+			// THIS = *(frame - 2)
+			code.add("@R14");
+			code.add("D=M");
+			code.add("@2");
+			code.add("A=D-A");
+			code.add("D=M");
+			code.add("@THIS");
+			code.add("M=D");
+			// ARG = *(frame - 3)
+			code.add("@R14");
+			code.add("D=M");
+			code.add("@3");
+			code.add("A=D-A");
+			code.add("D=M");
+			code.add("@ARG");
+			code.add("M=D");
+			// LCL = *(frame - 4)
+			code.add("@R14");
+			code.add("D=M");
+			code.add("@4");
+			code.add("A=D-A");
+			code.add("D=M");
+			code.add("@LCL");
+			code.add("M=D");
+			// goto retAddr
+			code.add("@R14");
+			code.add("A=M");
+			code.add("0;JMP");
+		}
+
 		public String CreateFalseStart(int index) {
 			return "@" + "FALSE" + String.valueOf(index);
 		}
@@ -350,6 +429,21 @@ public class CodeWriter {
 
 	public static void WriteIf(String label) {
 		codeGenerator.If_Goto_Command(label);
+		Write();
+	}
+	
+	public static void WriteCall(String functionName, int Args) {
+		codeGenerator.Call_Command(functionName, Args);
+		Write();
+	}
+
+	public static void WriteReturn() {
+		codeGenerator.Return_Command();
+		Write();
+	}
+
+	public static void WriteFunction(String functionName, int locals) {
+		codeGenerator.Function_Command(functionName, locals);
 		Write();
 	}
 
