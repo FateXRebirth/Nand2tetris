@@ -234,7 +234,64 @@ public class CodeWriter {
 		}
 
 		public void Call_Command(String functionName, int Args) {
-			
+			// push return Address
+			code.add("@" + functionName + "$RET");
+			code.add("D=A");
+			code.add("@SP");
+			code.add("A=M");
+			code.add("M=D");
+			code.add("@SP");
+			code.add("M=M+1");
+			// push LCL
+			code.add("@LCL");
+			code.add("D=M");
+			code.add("@SP");
+			code.add("A=M");
+			code.add("M=D");
+			code.add("@SP");
+			code.add("M=M+1");
+			// push ARG
+			code.add("@ARG");
+			code.add("D=M");
+			code.add("@SP");
+			code.add("A=M");
+			code.add("M=D");
+			code.add("@SP");
+			code.add("M=M+1");
+			// push THIS
+			code.add("@THIS");
+			code.add("D=M");
+			code.add("@SP");
+			code.add("A=M");
+			code.add("M=D");
+			code.add("@SP");
+			code.add("M=M+1");
+			// push THAT
+			code.add("@THAT");
+			code.add("D=M");
+			code.add("@SP");
+			code.add("A=M");
+			code.add("M=D");
+			code.add("@SP");
+			code.add("M=M+1");
+			// ARG = SP-nArgs-5
+			code.add("@SP");
+			code.add("D=M");
+			int count = 5 + Args;
+			code.add("@" + String.valueOf(count));
+			code.add("D=D-A");
+			code.add("@ARG");
+			code.add("M=D");
+			// LCL = SP
+			code.add("@SP");
+			code.add("D=M");
+			code.add("@LCL");
+			code.add("M=D");
+			// goto function
+			code.add("@" + functionName);
+			code.add("0;JMP");
+			// return Address
+			code.add("(" + functionName + "$RET" + ")");
 		}
 
 		public void Function_Command(String functionName, int locals) {
