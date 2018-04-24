@@ -290,7 +290,7 @@ public class CodeWriter {
 			// goto function
 			code.add("@" + functionName);
 			code.add("0;JMP");
-			// return Address
+			// resturn Address
 			code.add("(" + functionName + "$RET" + ")");
 		}
 
@@ -471,7 +471,67 @@ public class CodeWriter {
 	}
 
 	public static void WriteInit() {
-
+		code.add("@256");
+		code.add("D=A");
+		code.add("@SP");
+		code.add("M=D");
+		code.add("@Sys.init$RET");
+		code.add("D=A");
+		code.add("@SP");
+		code.add("A=M");
+		code.add("M=D");
+		code.add("@SP");
+		code.add("M=M+1");
+		// push LCL
+		code.add("@LCL");
+		code.add("D=M");
+		code.add("@SP");
+		code.add("A=M");
+		code.add("M=D");
+		code.add("@SP");
+		code.add("M=M+1");
+		// push ARG
+		code.add("@ARG");
+		code.add("D=M");
+		code.add("@SP");
+		code.add("A=M");
+		code.add("M=D");
+		code.add("@SP");
+		code.add("M=M+1");
+		// push THIS
+		code.add("@THIS");
+		code.add("D=M");
+		code.add("@SP");
+		code.add("A=M");
+		code.add("M=D");
+		code.add("@SP");
+		code.add("M=M+1");
+		// push THAT
+		code.add("@THAT");
+		code.add("D=M");
+		code.add("@SP");
+		code.add("A=M");
+		code.add("M=D");
+		code.add("@SP");
+		code.add("M=M+1");
+		// ARG = SP-5
+		code.add("@SP");
+		code.add("D=M");
+		code.add("@5");
+		code.add("D=D-A");
+		code.add("@ARG");
+		code.add("M=D");
+		// LCL = SP
+		code.add("@SP");
+		code.add("D=M");
+		code.add("@LCL");
+		code.add("M=D");
+		// goto Sys.init
+		code.add("@Sys.init");
+		code.add("0;JMP");
+		// return Sys.init
+		code.add("(Sys.init$RET)");
+		Write();
 	}
 
 	public static void WriteLabel(String label) {
