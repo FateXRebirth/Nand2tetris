@@ -186,7 +186,7 @@ public class CodeWriter {
 			code.add("D=M");
 			code.add("A=A-1");
 			code.add("D=M-D");
-			code.add(CreateFalseStart(labelCounter));
+			code.add(CreateFalseStart(compareCounter));
 			switch(type) {
 				case "Eq":
 					code.add("D;JNE");
@@ -204,14 +204,14 @@ public class CodeWriter {
 			code.add("@SP");
 			code.add("A=M-1");
 			code.add("M=-1");
-			code.add(CreateContinueStart(labelCounter));
+			code.add(CreateContinueStart(compareCounter));
 			code.add("0;JMP");
-			code.add(CreateFalseEnd(labelCounter));
+			code.add(CreateFalseEnd(compareCounter));
 			code.add("@SP");
 			code.add("A=M-1");
 			code.add("M=0");
-			code.add(CreateContinueEnd(labelCounter));
-			labelCounter = labelCounter + 1;
+			code.add(CreateContinueEnd(compareCounter));
+			compareCounter = compareCounter + 1;
 		}
 
 
@@ -223,7 +223,6 @@ public class CodeWriter {
 			code.add("@SP");
 			code.add("AM=M-1");
 			code.add("D=M");
-			code.add("A=A-1");
 			code.add("@" + GetFileName() + "$" + label);
 			code.add("D;JNE");
 		}
@@ -235,7 +234,7 @@ public class CodeWriter {
 
 		public void Call_Command(String functionName, int Args) {
 			// push return Address
-			code.add("@" + functionName + "$RET");
+			code.add("@" + functionName + "$RET" + String.valueOf(jumpCounter));
 			code.add("D=A");
 			code.add("@SP");
 			code.add("A=M");
@@ -290,8 +289,9 @@ public class CodeWriter {
 			// goto function
 			code.add("@" + functionName);
 			code.add("0;JMP");
-			// resturn Address
-			code.add("(" + functionName + "$RET" + ")");
+			// return Address
+			code.add("(" + functionName + "$RET" + String.valueOf(jumpCounter) + ")");
+			jumpCounter = jumpCounter + 1;
 		}
 
 		public void Function_Command(String functionName, int locals) {
@@ -308,63 +308,63 @@ public class CodeWriter {
 		}
 
 		public void Return_Command() {
-			// frame = LCL
+			// // frame = LCL
 			code.add("@LCL");
 			code.add("D=M");
-			code.add("@R14");
+			code.add("@FRAME");
 			code.add("M=D");
 			// retAddr = *(frame - 5)
 			code.add("@5");
 			code.add("A=D-A");
 			code.add("D=M");
-			code.add("@R15");
+			code.add("@RET");
 			code.add("M=D");
 			// *ARG = pop
+			code.add("@ARG");
+			code.add("D=M");
+			code.add("@R13");
+			code.add("M=D");
 			code.add("@SP");
 			code.add("AM=M-1");
 			code.add("D=M");
-			code.add("@ARG");
+			code.add("@R13");
 			code.add("A=M");
 			code.add("M=D");
 			// SP = ARG + 1
 			code.add("@ARG");
-			code.add("D=M+1");
-			code.add("@SP");
-			code.add("M=D");
-			// THAT = *(frame - 1)
-			code.add("@R14");
 			code.add("D=M");
-			code.add("@1");
-			code.add("A=D-A");
+			code.add("@SP");
+			code.add("M=D+1");
+			// THAT = *(frame - 1)
+			code.add("@FRAME");
+			code.add("D=M-1");
+			code.add("AM=D");
 			code.add("D=M");
 			code.add("@THAT");
 			code.add("M=D");
 			// THIS = *(frame - 2)
-			code.add("@R14");
-			code.add("D=M");
-			code.add("@2");
-			code.add("A=D-A");
+			code.add("@FRAME");
+			code.add("D=M-1");
+			code.add("AM=D");
 			code.add("D=M");
 			code.add("@THIS");
 			code.add("M=D");
 			// ARG = *(frame - 3)
-			code.add("@R14");
-			code.add("D=M");
-			code.add("@3");
-			code.add("A=D-A");
+			code.add("@FRAME");
+			code.add("D=M-1");
+			code.add("AM=D");
 			code.add("D=M");
 			code.add("@ARG");
 			code.add("M=D");
 			// LCL = *(frame - 4)
-			code.add("@R14");
-			code.add("D=M");
-			code.add("@4");
-			code.add("A=D-A");
+			code.add("@FRAME");
+			code.add("D=M-1");
+			code.add("AM=D");
 			code.add("D=M");
 			code.add("@LCL");
 			code.add("M=D");
 			// goto retAddr
-			code.add("@R14");
+			code.add("@RET");
 			code.add("A=M");
 			code.add("0;JMP");
 		}
@@ -390,7 +390,8 @@ public class CodeWriter {
 	private static CodeGenerator codeGenerator;
 	private static FileWriter fileWriter;
 	private static BufferedWriter bufferWriter;
-	private static int labelCounter;
+	private static int compareCounter;
+	private static int jumpCounter;
 	private static String fileName;
 	private static ArrayList<String> code;
 	
@@ -399,7 +400,8 @@ public class CodeWriter {
 		try {
 			codeGenerator = new CodeGenerator();
 			code = new ArrayList<String>();
-			labelCounter = 0;
+			compareCounter = 0;
+			jumpCounter = 0;
 			fileName = "";
             fileWriter = new FileWriter(output);
             bufferWriter = new BufferedWriter(fileWriter);          
@@ -578,7 +580,8 @@ public class CodeWriter {
 
 	public static void Close() {
 		try {
-			labelCounter = 0;
+			compareCounter = 0;
+			jumpCounter = 0;
 			bufferWriter.close();
 			fileWriter.close();
 		} catch (IOException e) {
