@@ -36,6 +36,12 @@ public class VmTranslator {
 
         fileOut = new File(fileOutPath);
         CodeWriter codewriter = new CodeWriter(fileOut);
+
+        for( File file : files ) {
+            if(file.getName().equals("Sys.vm")) {
+                codewriter.WriteInit();
+            }
+        }
         
         for( File file : files ) {
             Parser parser = new Parser(file);
@@ -89,7 +95,7 @@ public class VmTranslator {
         int index = fileName.lastIndexOf('.');
         if (index != -1 ){
             return fileName.substring(index);
-        }else {
+        } else {
             return "";
         }
     }
