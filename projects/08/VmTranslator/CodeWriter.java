@@ -1,5 +1,5 @@
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
 
 public class CodeWriter {
 
@@ -11,7 +11,7 @@ public class CodeWriter {
 				
 				switch(segment) {
 					case "static":
-						code.add("@" + String.valueOf( 16 + index));
+						code.add("@" + GetFileName() + "$" + String.valueOf(index));
 						code.add("D=M");
 						break;
 					case "constant":
@@ -19,10 +19,7 @@ public class CodeWriter {
 						code.add("D=A");
 						break;
 					case "temp":
-						code.add("@R5");
-						code.add("D=M");
-						code.add("@" + String.valueOf( 5 + index));
-						code.add("A=D+A");
+						code.add("@R" + String.valueOf( 5 + index ));
 						code.add("D=M");
 						break;
 					case "pointer":
@@ -74,21 +71,15 @@ public class CodeWriter {
 
 		public void Pop_Command(String segment, int index) {
 			if ( (segment.equals("static")) || (segment.equals("constant"))
-				|| (segment.equals("temp")) || (segment.equals("pointer"))  ) {
+				|| (segment.equals("pointer"))  ) {
 				
 				switch(segment) {
 					case "static":
-						code.add("@" + String.valueOf(16 + index));
+						code.add("@" + GetFileName() + "$" + String.valueOf(index));
 						code.add("D=A");
 						break;
 					case "constant":
 						System.out.println("Shouldn't have this case");
-						break;
-					case "temp":
-						code.add("@R5");
-						code.add("D=M");
-						code.add("@" + String.valueOf( 5 + index));
-						code.add("D=D+A");
 						break;
 					case "pointer":
 						if (index == 0) {
@@ -102,6 +93,15 @@ public class CodeWriter {
 						System.out.println("Push_Command Error");
 						break;
 				}
+
+				code.add("@R13");
+				code.add("M=D");
+				code.add("@SP");
+				code.add("AM=M-1");
+				code.add("D=M");
+				code.add("@R13");
+				code.add("A=M");
+				code.add("M=D");
 				
 
 			} else if ( (segment.equals("local")) || (segment.equals("argument")) 
@@ -128,16 +128,24 @@ public class CodeWriter {
 				code.add("D=M");
 				code.add("@"+ String.valueOf(index));
 				code.add("D=D+A");
+
+				code.add("@R13");
+				code.add("M=D");
+				code.add("@SP");
+				code.add("AM=M-1");
+				code.add("D=M");
+				code.add("@R13");
+				code.add("A=M");
+				code.add("M=D");
+
+			} else {
+				code.add("@SP");
+				code.add("AM=M-1");
+				code.add("D=M");
+				code.add("@R" + String.valueOf( 5 + index ));
+				code.add("M=D");
 			}
 
-			code.add("@R13");
-			code.add("M=D");
-			code.add("@SP");
-			code.add("AM=M-1");
-			code.add("D=M");
-			code.add("@R13");
-			code.add("A=M");
-			code.add("M=D");
 		}
 
 		public void Add_Sub_And_Or_Command(String type) {
