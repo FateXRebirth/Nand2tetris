@@ -1,0 +1,7 @@
+class Main {
+	function void main() {
+  		var Stack stack;
+      	let stack = Stack.new(5);
+      	return;
+   }
+}

@@ -1,0 +1,71 @@
+class Stack {
+	
+	field int index;
+	field int size;
+	field Array Stack;
+
+	constructor Stack new(int length) {
+		let index = 0;
+        let size = length;
+        let Stack = Array.new(length);
+        do init();
+        return this;
+    }
+
+    method void init() {
+        var int i;	
+    	do Output.printString("Initialization...");
+    	let i = 0;
+    	do Output.printString("[");
+    	while ( ~(i = size) ) {
+    		do Output.printInt(i);
+    		let Stack[i] = 0;
+    		let i = i + 1;
+    		do Output.printString(", ");
+    	}
+    	do Output.printString("]");
+    	return;
+    }
+
+    method void push(int value) {
+    	if ((index+1 = size)) {
+            do Output.printString("Stack is full");
+        } else {
+        	let Stack[index] = value;
+        	let index = index + 1;
+        }
+    	return;
+    }
+
+    method int pop() {
+    	var int temp;
+    	if ((index-1 = -1)) {
+            do Output.printString("There is nothing left");
+        } else {
+        	let temp = Stack[index];
+        	let Stack[index] = 0;
+        	let index = index - 1;
+        }
+        return temp;
+    }
+
+    method void list() {
+    	var int i;
+    	let i = 0;
+    	do Output.printString("[");
+    	while ( ~(i = size) ) {
+    		do Output.printInt(Stack[i]);
+    		let i = i + 1;
+    		do Output.printString(", ");
+    	}
+    	do Output.printString("]");
+    	return;
+    }
+
+    method void dispose() {
+        do Stack.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+}
