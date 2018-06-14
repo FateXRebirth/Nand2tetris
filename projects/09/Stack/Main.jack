@@ -1,7 +1,29 @@
 class Main {
-	function void main() {
-  		var Stack stack;
-      	let stack = Stack.new(5);
-      	return;
+   function void main() {
+ 		var int	i;
+	  	var Stack stack;
+
+
+   		do Output.printString("Create a new Stack with size 5");  
+   		do Output.println();
+		let stack = Stack.new(5);
+
+		let i = 1;
+		while( ~(i = 7) ) {
+			do Output.printString("Push ");
+			do Output.printInt(i);
+			do Output.printString("   ");
+			do stack.push(i);
+			let i = i + 1;
+		}	
+
+		let i = 0;
+		while( ~(i = 6) ) {
+			do Output.printString("pop...   ");
+			do stack.pop();
+			let i = i + 1;
+		}	
+
+		return;
    }
 }

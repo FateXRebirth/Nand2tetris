@@ -15,24 +15,25 @@ class Stack {
     method void init() {
         var int i;	
     	do Output.printString("Initialization...");
+        do Output.println();
     	let i = 0;
-    	do Output.printString("[");
     	while ( ~(i = size) ) {
-    		do Output.printInt(i);
     		let Stack[i] = 0;
     		let i = i + 1;
-    		do Output.printString(", ");
     	}
-    	do Output.printString("]");
+        do list();
+        do Output.println();
     	return;
     }
 
     method void push(int value) {
-    	if ((index+1 = size)) {
+    	if ((index = size)) {
             do Output.printString("Stack is full");
+            do Output.println();
         } else {
         	let Stack[index] = value;
         	let index = index + 1;
+            do list();
         }
     	return;
     }
@@ -41,10 +42,12 @@ class Stack {
     	var int temp;
     	if ((index-1 = -1)) {
             do Output.printString("There is nothing left");
+            do Output.println();        
         } else {
+            let index = index - 1;
         	let temp = Stack[index];
         	let Stack[index] = 0;
-        	let index = index - 1;
+            do list();
         }
         return temp;
     }
@@ -52,13 +55,14 @@ class Stack {
     method void list() {
     	var int i;
     	let i = 0;
-    	do Output.printString("[");
+    	do Output.printString("Stack -> [ ");
     	while ( ~(i = size) ) {
     		do Output.printInt(Stack[i]);
     		let i = i + 1;
-    		do Output.printString(", ");
+    		do Output.printString(" ");
     	}
     	do Output.printString("]");
+        do Output.println();
     	return;
     }
 
