@@ -1,8 +1,10 @@
 class Main {
    function void main() {
  		var int	i;
+ 		var int size;
+ 		var int number;
+ 		var int action;
 	  	var Stack stack;
-
 
    		do Output.printString("Create a new Stack with size 5");  
    		do Output.println();
@@ -16,6 +18,7 @@ class Main {
 			do stack.push(i);
 			let i = i + 1;
 		}	
+		do Output.println();
 
 		let i = 0;
 		while( ~(i = 6) ) {
@@ -24,6 +27,79 @@ class Main {
 			let i = i + 1;
 		}	
 
-		return;
+		do stack.dispose();
+		do Output.println();
+
+		do Output.printString("You want to create your own stack ? 1. Yes 2. No");
+		do Output.println();
+		let action = Keyboard.readInt("Choose : ");
+	
+		if(action = 1) {
+			do Screen.clearScreen();
+			do Output.moveCursor(0, 0);
+			let size = Keyboard.readInt("Type a size of Stack : ");  
+			let stack = Stack.new(size);
+
+	   		do Output.println();
+		
+			do Output.println();
+			do Output.printString("You can do the following action : ");
+			do Output.println();
+			do Output.printString("0. Exit 1. Push 2. Pop 3. Show 4. Reset");
+			do Output.println();
+			let action = Keyboard.readInt("What are you going to do ? (type number): ");
+			do Output.println();
+
+			while(~(action = 0)) {
+				do Screen.clearScreen();
+				do Output.moveCursor(0, 0);
+				do Output.printString("You choose : ");
+				do Output.printInt(action);	
+				do Output.println();
+
+				if( action = 1) {
+					let number = Keyboard.readInt("Type a number you want to push : ");
+					do stack.push(number);
+				} else {
+					if ( action = 2 ) {
+						let number = stack.pop();
+						if( ~(number = 0)) {
+							do Output.printString("Result : ");
+							do Output.printInt(number);
+							do Output.println();
+						}
+					} else {
+						if ( action = 3 ) {
+							do stack.list();
+						} 
+						else {
+							do stack.dispose();
+							do Screen.clearScreen();
+							do Output.moveCursor(0, 0);
+							let size = Keyboard.readInt("Type a size of Stack : ");  
+							let stack = Stack.new(size);
+						}
+					}
+				} 
+				do Output.println();
+				do Output.println();
+				do Output.printString("You can do the following action : ");
+				do Output.println();
+				do Output.printString("0. Exit 1. Push 2. Pop 3. Show 4. Reset");
+				do Output.println();
+				let action = Keyboard.readInt("What are you going to do ? (type number): ");
+			}
+
+			do stack.dispose();
+			do Output.println();
+			do Output.printString("GoodBye!");
+			return;
+			
+		} else {
+			do Output.println();
+			do Output.printString("GoodBye!");
+			return;
+		}
+		
    }
 }
