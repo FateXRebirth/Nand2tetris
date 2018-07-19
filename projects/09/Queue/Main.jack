@@ -1,0 +1,7 @@
+class Main {
+	function void main() {
+  		var Queue queue;
+  		let queue = Queue.new(5);
+    	return;
+  	}
+}

@@ -1,0 +1,49 @@
+class Queue {
+	field int size;
+	field int first;
+	field int rear;
+	field Array Queue;
+	
+	constructor Queue new(int length) {
+		let first = 0;
+		let rear = 0;
+        let size = length;
+        let Queue = Array.new(length);
+        do init();
+        return this;
+    }
+
+    method void init() {
+        var int i;	
+    	do Output.printString("Initialization...");
+        do Output.println();
+    	let i = 0;
+    	while ( ~(i = size) ) {
+    		let Queue[i] = 0;
+    		let i = i + 1;
+    	}
+        do list();
+        do Output.println();
+    	return;
+    }
+
+    method void list() {
+    	var int i;
+    	let i = 0;
+    	do Output.printString("Queue -> [ ");
+    	while ( ~(i = size) ) {
+    		do Output.printInt(Queue[i]);
+    		let i = i + 1;
+    		do Output.printString(" ");
+    	}
+    	do Output.printString("]");
+        do Output.println();
+    	return;
+    }
+
+    method void dispose() {
+        do Queue.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+}
