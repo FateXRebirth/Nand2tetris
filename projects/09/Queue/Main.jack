@@ -1,7 +1,18 @@
 class Main {
-	function void main() {
-  		var Queue queue;
-  		let queue = Queue.new(5);
-    	return;
-  	}
+    function void main() {
+      	var Queue queue;
+      	let queue = Queue.new(4);
+      	do queue.add(1);
+      	do queue.add(2);
+      	do queue.remove();
+      	do queue.add(3);
+      	do queue.add(3);
+      	do queue.remove();
+      	do queue.remove();	
+      	do queue.remove();
+      	do queue.remove();
+      	do queue.add(3);
+
+        return;
+    }
 }

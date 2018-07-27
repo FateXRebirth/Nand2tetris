@@ -5,8 +5,6 @@ class Queue {
 	field Array Queue;
 	
 	constructor Queue new(int length) {
-		let first = 0;
-		let rear = 0;
         let size = length;
         let Queue = Array.new(length);
         do init();
@@ -15,6 +13,8 @@ class Queue {
 
     method void init() {
         var int i;	
+		let first = 0;
+		let rear = 0;
     	do Output.printString("Initialization...");
         do Output.println();
     	let i = 0;
@@ -27,9 +27,44 @@ class Queue {
     	return;
     }
 
+    method void add(int value) {
+    	if(rear = size) {
+    		if(rear = first) {
+    			do Output.printString("Queue is full, you have to init");
+    			do Output.println();
+    		} else {
+    			do Output.printString("Queue is full, you only can remove");
+    			do Output.println();
+    		}
+    	} else {
+    		let Queue[rear] = value;
+    		let rear = rear + 1;
+    		do list();
+    	}
+    	
+    	return;
+    }
+
+    method void remove() {
+    	if(first = rear) {
+    		do Output.printString("Queue is empty, you have to add or init");
+    		do Output.println();
+    	} else {
+    		let Queue[first] = 0;
+    		let first = first + 1;
+    		do list();
+    	}
+    	return;
+    }
+
     method void list() {
     	var int i;
     	let i = 0;
+    	do Output.printString("First -> ");
+		do Output.printInt(first);
+		do Output.printString(" Rear -> ");
+		do Output.printInt(rear);
+        do Output.println();
     	do Output.printString("Queue -> [ ");
     	while ( ~(i = size) ) {
     		do Output.printInt(Queue[i]);
