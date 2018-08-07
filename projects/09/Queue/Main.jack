@@ -1,18 +1,90 @@
 class Main {
     function void main() {
-      	var Queue queue;
-      	let queue = Queue.new(4);
-      	do queue.add(1);
-      	do queue.add(2);
-      	do queue.remove();
-      	do queue.add(3);
-      	do queue.add(3);
-      	do queue.remove();
-      	do queue.remove();	
-      	do queue.remove();
-      	do queue.remove();
-      	do queue.add(3);
+        var int size;
+        var int number;
+        var int action;
+    	var Queue queue;
 
-        return;
-    }
+    	let queue = Queue.new(4);
+    	do queue.add(1);
+    	do queue.add(2);
+    	do queue.remove();
+    	do queue.add(3);
+    	do queue.remove();
+    	do queue.remove();	
+    	do queue.remove();
+    	do queue.add(3);
+
+        do queue.dispose();
+        do Output.println();
+
+        do Output.printString("You want to create your own queue ? 1. Yes 2. No");
+        do Output.println();
+        let action = Keyboard.readInt("Choose : ");
+
+        if(action = 1) {
+            do Screen.clearScreen();
+            do Output.moveCursor(0, 0);
+            let size = Keyboard.readInt("Type a size of Queue : ");  
+            let queue = Queue.new(size);
+
+            do Output.println();
+
+            do Output.println();
+            do Output.printString("You can do the following action : ");
+            do Output.println();
+            do Output.printString("0. Exit 1. Add 2. Remove 3. Show 4. Init 5. Reset");
+            do Output.println();
+            let action = Keyboard.readInt("What are you going to do ? (type number): ");
+            do Output.println();
+
+            while(~(action = 0)) {
+                do Screen.clearScreen();
+                do Output.moveCursor(0, 0);
+                do Output.printString("You choose : ");
+                do Output.printInt(action); 
+                do Output.println();
+
+                if ( action = 1) {
+                    let number = Keyboard.readInt("Type a number you want to add : ");
+                    do queue.add(number);
+                } else {
+                    if ( action = 2 ) {
+                        let number = queue.remove();
+                    } else {
+                        if ( action = 3) {
+                            do queue.list();
+                        } else {
+                            if ( action = 4) {
+                                do queue.init();
+                            } else {
+                                do queue.dispose();
+                                do Screen.clearScreen();
+                                do Output.moveCursor(0, 0);
+                                let size = Keyboard.readInt("Type a size of Queue : ");  
+                                let queue = Queue.new(size);
+                            }
+                        }
+                    }
+                } 
+                do Output.println();
+                do Output.println();
+                do Output.printString("You can do the following action : ");
+                do Output.println();
+                do Output.printString("0. Exit 1. Add 2. Remove 3. Show 4. Init 5. Reset");
+                do Output.println();
+                let action = Keyboard.readInt("What are you going to do ? (type number): ");
+            }
+
+            do queue.dispose();
+            do Output.println();
+            do Output.printString("GoodBye!");
+            return;
+
+        } else {
+          do Output.println();
+          do Output.printString("GoodBye!");
+          return;
+        }
+    }   
 }
