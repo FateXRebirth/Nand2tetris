@@ -1,0 +1,7 @@
+class Main {
+	function void main() {
+		var Hash hash;
+		let hash = Hash.new(5);
+	  	return;
+   }
+}

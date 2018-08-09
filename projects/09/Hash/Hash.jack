@@ -1,0 +1,48 @@
+class Hash {
+	
+	field int size;
+	field Array Hash;
+
+	constructor Hash new(int length) {
+		let size = length;
+		let Hash = Array.new(length);
+	    do init();
+		return this;
+	}
+
+	method void init() {
+        var int i;	
+    	do Output.printString("Initialization...");
+        do Output.println();
+    	let i = 0;
+    	while ( ~(i = size) ) {
+    		let Hash[i] = "";
+    		let i = i + 1;
+    	}
+        do list();
+        do Output.println();
+    	return;
+    }
+
+    method void list() {
+    	var int i;
+    	let i = 0;
+    	do Output.printString("Hash -> [ ");
+    	while ( ~(i = size) ) {
+    		do Output.printInt(i);
+    		do Output.printString(" : ");
+    		do Output.printString(Hash[i]);
+    		let i = i + 1;
+    		do Output.printString(" ");
+    	}
+    	do Output.printString("]");
+        do Output.println();
+    	return;
+    }
+
+    method void dispose() {
+        do Hash.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+}
