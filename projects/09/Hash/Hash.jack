@@ -24,14 +24,48 @@ class Hash {
     	return;
     }
 
+    method void set(int index, String value) {
+        if( index > (size - 1)) {
+            do Output.printString("Failure, No such key");
+        } else {
+            let Hash[index] = value;
+            do Output.printString("Successfully");
+        }
+        do Output.println();
+        return;
+    }
+
+    method String get(int index) {
+        var String result;
+        if( index > (size - 1)) {
+            let result = "Failure, No such key";
+        } else {
+            let result = Hash[index];
+        }
+        return result;
+    }
+
+    method void clear(int index) {
+        if( index > (size - 1)) {
+            do Output.printString("Failure, No such key");
+        } else {
+            let Hash[index] = "";
+            do Output.printString("Successfully");
+        }
+        do Output.println();
+        return;
+    }
+
     method void list() {
     	var int i;
     	let i = 0;
     	do Output.printString("Hash -> [ ");
     	while ( ~(i = size) ) {
     		do Output.printInt(i);
-    		do Output.printString(" : ");
+    		do Output.printString("->");
+            do Output.printString("[");
     		do Output.printString(Hash[i]);
+            do Output.printString("]");
     		let i = i + 1;
     		do Output.printString(" ");
     	}

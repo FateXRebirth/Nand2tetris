@@ -1,7 +1,21 @@
 class Main {
 	function void main() {
+		var String value;
 		var Hash hash;
 		let hash = Hash.new(5);
+
+		let value = "A";
+		do hash.set(1, value);
+		do hash.list();
+		let value = "B";
+		do hash.set(2, value);
+		do hash.list();
+		do Output.printString(hash.get(2));
+		do Output.println();
+		do hash.clear(1);
+		do hash.clear(2);
+		do hash.list();
+
 	  	return;
    }
 }
