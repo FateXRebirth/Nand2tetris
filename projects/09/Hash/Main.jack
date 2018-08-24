@@ -1,21 +1,102 @@
 class Main {
-	function void main() {
-		var String value;
-		var Hash hash;
-		let hash = Hash.new(5);
+    function void main() {
+        var int size;
+        var int action;
+        var int index;
+        var String value;
+        var Hash hash;
+        let hash = Hash.new(5);
 
-		let value = "A";
-		do hash.set(1, value);
-		do hash.list();
-		let value = "B";
-		do hash.set(2, value);
-		do hash.list();
-		do Output.printString(hash.get(2));
-		do Output.println();
-		do hash.clear(1);
-		do hash.clear(2);
-		do hash.list();
+        let value = "A";
+        do hash.set(1, value);
+        do hash.list();
+        let value = "B";
+        do hash.set(2, value);
+        do hash.list();
+        do Output.printString(hash.get(2));
+        do Output.println();
+        do hash.clear(1);
+        do hash.clear(2);
+        do hash.list();
 
-	  	return;
-   }
+        do hash.dispose();
+        do Output.println();
+
+        do Output.printString("You want to create your own hash ? 1. Yes 2. No");
+        do Output.println();
+        let action = Keyboard.readInt("Choose : ");
+
+        if(action = 1) {
+            do Screen.clearScreen();
+            do Output.moveCursor(0, 0);
+            let size = Keyboard.readInt("Type a size of hash : ");  
+            let hash = Hash.new(size);
+
+            do Output.println();
+
+            do Output.println();
+            do Output.printString("You can do the following action : ");
+            do Output.println();
+            do Output.printString("0. Exit 1. Set 2. Get 3. Clear 4. Show 5. Init 6. Reset");
+            do Output.println();
+            let action = Keyboard.readInt("What are you going to do ? (type number): ");
+            do Output.println();
+
+            while(~(action = 0)) {
+                do Screen.clearScreen();
+                do Output.moveCursor(0, 0);
+                do Output.printString("You choose : ");
+                do Output.printInt(action); 
+                do Output.println();
+
+                if ( action = 1) {
+                    let index = Keyboard.readInt("Type a position you want to place : ");
+                    let value = Keyboard.readLine("Type a string you want to store : ");
+                    do hash.set(index, value);
+                } else {
+                    if ( action = 2 ) {
+                        let index = Keyboard.readInt("Type a position you want to fetch : ");
+                        let value = hash.get(index);
+                        do Output.printString(value);
+                    } else {
+                        if ( action = 3) {
+                            let index = Keyboard.readInt("Type a position you want to clear : ");
+                            do hash.clear(index);
+                        } else {
+                            if ( action = 4) {
+                                do hash.list();
+                            } else {
+                                if ( action = 5 ) {
+                                    do hash.init();
+                                } else {
+                                    do hash.dispose();
+                                    do Screen.clearScreen();
+                                    do Output.moveCursor(0, 0);
+                                    let size = Keyboard.readInt("Type a size of hash : ");  
+                                    let hash = Hash.new(size);
+                                }
+                            }
+                        }
+                    }
+                } 
+                do Output.println();
+                do Output.println();
+                do Output.printString("You can do the following action : ");
+                do Output.println();
+                do Output.printString("0. Exit 1. Set 2. Get 3. Clear 4. Show 5. Init 6. Reset");
+                do Output.println();
+                let action = Keyboard.readInt("What are you going to do ? (type number): ");
+            }
+
+            do hash.dispose();
+            do Output.println();
+            do Output.printString("GoodBye!");
+            return;
+
+        } else {
+          do Output.println();
+          do Output.printString("GoodBye!");
+          return;
+        }
+    }   
 }
