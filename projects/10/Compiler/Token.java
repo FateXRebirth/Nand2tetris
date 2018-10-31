@@ -24,6 +24,10 @@ public class Token {
     return this.value;
   }
 
+  public String toString() {
+    return "Token(" + this.type + "," + this.value + ")";
+  }
+
   public String XmlFormat() {
     return "  <" + this.type + "> " + this.value + " </" + this.type + ">"; 
   }
