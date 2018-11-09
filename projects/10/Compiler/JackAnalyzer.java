@@ -15,6 +15,7 @@ class JackAnalyzer {
     ArrayList<File> files = new ArrayList<File>();
 
     if( fileIn.isFile() ) {
+      // if this input is file
       String path = fileIn.getAbsolutePath();
       if( !GetExtension(path).equals(".jack") ) {
         throw new IllegalArgumentException(".jack file is required!");
@@ -22,6 +23,7 @@ class JackAnalyzer {
       files.add(fileIn);
       fileOutPath = fileIn.getAbsolutePath().substring(0, fileIn.getAbsolutePath().lastIndexOf(".")) + ".xml";
     } else if( fileIn.isDirectory() ) {
+      // if this input is directory
       files = GetFiles(fileIn);
       if( files.size() == 0 ) {
           throw new IllegalArgumentException("No jack file in this directory!");
@@ -31,6 +33,7 @@ class JackAnalyzer {
 
     File fileOut = new File(fileOutPath);
 
+    // initialize Tokenizer
     Tokenizer tokenizer = new Tokenizer(fileOut);
 
     for( File file : files ) {
@@ -38,12 +41,11 @@ class JackAnalyzer {
       while(tokenizer.HasMoreTokens()) {
         tokenizer.Handle();
       }
-    }
-
-    tokenizer.Close();
-    
+      tokenizer.Close();
+    }    
   }
 
+  // Get File's Extension
   public static String GetExtension(String fileName){
     int index = fileName.lastIndexOf('.');
     if (index != -1 ){
@@ -52,7 +54,7 @@ class JackAnalyzer {
       return "";
     }
   }
-
+  // Get Files in Directory
   public static ArrayList<File> GetFiles(File dir){
     File[] files = dir.listFiles();
     ArrayList<File> result = new ArrayList<File>();
