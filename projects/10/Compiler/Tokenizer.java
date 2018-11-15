@@ -1,12 +1,14 @@
 import java.io.*;
 import java.util.regex.*;
-import java.util.Hashtable;
 import java.util.ArrayList;
 
 public class Tokenizer {
 
   static String stream;
-  static Parser parser;
+  static int pos;
+  static ArrayList<String> TOKENS;
+
+  static CompilationEngine engine;
   static FileReader fileReader;
   static BufferedReader bufferReader;
 
@@ -22,47 +24,7 @@ public class Tokenizer {
   static String UNKNOWN = "Unknown";
 
   public Tokenizer(File output) {
-    parser = new Parser(output);   
-  }
-
-  public void Open(File input) {
-    try { 
-      fileReader = new FileReader(input);
-      bufferReader = new BufferedReader(fileReader);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }      
-  }
-
-  public boolean HasMoreTokens() {
-    try {
-      stream = bufferReader.readLine();
-      if( stream == null) {
-          bufferReader.close();
-          fileReader.close();
-          return false;
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }    
-    return true;
-  }
-
-  public void Handle() {
-    String content = RemoveIndent(RemoveComment(stream));
-    System.out.println(content);
-  }
-
-  public void Close() {
-    parser.Close();
-  }
-
-  @Override
-  public void finalize() {
-    System.out.println("Is This Destructor?");
-  }
-
-  private void Initialize() {
+    engine = new CompilationEngine(output);   
     final String[] keywords = { "class", "constructor", "function", "method", "field", "static", "var", "int", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
     final String[] symbols = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=", "~" };
     KEYWORDS = new ArrayList<String>();
@@ -73,9 +35,54 @@ public class Tokenizer {
     for(String symbol : symbols) {
       SYMBOLS.add(symbol);
     }
+    pos = 0;
+    TOKENS = new ArrayList<String>();
   }
 
-  private String GetTokenType(String value) {
+  public void Open(File input) {
+    try { 
+      fileReader = new FileReader(input);
+      bufferReader = new BufferedReader(fileReader);
+      int value = 0;
+      // reads to the end of the stream 
+      while((value = bufferReader.read()) != -1) {
+        
+        // ignore space and \n
+        if(value != 10 && value != 32) {
+          // converts int to character
+          char c = (char)value;
+          // prints character and its ascii code for debug
+          // System.out.println("char(" + c + ") -> int(" + value +")");
+          // save tokens
+          TOKENS.add(Character.toString(c));
+        }
+      }
+      // for(String x : TOKENS) {
+      //   System.out.println(x);
+      // }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }      
+  }
+  
+  public void Close() {
+    engine.Close();
+  }
+
+  public boolean HasMoreTokens() {
+   try {
+     TOKENS.get(pos);
+     return true;
+   } catch (Exception e) {
+     return false;
+   }
+  }
+
+  public void Advance() {
+    engine.Write(TOKENS.get(pos++));
+  }
+
+  private String TokenType(String value) {
     if(KEYWORDS.contains(value)) {
       return KEYWORD;
     } else if(SYMBOLS.contains(value)) {
@@ -88,7 +95,7 @@ public class Tokenizer {
       return UNKNOWN;
     }
   }
-  
+
   private String RemoveIndent(String stream) {
     int index = 0;
     for(int i = 0; i < stream.length(); i++) {

@@ -39,7 +39,7 @@ class JackAnalyzer {
     for( File file : files ) {
       tokenizer.Open(file);
       while(tokenizer.HasMoreTokens()) {
-        tokenizer.Handle();
+        tokenizer.Advance();
       }
       tokenizer.Close();
     }    
