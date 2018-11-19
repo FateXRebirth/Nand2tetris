@@ -2,93 +2,93 @@ import java.io.*;
 
 public class CompilationEngine {
 
-  static FileWriter fileWriter;
-  static BufferedWriter bufferWriter;
+    static FileWriter fileWriter;
+    static BufferedWriter bufferWriter;
 
-  public CompilationEngine(File output) {
-    try {
-      fileWriter = new FileWriter(output);
-      bufferWriter = new BufferedWriter(fileWriter);
-    } catch (IOException e) {
-        e.printStackTrace();
+    public CompilationEngine(File output) {
+        try {
+            fileWriter = new FileWriter(output);
+            bufferWriter = new BufferedWriter(fileWriter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-  }
-  
-  public void Write(String content) {
-    try {
-      bufferWriter.write(content);
-      bufferWriter.newLine();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } 
-  }
 
-  public void Close() {
-    try { 
-      bufferWriter.close();
-      fileWriter.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }   
-  }
+    public void Write(String content) {
+        try {
+            bufferWriter.write(content);
+            bufferWriter.write(" ");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-  private void CompileClass() {
+    public void Close() {
+        try {
+            bufferWriter.close();
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-  }
+    private void CompileClass() {
 
-  private void CompileClassVarDec() {
+    }
 
-  }
+    private void CompileClassVarDec() {
 
-  private void CompileSubRoutineDec() {
+    }
 
-  }
-  
-  private void CompileSubRoutineBody() {
+    private void CompileSubRoutineDec() {
 
-  }
+    }
 
-  private void CompileParameterList() {
+    private void CompileSubRoutineBody() {
 
-  }
+    }
 
-  private void CompileVarDec() {
+    private void CompileParameterList() {
 
-  }
+    }
 
-  private void CompileStatements() {
+    private void CompileVarDec() {
 
-  }
+    }
 
-  private void CompileDo() {
+    private void CompileStatements() {
 
-  }
+    }
 
-  private void CompileLet() {
+    private void CompileDo() {
 
-  }
+    }
 
-  private void CompileWhile() {
+    private void CompileLet() {
 
-  }
+    }
 
-  private void CompileReturn() {
+    private void CompileWhile() {
 
-  }
+    }
 
-  private void CompileIf() {
+    private void CompileReturn() {
 
-  }
+    }
 
-  private void CompileExpression() {
+    private void CompileIf() {
 
-  }
+    }
 
-  private void CompileTerm() {
+    private void CompileExpression() {
 
-  }
+    }
 
-  private void CompileExpressionList() {
+    private void CompileTerm() {
 
-  }
+    }
+
+    private void CompileExpressionList() {
+
+    }
 }

@@ -3,67 +3,67 @@ import java.util.ArrayList;
 
 class JackAnalyzer {
 
-  public static void main(String[] args) {
-        
-    // check if user provides argument to handle
-    if(args.length < 1) {
-      throw new IllegalArgumentException("Missing argument! (e.g. java Tokenizer Test.jack) ");
-    }
+    public static void main(String[] args) {
 
-    File fileIn = new File(args[0]);
-    String fileOutPath = "";
-    ArrayList<File> files = new ArrayList<File>();
+        // check if user provides argument to handle
+        if(args.length < 1) {
+            throw new IllegalArgumentException("Missing argument! (e.g. java Tokenizer Test.jack) ");
+        }
 
-    if( fileIn.isFile() ) {
-      // if this input is file
-      String path = fileIn.getAbsolutePath();
-      if( !GetExtension(path).equals(".jack") ) {
-        throw new IllegalArgumentException(".jack file is required!");
-      }
-      files.add(fileIn);
-      fileOutPath = fileIn.getAbsolutePath().substring(0, fileIn.getAbsolutePath().lastIndexOf(".")) + ".xml";
-    } else if( fileIn.isDirectory() ) {
-      // if this input is directory
-      files = GetFiles(fileIn);
-      if( files.size() == 0 ) {
-          throw new IllegalArgumentException("No jack file in this directory!");
-      }
-      fileOutPath = fileIn.getAbsolutePath() + "/" +  fileIn.getName() + ".xml";
-    }
+        File fileIn = new File(args[0]);
+        String fileOutPath = "";
+        ArrayList<File> files = new ArrayList<File>();
 
-    File fileOut = new File(fileOutPath);
+        if( fileIn.isFile() ) {
+            // if this input is file
+            String path = fileIn.getAbsolutePath();
+            if( !GetExtension(path).equals(".jack") ) {
+                throw new IllegalArgumentException(".jack file is required!");
+            }
+            files.add(fileIn);
+            fileOutPath = fileIn.getAbsolutePath().substring(0, fileIn.getAbsolutePath().lastIndexOf(".")) + ".xml";
+        } else if( fileIn.isDirectory() ) {
+            // if this input is directory
+            files = GetFiles(fileIn);
+            if( files.size() == 0 ) {
+                throw new IllegalArgumentException("No jack file in this directory!");
+            }
+            fileOutPath = fileIn.getAbsolutePath() + "/" +  fileIn.getName() + ".xml";
+        }
 
-    // initialize Tokenizer
-    Tokenizer tokenizer = new Tokenizer(fileOut);
+        File fileOut = new File(fileOutPath);
 
-    for( File file : files ) {
-      tokenizer.Open(file);
-      while(tokenizer.HasMoreTokens()) {
-        tokenizer.Advance();
-      }
-      tokenizer.Close();
-    }    
-  }
+        // initialize Tokenizer
+        Tokenizer tokenizer = new Tokenizer(fileOut);
 
-  // Get File's Extension
-  public static String GetExtension(String fileName){
-    int index = fileName.lastIndexOf('.');
-    if (index != -1 ){
-      return fileName.substring(index);
-    } else {
-      return "";
-    }
-  }
-  // Get Files in Directory
-  public static ArrayList<File> GetFiles(File dir){
-    File[] files = dir.listFiles();
-    ArrayList<File> result = new ArrayList<File>();
-    for ( File file : files ){
-        if ( file.getName().endsWith(".jack") ){
-            result.add(file);
+        for( File file : files ) {
+            tokenizer.Open(file);
+            while(tokenizer.HasMoreTokens()) {
+                tokenizer.Advance();
+            }
+            tokenizer.Close();
         }
     }
-    return result;
-  }
+
+    // Get File's Extension
+    public static String GetExtension(String fileName){
+        int index = fileName.lastIndexOf('.');
+        if (index != -1 ){
+            return fileName.substring(index);
+        } else {
+            return "";
+        }
+    }
+    // Get Files in Directory
+    public static ArrayList<File> GetFiles(File dir){
+        File[] files = dir.listFiles();
+        ArrayList<File> result = new ArrayList<File>();
+        for ( File file : files ){
+            if ( file.getName().endsWith(".jack") ){
+                result.add(file);
+            }
+        }
+        return result;
+    }
 
 }
