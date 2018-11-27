@@ -4,24 +4,27 @@ import java.util.ArrayList;
 
 public class Tokenizer {
 
+    // Variable For Parsing
     static String stream;
+    static String last;
+    static String commentString;
+    static boolean comment;
     static int pos;
     static ArrayList<String> TOKENS;
 
+    // Parser
     static CompilationEngine engine;
     static FileReader fileReader;
     static BufferedReader bufferReader;
 
+    // Variable For Token
     static ArrayList<String> KEYWORDS;
     static ArrayList<String> SYMBOLS;
-
     static String KEYWORD = "keyword";
     static String SYMBOL = "symbol";
     static String STRING_CONST = "stringConstant";
     static String INT_CONST = "integerConstant";
     static String IDENTIFIER = "identifier";
-    static String SPACE = "Space";
-    static String UNKNOWN = "Unknown";
 
     public Tokenizer(File output) {
         engine = new CompilationEngine(output);
@@ -35,8 +38,12 @@ public class Tokenizer {
         for(String symbol : symbols) {
             SYMBOLS.add(symbol);
         }
-        pos = 0;
         TOKENS = new ArrayList<String>();
+        stream = "";
+        last = "";
+        commentString = "";
+        comment = false;
+        pos = -1;
     }
 
     public void Open(File input) {
@@ -68,6 +75,7 @@ public class Tokenizer {
     public boolean HasMoreTokens() {
         try {
             TOKENS.get(pos+1);
+            pos = pos + 1;
             return true;
         } catch (Exception e) {
             return false;
@@ -75,78 +83,65 @@ public class Tokenizer {
     }
 
     public void Advance() {
-        String string = "";
-        String last = "";
-        String commentString = "";
-        boolean comment = false;
-        while(pos < TOKENS.size() ) {
-            last = TOKENS.get(pos);
-            string = string + TOKENS.get(pos);
-            if (TokenType(last) == SYMBOL) {
-                if(last.equals("/") || last.equals("*")) {
-                    commentString = commentString + last;
-                    if(commentString.equals("//") || commentString.equals("/*")) {
-                        String c = "";
-                        int index = 1;
-                        comment = true;
-                        while(comment) {
-                            c = TOKENS.get(pos + index);
-                            if(c.equals("/") || c.equals("\n")) {
-                                pos = pos + index;
-                                comment = false;
-                            } else {
-                                index = index + 1;
-                            }
+        last = TOKENS.get(pos);
+        stream = stream + TOKENS.get(pos);
+        if (GetToken(last).getType() == SYMBOL) {
+            if(last.equals("/") || last.equals("*")) {
+                commentString = commentString + last;
+                if(commentString.equals("//") || commentString.equals("/*")) {
+                    String c;
+                    int index = 1;
+                    comment = true;
+                    while(comment) {
+                        c = TOKENS.get(pos + index);
+                        if(c.equals("/") || c.equals("\n")) {
+                            pos = pos + index;
+                            comment = false;
+                        } else {
+                            index = index + 1;
                         }
                     }
-                } else {
-                    if (string.length() > 1) System.out.println(string.substring(0, string.length() - 1));
-                    System.out.println(last);
-                    string = "";
                 }
-
-            } else if(last.equals("\n")) {
-                string = "";
             } else {
-                if(TokenType(string) == SYMBOL || TokenType(string) == KEYWORD) {
-                    System.out.println(string);
-
-                    string = "";
+                if (stream.length() > 1) {
+                    String subString = stream.substring(0, stream.length() - 1);
+                    engine.Parser(GetToken(subString));
                 }
+                engine.Parser(GetToken(last));
+                stream = "";
             }
-            pos = pos + 1;
-        }
-    }
 
-    private String TokenType(String value) {
-        if(KEYWORDS.contains(value)) {
-            return KEYWORD;
-        } else if(SYMBOLS.contains(value)) {
-            return SYMBOL;
-        } else if(Pattern.matches("^\"[a-zA-Z]+\"$", value)) {
-            return STRING_CONST;
-        } else if(Pattern.matches("^[0-9]{1,5}$", value) && Integer.valueOf(value) >= 0 && Integer.valueOf(value) <= 32767) {
-            return INT_CONST;
+        } else if(last.equals("\n")) {
+            stream = "";
         } else {
-            return UNKNOWN;
-        }
-    }
-
-    private String RemoveIndent(String stream) {
-        int index = 0;
-        for(int i = 0; i < stream.length(); i++) {
-            if(stream.charAt(i) != ' ') {
-                index = i;
-                break;
+            if(GetToken(stream).getType() == SYMBOL || GetToken(stream).getType() == KEYWORD) {
+                engine.Parser(GetToken(stream));
+                stream = "";
             }
         }
-        return stream.substring(index);
     }
 
-    private String RemoveComment(String stream) {
-        int index = stream.indexOf("/");
-        if(index == -1) return stream;
-        return stream.substring(0, index);
+    private Token GetToken(String value) {
+        if(KEYWORDS.contains(value)) {
+            return new Token(KEYWORD, value);
+        } else if(SYMBOLS.contains(value)) {
+            if(value.equals("<")) {
+                return new Token(SYMBOL, "&lt;");
+            } else if(value.equals(">")) {
+                return new Token(SYMBOL, "&gt;");
+            } else if(value.equals("\"")) {
+                return new Token(SYMBOL, "&quot;");
+            } else if(value.equals("&")) {
+                return new Token(SYMBOL, "&amp;");
+            } else {
+                return new Token(SYMBOL, value);
+            }
+        } else if(Pattern.matches("^\".+\"$", value)) {
+            return new Token(STRING_CONST, value.substring(1, value.length()-1));
+        } else if(Pattern.matches("^[0-9]{1,5}$", value) && Integer.valueOf(value) >= 0 && Integer.valueOf(value) <= 32767) {
+            return new Token(INT_CONST, value);
+        } else {
+            return new Token(IDENTIFIER, value);
+        }
     }
-
 }

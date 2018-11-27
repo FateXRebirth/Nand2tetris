@@ -9,6 +9,8 @@ public class CompilationEngine {
         try {
             fileWriter = new FileWriter(output);
             bufferWriter = new BufferedWriter(fileWriter);
+            bufferWriter.write("<token>");
+            bufferWriter.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -17,7 +19,16 @@ public class CompilationEngine {
     public void Write(String content) {
         try {
             bufferWriter.write(content);
-            bufferWriter.write(" ");
+            bufferWriter.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void Parser(Token token) {
+        try {
+            bufferWriter.write(token.XmlFormat());
+            bufferWriter.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -25,6 +36,8 @@ public class CompilationEngine {
 
     public void Close() {
         try {
+            bufferWriter.write("</token>");
+            bufferWriter.newLine();
             bufferWriter.close();
             fileWriter.close();
         } catch (IOException e) {
