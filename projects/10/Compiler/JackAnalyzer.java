@@ -33,15 +33,13 @@ class JackAnalyzer {
 
         File fileOut = new File(fileOutPath);
 
-        // initialize Tokenizer
-        Tokenizer tokenizer = new Tokenizer(fileOut);
+        // initialize CompilationEngine
+        CompilationEngine compilationEngine = new CompilationEngine(fileOut);
 
         for( File file : files ) {
-            tokenizer.Open(file);
-            while(tokenizer.HasMoreTokens()) {
-                tokenizer.Advance();
-            }
-            tokenizer.Close();
+            compilationEngine.Open(file);
+            compilationEngine.Parser();
+            compilationEngine.Close();
         }
     }
 

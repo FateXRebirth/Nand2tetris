@@ -4,20 +4,17 @@ import java.util.ArrayList;
 
 public class Tokenizer {
 
-    // Variable For Parsing
+    static ArrayList<String> INPUT;
     static String stream;
     static String last;
     static String commentString;
     static boolean comment;
     static int pos;
-    static ArrayList<String> TOKENS;
 
-    // Parser
-    static CompilationEngine engine;
     static FileReader fileReader;
     static BufferedReader bufferReader;
 
-    // Variable For Token
+    static ArrayList<Token> TOKENS;
     static ArrayList<String> KEYWORDS;
     static ArrayList<String> SYMBOLS;
     static String KEYWORD = "keyword";
@@ -26,24 +23,26 @@ public class Tokenizer {
     static String INT_CONST = "integerConstant";
     static String IDENTIFIER = "identifier";
 
-    public Tokenizer(File output) {
-        engine = new CompilationEngine(output);
-        final String[] keywords = { "class", "constructor", "function", "method", "field", "static", "var", "int", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
-        final String[] symbols = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=", "~" };
+    public Tokenizer() {
+        INPUT = new ArrayList<String>();
+        stream = "";
+        last = "";
+        commentString = "";
+        comment = false;
+        pos = -1;
+        TOKENS = new ArrayList<Token>();
         KEYWORDS = new ArrayList<String>();
         SYMBOLS = new ArrayList<String>();
+        final String[] keywords = { "class", "constructor", "function", "method", "field", "static", "var", "int", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
+        final String[] symbols = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=", "~" };
+
         for(String keyword : keywords) {
             KEYWORDS.add(keyword);
         }
         for(String symbol : symbols) {
             SYMBOLS.add(symbol);
         }
-        TOKENS = new ArrayList<String>();
-        stream = "";
-        last = "";
-        commentString = "";
-        comment = false;
-        pos = -1;
+
     }
 
     public void Open(File input) {
@@ -60,7 +59,7 @@ public class Tokenizer {
                     // prints character and its ascii code for debug
                     // System.out.println("char(" + c + ") -> int(" + value +")");
                     // save tokens
-                    TOKENS.add(Character.toString(c));
+                    INPUT.add(Character.toString(c));
                 }
             }
         } catch (IOException e) {
@@ -69,12 +68,21 @@ public class Tokenizer {
     }
 
     public void Close() {
-        engine.Close();
+        try {
+            bufferReader.close();
+            fileReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<Token> GetTokens() {
+        return TOKENS;
     }
 
     public boolean HasMoreTokens() {
         try {
-            TOKENS.get(pos+1);
+            INPUT.get(pos+1);
             pos = pos + 1;
             return true;
         } catch (Exception e) {
@@ -83,9 +91,9 @@ public class Tokenizer {
     }
 
     public void Advance() {
-        last = TOKENS.get(pos);
-        stream = stream + TOKENS.get(pos);
-        if (GetToken(last).getType() == SYMBOL) {
+        last = INPUT.get(pos);
+        stream = stream + INPUT.get(pos);
+        if (SYMBOLS.contains(last)) {
             if(last.equals("/") || last.equals("*")) {
                 commentString = commentString + last;
                 if(commentString.equals("//") || commentString.equals("/*")) {
@@ -93,7 +101,7 @@ public class Tokenizer {
                     int index = 1;
                     comment = true;
                     while(comment) {
-                        c = TOKENS.get(pos + index);
+                        c = INPUT.get(pos + index);
                         if(c.equals("/") || c.equals("\n")) {
                             pos = pos + index;
                             comment = false;
@@ -105,17 +113,17 @@ public class Tokenizer {
             } else {
                 if (stream.length() > 1) {
                     String subString = stream.substring(0, stream.length() - 1);
-                    engine.Parser(GetToken(subString));
+                    TOKENS.add(GetToken(subString));
                 }
-                engine.Parser(GetToken(last));
+                TOKENS.add(GetToken(last));
                 stream = "";
             }
 
         } else if(last.equals("\n")) {
             stream = "";
         } else {
-            if(GetToken(stream).getType() == SYMBOL || GetToken(stream).getType() == KEYWORD) {
-                engine.Parser(GetToken(stream));
+            if(SYMBOLS.contains(stream) || KEYWORDS.contains(stream)) {
+                TOKENS.add(GetToken(stream));
                 stream = "";
             }
         }
