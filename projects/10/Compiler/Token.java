@@ -1,3 +1,5 @@
+package com.example.compile;
+
 public class Token {
 
     private String type;
@@ -16,11 +18,11 @@ public class Token {
         return this.type;
     }
 
-    public void setToken(String Value) {
+    public void setValue(String Value) {
         this.value = Value;
     }
 
-    public String getToken() {
+    public String getValue() {
         return this.value;
     }
 

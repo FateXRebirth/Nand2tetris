@@ -1,3 +1,5 @@
+package com.example.compile;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -33,13 +35,13 @@ class JackAnalyzer {
 
         File fileOut = new File(fileOutPath);
 
-        // initialize CompilationEngine
-        CompilationEngine compilationEngine = new CompilationEngine(fileOut);
+        // initialize Tokenizer
+        Tokenizer tokenizer = new Tokenizer(fileOut);
 
         for( File file : files ) {
-            compilationEngine.Open(file);
-            compilationEngine.Parser();
-            compilationEngine.Close();
+            tokenizer.Open(file);
+            tokenizer.Analyze();
+            tokenizer.Close();
         }
     }
 
