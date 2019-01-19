@@ -1,6 +1,4 @@
-package com.example.compile;
-
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 
 class JackAnalyzer {
@@ -13,7 +11,9 @@ class JackAnalyzer {
         }
 
         File fileIn = new File(args[0]);
+        File fileOut, TokenfileOut;
         String fileOutPath = "";
+        String TokenfileOutPath = "";
         ArrayList<File> files = new ArrayList<File>();
 
         if( fileIn.isFile() ) {
@@ -23,25 +23,21 @@ class JackAnalyzer {
                 throw new IllegalArgumentException(".jack file is required!");
             }
             files.add(fileIn);
-            fileOutPath = fileIn.getAbsolutePath().substring(0, fileIn.getAbsolutePath().lastIndexOf(".")) + ".xml";
         } else if( fileIn.isDirectory() ) {
             // if this input is directory
             files = GetFiles(fileIn);
             if( files.size() == 0 ) {
                 throw new IllegalArgumentException("No jack file in this directory!");
             }
-            fileOutPath = fileIn.getAbsolutePath() + "/" +  fileIn.getName() + ".xml";
         }
 
-        File fileOut = new File(fileOutPath);
-
-        // initialize Tokenizer
-        Tokenizer tokenizer = new Tokenizer(fileOut);
-
         for( File file : files ) {
-            tokenizer.Open(file);
-            tokenizer.Analyze();
-            tokenizer.Close();
+            fileOutPath = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")) + ".xml";
+            TokenfileOutPath = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")) + "T.xml";
+            fileOut = new File(fileOutPath);
+            TokenfileOut = new File(TokenfileOutPath);
+            CompilationEngine compilationEngine = new CompilationEngine(file, fileOut, TokenfileOut);
+            compilationEngine.CompileClass();
         }
     }
 

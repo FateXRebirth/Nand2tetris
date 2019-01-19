@@ -3,118 +3,132 @@ import java.util.ArrayList;
 
 public class CompilationEngine {
 
-    static Token token;
-    static FileWriter fileWriter;
-    static BufferedWriter bufferWriter;
-    static Tokenizer tokenizer;
-    static ArrayList<Token> TOKENS;
+    private Tokenizer tokenizer;
+    private FileWriter fileWriter;
+    private BufferedWriter bufferedWriter;
+    private FileWriter TokenfileWriter;
+    private BufferedWriter TokenbufferedWriter;
 
-    public CompilationEngine(File output) {
-        tokenizer = new Tokenizer();
+    private ArrayList<Token> TOKENS;
+
+    public CompilationEngine(File inFile, File outFile, File outTokenFile) {
         TOKENS = new ArrayList<Token>();
         try {
-            fileWriter = new FileWriter(output);
-            bufferWriter = new BufferedWriter(fileWriter);
+            tokenizer = new Tokenizer(inFile);
+            fileWriter = new FileWriter(outFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
+            TokenfileWriter = new FileWriter(outTokenFile);
+            TokenbufferedWriter = new BufferedWriter(TokenfileWriter);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void Open(File input) {
-        tokenizer.Open(input);
-    }
-
-    public void Close() {
-        tokenizer.Close();
-        try {
-            bufferWriter.close();
-            fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void WriteTag(String tag) {
+        System.out.println(tag);
     }
 
     public void Write() {
+
         try {
-            bufferWriter.write("<token>");
-            bufferWriter.newLine();
-            for(Token t : TOKENS) {
-                bufferWriter.write(t.XmlFormat());
-                bufferWriter.newLine();
+            bufferedWriter.write("<class>");
+            bufferedWriter.newLine();
+            TokenbufferedWriter.write("<token>");
+            TokenbufferedWriter.newLine();
+            for(Token t : tokenizer.GetTokens()) {
+                bufferedWriter.write(t.XmlFormat());
+                bufferedWriter.newLine();
+                TokenbufferedWriter.write(t.XmlFormat());
+                TokenbufferedWriter.newLine();
             }
-            bufferWriter.write("</token>");
+            bufferedWriter.write("</class>");
+            TokenbufferedWriter.write("</token>");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void Parser() {
-        while (tokenizer.HasMoreTokens()) {
-            tokenizer.Advance();
-        }
-        for( Token t : tokenizer.GetTokens()) {
-            TOKENS.add(t);
-        }
+    public void CompileClass() {
+        WriteTag("<class>");
+        WriteTag("</class>");
         Write();
+        try {
+            bufferedWriter.close();
+            fileWriter.close();
+            TokenbufferedWriter.close();
+            TokenfileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void CompileClass() {
-
+    public void CompileClassVarDec() {
+        WriteTag("<classVarDec>");
+        WriteTag("</classVarDec>");
     }
 
-    private void CompileClassVarDec() {
-
+    public void CompileSubRoutineDec() {
+        WriteTag("<subRoutineDec>");
+        WriteTag("</subRoutineDec>");
     }
 
-    private void CompileSubRoutineDec() {
-
+    public void CompileSubRoutineBody() {
+        WriteTag("<subRoutineBody>");
+        WriteTag("</subRoutineBody>");
     }
 
-    private void CompileSubRoutineBody() {
-
+    public void CompileParameterList() {
+        WriteTag("<parameterList>");
+        WriteTag("</parameterList>");
     }
 
-    private void CompileParameterList() {
-
+    public void CompileVarDec() {
+        WriteTag("<varDec>");
+        WriteTag("</varDec>");
     }
 
-    private void CompileVarDec() {
-
+    public void CompileStatements() {
+        WriteTag("<statements>");
+        WriteTag("</statements>");
     }
 
-    private void CompileStatements() {
-
+    public void CompileDo() {
+        WriteTag("<doStatement>");
+        WriteTag("</doStatement>");
     }
 
-    private void CompileDo() {
-
+    public void CompileLet() {
+        WriteTag("<letStatement>");
+        WriteTag("</letStatement>");
     }
 
-    private void CompileLet() {
-
+    public void CompileWhile() {
+        WriteTag("<whileStatement>");
+        WriteTag("</whileStatement>");
     }
 
-    private void CompileWhile() {
-
+    public void CompileReturn() {
+        WriteTag("<returnStatement>");
+        WriteTag("</returnStatement>");
     }
 
-    private void CompileReturn() {
-
+    public void CompileIf() {
+        WriteTag("<ifStatement>");
+        WriteTag("</ifStatement>");
     }
 
-    private void CompileIf() {
-
+    public void CompileExpression() {
+        WriteTag("<expression>");
+        WriteTag("</expression>");
     }
 
-    private void CompileExpression() {
-
+    public void CompileTerm() {
+        WriteTag("<term>");
+        WriteTag("</term>");
     }
 
-    private void CompileTerm() {
-
-    }
-
-    private void CompileExpressionList() {
-
+    public void CompileExpressionList() {
+        WriteTag("<expressionList>");
+        WriteTag("</expressionList>");
     }
 }
