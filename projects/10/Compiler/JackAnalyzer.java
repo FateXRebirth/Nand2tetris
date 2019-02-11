@@ -1,4 +1,6 @@
-import java.io.*;
+package com.example.compile;
+
+import java.io.File;
 import java.util.ArrayList;
 
 class JackAnalyzer {

@@ -1,3 +1,5 @@
+package com.example.compile;
+
 import java.io.*;
 import java.util.regex.*;
 import java.util.ArrayList;
@@ -12,11 +14,33 @@ public class Tokenizer {
     private ArrayList<Token> TOKENS;
     private ArrayList<String> KEYWORDS;
     private ArrayList<String> SYMBOLS;
-    private String KEYWORD = "keyword";
-    private String SYMBOL = "symbol";
-    private String STRING_CONST = "stringConstant";
-    private String INT_CONST = "integerConstant";
-    private String IDENTIFIER = "identifier";
+
+    public String KEYWORD = "keyword";
+    public String SYMBOL = "symbol";
+    public String STRING_CONST = "stringConstant";
+    public String INT_CONST = "integerConstant";
+    public String IDENTIFIER = "identifier";
+    public String CLASS = "class";
+    public String METHOD = "method";
+    public String FUNCTION = "function";
+    public String CONSTRUCTOR = "constructor";
+    public String INT = "int";
+    public String BOOLEAN = "boolean";
+    public String CHAR = "char";
+    public String VOID = "void";
+    public String VAR = "var";
+    public String STATIC = "static";
+    public String FIELD = "field";
+    public String LET = "let";
+    public String DO = "do";
+    public String IF = "if";
+    public String ELSE = "else";
+    public String WHILE = "while";
+    public String RETURN = "return";
+    public String TRUE = "true";
+    public String FALSE = "false";
+    public String NULL = "null";
+    public String THIS = "this";
 
     public Tokenizer(File input) {
         INDEX = 0;
@@ -111,6 +135,14 @@ public class Tokenizer {
         return TOKENS;
     }
 
+    public String GetType() {
+        return TOKEN.getType();
+    }
+
+    public String GetValue() {
+        return TOKEN.getValue();
+    }
+
     public boolean HasMoreTokens() {
         return INDEX + 1 != TOKENS.size();
     }
@@ -119,7 +151,14 @@ public class Tokenizer {
         if(HasMoreTokens()) {
             TOKEN = TOKENS.get(INDEX);
             INDEX = INDEX + 1;
+        } else {
+            throw new IllegalStateException("No more tokens");
         }
+    }
+
+    public void Back() {
+        INDEX = INDEX - 1;
+        TOKEN = TOKENS.get(INDEX);
     }
 
     public Token Classify(String value) {

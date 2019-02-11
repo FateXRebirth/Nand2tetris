@@ -1,3 +1,5 @@
+package com.example.compile;
+
 import java.io.*;
 import java.util.ArrayList;
 
@@ -24,12 +26,7 @@ public class CompilationEngine {
         }
     }
 
-    public void WriteTag(String tag) {
-        System.out.println(tag);
-    }
-
-    public void Write() {
-
+    public void Test() {
         try {
             bufferedWriter.write("<class>");
             bufferedWriter.newLine();
@@ -48,11 +45,21 @@ public class CompilationEngine {
         }
     }
 
-    public void CompileClass() {
-        WriteTag("<class>");
-        WriteTag("</class>");
-        Write();
+    public void Start() {
         try {
+            bufferedWriter.write("<class>");
+            bufferedWriter.newLine();
+            TokenbufferedWriter.write("<token>");
+            TokenbufferedWriter.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void End() {
+        try {
+            bufferedWriter.write("</class>");
+            TokenbufferedWriter.write("</token>");
             bufferedWriter.close();
             fileWriter.close();
             TokenbufferedWriter.close();
@@ -62,9 +69,118 @@ public class CompilationEngine {
         }
     }
 
+    public void WriteTag(String tag) {
+        try {
+            bufferedWriter.write(tag);
+            bufferedWriter.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void Write(Token token) {
+        try {
+            bufferedWriter.write(token.XmlFormat());
+            bufferedWriter.newLine();
+            TokenbufferedWriter.write(token.XmlFormat());
+            TokenbufferedWriter.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void  CompileType() {
+        tokenizer.Advance();
+
+        if(tokenizer.GetType() == tokenizer.KEYWORD && (tokenizer.GetValue() == tokenizer.INT || tokenizer.GetValue() == tokenizer.CHAR || tokenizer.GetValue() == tokenizer.BOOLEAN)) {
+            Write(tokenizer.GetToken());
+            return;
+        }
+        if(tokenizer.GetType() == tokenizer.IDENTIFIER) {
+            Write(tokenizer.GetToken());
+            return;
+        }
+        Exception("Int | Char | Boolean | ClassName");
+        return;
+    }
+
+    public void CompileClass() {
+        tokenizer.Advance();
+
+        if(tokenizer.GetType() != tokenizer.KEYWORD || tokenizer.GetValue() != tokenizer.CLASS) {
+            Exception("Class");
+        }
+
+        Start();
+        Write(tokenizer.GetToken());
+        tokenizer.Advance();
+
+        if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+            Exception("ClassName");
+        }
+        Write(tokenizer.GetToken());
+        Expect("{");
+
+        CompileClassVarDec();
+        CompileSubRoutineDec();
+
+        Expect("}");
+
+        if(tokenizer.HasMoreTokens()) {
+            throw new IllegalStateException("Unexpected Tokens");
+        }
+
+        End();
+    }
+
     public void CompileClassVarDec() {
+        tokenizer.Advance();
+
+        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "}") {
+            tokenizer.Back();
+            return;
+        }
+
+        if(tokenizer.GetType() != tokenizer.KEYWORD) {
+            Exception("Keywords");
+        }
+
+        if(tokenizer.GetValue() == tokenizer.CONSTRUCTOR || tokenizer.GetValue() == tokenizer.FUNCTION || tokenizer.GetValue() == tokenizer.METHOD) {
+            tokenizer.Back();
+            return;
+        }
+
         WriteTag("<classVarDec>");
+
+        if(tokenizer.GetValue() != tokenizer.STATIC && tokenizer.GetValue() != tokenizer.FIELD) {
+            Exception("Static or Field");
+        }
+
+        Write(tokenizer.GetToken());
+
+        CompileType();
+
+        do {
+            tokenizer.Advance();
+            if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+                Exception("Identifier");
+            }
+            Write(tokenizer.GetToken());
+            tokenizer.Advance();
+            if(tokenizer.GetType() != tokenizer.SYMBOL || (tokenizer.GetValue() != "," && tokenizer.GetValue() != ";")) {
+                Exception("',' or ';'");
+            }
+            if(tokenizer.GetValue() == ",") {
+                Write(tokenizer.GetToken());
+            } else {
+                Write(tokenizer.GetToken());
+                break;
+            }
+        } while (true);
+
         WriteTag("</classVarDec>");
+
+        CompileClassVarDec();
     }
 
     public void CompileSubRoutineDec() {
@@ -130,5 +246,18 @@ public class CompilationEngine {
     public void CompileExpressionList() {
         WriteTag("<expressionList>");
         WriteTag("</expressionList>");
+    }
+
+    public void Exception(String message) {
+        throw new IllegalStateException("Expected : " + message + ", But :" + tokenizer.GetValue());
+    }
+
+    public void Expect(String symbol) {
+        tokenizer.Advance();
+        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == symbol) {
+            Write(tokenizer.GetToken());
+        } else {
+            Exception(symbol);
+        }
     }
 }
