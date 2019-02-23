@@ -142,7 +142,7 @@ public class CompilationEngine {
         }
 
         if(tokenizer.GetType() != tokenizer.KEYWORD) {
-            Exception("Keywords");
+            Exception("Keyword");
         }
 
         if(tokenizer.GetValue() == tokenizer.CONSTRUCTOR || tokenizer.GetValue() == tokenizer.FUNCTION || tokenizer.GetValue() == tokenizer.METHOD) {
@@ -184,32 +184,150 @@ public class CompilationEngine {
     }
 
     public void CompileSubRoutineDec() {
+
+        tokenizer.Advance();
+
+        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "}") {
+            tokenizer.Back();
+            return;
+        }
+
+        if(tokenizer.GetType() != tokenizer.KEYWORD || (tokenizer.GetValue() != tokenizer.CONSTRUCTOR && tokenizer.GetValue() != tokenizer.FUNCTION && tokenizer.GetValue() != tokenizer.METHOD)) {
+            Exception("Constructor | Function | Method");
+        }
+
         WriteTag("<subRoutineDec>");
+        Write(tokenizer.GetToken());
+        tokenizer.Advance();
+        if(tokenizer.GetType() == tokenizer.KEYWORD && tokenizer.GetValue() == tokenizer.VOID) {
+            Write(tokenizer.GetToken());
+        } else {
+            tokenizer.Back();
+            CompileType();
+        }
+
+        tokenizer.Advance();
+        if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+            Exception("SubroutineName");
+        }
+        Write(tokenizer.GetToken());
+
+        Expect("(");
+        CompileParameterList();
+        Expect(")");
+        CompileSubRoutineBody();
         WriteTag("</subRoutineDec>");
+        CompileSubRoutineDec();
     }
 
     public void CompileSubRoutineBody() {
         WriteTag("<subRoutineBody>");
+        Expect("{");
+        CompileVarDec();
+        WriteTag("<statements>");
+        CompileStatements();
+        WriteTag("</statements>");
+        Expect("}");
         WriteTag("</subRoutineBody>");
+    }
+
+    public void CompileSubroutineCall() {
+        
     }
 
     public void CompileParameterList() {
         WriteTag("<parameterList>");
+        tokenizer.Advance();
+        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == ")") {
+            tokenizer.Back();
+            return;
+        }
+        tokenizer.Advance();
+        do {
+            CompileType();
+
+            tokenizer.Advance();
+            if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+                Exception("Identifier");
+            }
+            Write(tokenizer.GetToken());
+            tokenizer.Advance();
+            if(tokenizer.GetType() != tokenizer.SYMBOL || (tokenizer.GetValue() != "," && tokenizer.GetValue() != ")")) {
+                Exception("',' or ')'" );
+            }
+            if(tokenizer.GetValue() == ",") {
+                Write(tokenizer.GetToken());
+            } else {
+                tokenizer.Back();
+                break;
+            }
+        } while (true);
         WriteTag("</parameterList>");
     }
 
     public void CompileVarDec() {
+        tokenizer.Advance();
+        if(tokenizer.GetType() != tokenizer.KEYWORD || tokenizer.GetValue() != tokenizer.VAR) {
+            tokenizer.Back();
+            return;
+        }
         WriteTag("<varDec>");
+        Write(tokenizer.GetToken());
+        CompileType();
+        do {
+            tokenizer.Advance();
+            if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+                Exception("Identifier");
+            }
+            Write(tokenizer.GetToken());
+            tokenizer.Advance();
+            if(tokenizer.GetType() != tokenizer.SYMBOL || (tokenizer.GetValue() != "," && tokenizer.GetValue() != ";")) {
+                Exception("',' or ';'");
+            }
+            if(tokenizer.GetValue() == ",") {
+                Write(tokenizer.GetToken());
+            } else {
+                Write(tokenizer.GetToken());
+                break;
+            }
+        } while (true);
         WriteTag("</varDec>");
+        CompileVarDec();
     }
 
     public void CompileStatements() {
-        WriteTag("<statements>");
-        WriteTag("</statements>");
+        tokenizer.Advance();
+        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "}") {
+            tokenizer.Back();
+            return;
+        }
+
+        if(tokenizer.GetType() != tokenizer.KEYWORD) {
+            Exception("Keyword");
+        } else {
+            if(tokenizer.GetValue() == tokenizer.LET) {
+                CompileLet();
+            } else if(tokenizer.GetValue() == tokenizer.IF) {
+                CompileIf();
+            } else if(tokenizer.GetValue() == tokenizer.WHILE) {
+                CompileWhile();
+            } else if(tokenizer.GetValue() == tokenizer.DO) {
+                CompileDo();
+            } else if(tokenizer.GetValue() == tokenizer.RETURN) {
+                CompileReturn();
+            } else {
+                Exception("Let | If | While | Do | Return");
+            }
+        }
+        CompileStatements();
     }
 
     public void CompileDo() {
         WriteTag("<doStatement>");
+        tokenizer.Advance();
+        Write(tokenizer.GetToken());
+        CompileSubroutineCall();
+        Expect(";");
         WriteTag("</doStatement>");
     }
 
