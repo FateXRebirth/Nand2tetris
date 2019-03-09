@@ -1,5 +1,7 @@
 package com.example.compile;
 
+import sun.jvm.hotspot.opto.Compile;
+
 import java.io.*;
 import java.util.ArrayList;
 
@@ -232,7 +234,7 @@ public class CompilationEngine {
     }
 
     public void CompileSubroutineCall() {
-        
+
     }
 
     public void CompileParameterList() {
@@ -333,21 +335,94 @@ public class CompilationEngine {
 
     public void CompileLet() {
         WriteTag("<letStatement>");
+        tokenizer.Advance();
+        Write(tokenizer.GetToken());
+        tokenizer.Advance();
+        if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+            Exception("VarName");
+        }
+        Write(tokenizer.GetToken());
+        tokenizer.Advance();
+        if(tokenizer.GetType() != tokenizer.SYMBOL || (tokenizer.GetValue() != "[" && tokenizer.GetValue() != "=")) {
+            Exception("'[' or '='");
+        }
+
+        boolean KeepGoing = false;
+        if(tokenizer.GetValue() == "[") {
+            KeepGoing = true;
+            Write(tokenizer.GetToken());
+            CompileExpression();
+            tokenizer.Advance();
+            if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "]") {
+                Write(tokenizer.GetToken());
+            } else {
+                Exception("']");
+            }
+        }
+        if(KeepGoing) tokenizer.Advance();
+
+        Write(tokenizer.GetToken());
+        CompileExpression();
+        Expect(";");
         WriteTag("</letStatement>");
     }
 
     public void CompileWhile() {
         WriteTag("<whileStatement>");
+        tokenizer.Advance();
+        Write(tokenizer.GetToken());
+        Expect("(");
+        CompileExpression();
+        Expect(")");
+        Expect("{");
+        WriteTag("<statements>");
+        CompileStatements();
+        WriteTag("</statements>");
+        Expect("}");
         WriteTag("</whileStatement>");
     }
 
     public void CompileReturn() {
         WriteTag("<returnStatement>");
+        tokenizer.Advance();
+        Write(tokenizer.GetToken());
+        tokenizer.Advance();
+        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == ";") {
+            Write(tokenizer.GetToken());
+            WriteTag("</returnStatement>");
+            return;
+        }
+
+        tokenizer.Back();
+        CompileExpression();
+        Expect(";");
         WriteTag("</returnStatement>");
     }
 
     public void CompileIf() {
         WriteTag("<ifStatement>");
+        tokenizer.Advance();
+        Write(tokenizer.GetToken());
+        Expect("(");
+        CompileExpression();
+        Expect(")");
+        Expect("{");
+        WriteTag("<statements>");
+        CompileStatements();
+        WriteTag("</statements>");
+        Expect("}");
+
+        tokenizer.Advance();
+        if(tokenizer.GetType() == tokenizer.KEYWORD && tokenizer.GetValue() == tokenizer.ELSE) {
+            Write(tokenizer.GetToken());
+            Expect("{");
+            WriteTag("<statements>");
+            CompileStatements();
+            WriteTag("</statements>");
+            Expect("}");
+        } else {
+            tokenizer.Back();
+        }
         WriteTag("</ifStatement>");
     }
 
