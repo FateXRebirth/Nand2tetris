@@ -14,6 +14,7 @@ public class Tokenizer {
     private ArrayList<Token> TOKENS;
     private ArrayList<String> KEYWORDS;
     private ArrayList<String> SYMBOLS;
+    private ArrayList<String> OPERATORS;
 
     public String KEYWORD = "keyword";
     public String SYMBOL = "symbol";
@@ -48,13 +49,18 @@ public class Tokenizer {
         TOKENS = new ArrayList<Token>();
         KEYWORDS = new ArrayList<String>();
         SYMBOLS = new ArrayList<String>();
+        OPERATORS = new ArrayList<String>();
         String[] keywords = { "class", "constructor", "function", "method", "field", "static", "var", "int", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
         String[] symbols = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=", "~" };
+        String[] operators = { "+", "-", "*", "/", "&", "|", "<", ">", "=" };
         for(String keyword : keywords) {
             KEYWORDS.add(keyword);
         }
         for(String symbol : symbols) {
             SYMBOLS.add(symbol);
+        }
+        for(String operator : operators) {
+            OPERATORS.add(operator);
         }
         try {
             fileReader = new FileReader(input);
@@ -159,6 +165,10 @@ public class Tokenizer {
     public void Back() {
         INDEX = INDEX - 1;
         TOKEN = TOKENS.get(INDEX);
+    }
+
+    public boolean IsOperator() {
+        return OPERATORS.contains(TOKEN.getValue());
     }
 
     public Token Classify(String value) {

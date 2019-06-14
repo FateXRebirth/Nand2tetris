@@ -234,7 +234,30 @@ public class CompilationEngine {
     }
 
     public void CompileSubroutineCall() {
-
+        tokenizer.Advance();
+        if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+            Exception("Identifier");
+        }
+        Write(tokenizer.GetToken());
+        tokenizer.Advance();
+        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "(") {
+            Write(tokenizer.GetToken());
+            CompileExpressionList();
+            Expect(")");
+        } else if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == ".") {
+            Write(tokenizer.GetToken());
+            tokenizer.Advance();
+            if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+                Exception("Identifier");
+            }
+            Write(tokenizer.GetToken());
+            tokenizer.Advance();
+            Expect("(");
+            CompileExpressionList();
+            Expect(")");
+        } else {
+            Exception("'(' or '.'");
+        }
     }
 
     public void CompileParameterList() {
@@ -428,16 +451,87 @@ public class CompilationEngine {
 
     public void CompileExpression() {
         WriteTag("<expression>");
+        CompileTerm();
+        do {
+            tokenizer.Advance();
+            if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.IsOperator()) {
+                if(tokenizer.GetValue() == ">") {
+                    Write(tokenizer.GetToken());
+                } else if(tokenizer.GetValue() == "<") {
+                    Write(tokenizer.GetToken());
+                } else if(tokenizer.GetValue() == "&") {
+                    Write(tokenizer.GetToken());
+                } else {
+                    Write(tokenizer.GetToken());
+                }
+                CompileTerm();
+            } else {
+                tokenizer.Back();
+                break;
+            }
+        } while (true);
         WriteTag("</expression>");
     }
 
     public void CompileTerm() {
         WriteTag("<term>");
+        tokenizer.Advance();
+        if(tokenizer.GetType() == tokenizer.IDENTIFIER) {
+            Token identifier = tokenizer.GetToken();
+            tokenizer.Advance();
+            if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "[") {
+                Write(identifier);
+                Write(tokenizer.GetToken());
+                CompileExpression();
+                Expect("]");
+            } else if(tokenizer.GetType() == tokenizer.SYMBOL && (tokenizer.GetValue() == "(" || tokenizer.GetValue() == ".")) {
+                tokenizer.Back();
+                tokenizer.Back();
+                CompileSubroutineCall();
+            } else {
+                Write(identifier);
+                tokenizer.Back();
+            }
+        } else {
+            if(tokenizer.GetType() == tokenizer.INT_CONST) {
+                Write(tokenizer.GetToken());
+            } else if(tokenizer.GetType() == tokenizer.STRING_CONST) {
+                Write(tokenizer.GetToken());
+            } else if(tokenizer.GetType() == tokenizer.KEYWORD && (tokenizer.GetValue() == tokenizer.TRUE || tokenizer.GetValue() == tokenizer.FALSE || tokenizer.GetValue() == tokenizer.NULL || tokenizer.GetValue() == tokenizer.THIS)) {
+                Write(tokenizer.GetToken());
+            } else if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "(") {
+                Write(tokenizer.GetToken());
+                CompileExpression();
+                Expect(")");
+            } else if(tokenizer.GetType() == tokenizer.SYMBOL && (tokenizer.GetValue() == "-" || tokenizer.GetValue() == "~")) {
+                Write(tokenizer.GetToken());
+                CompileTerm();
+            } else {
+                Exception("IntegerConstant | StringConstant | KeywordConstant| '(' expression ')' | unaryOp term");
+            }
+        }
         WriteTag("</term>");
     }
 
     public void CompileExpressionList() {
         WriteTag("<expressionList>");
+        tokenizer.Advance();
+        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == ")") {
+            tokenizer.Back();
+        } else {
+            tokenizer.Back();
+            CompileExpression();
+            do {
+                tokenizer.Advance();
+                if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == ",") {
+                    Write(tokenizer.GetToken());
+                    CompileExpression();
+                } else {
+                    tokenizer.Back();
+                    break;
+                }
+            } while (true);
+        }
         WriteTag("</expressionList>");
     }
 
