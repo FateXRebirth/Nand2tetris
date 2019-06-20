@@ -1,5 +1,6 @@
 package com.example.compile;
 
+import com.sun.tools.corba.se.idl.constExpr.Not;
 import sun.jvm.hotspot.opto.Compile;
 
 import java.io.*;
@@ -94,11 +95,11 @@ public class CompilationEngine {
     public void  CompileType() {
         tokenizer.Advance();
 
-        if(tokenizer.GetType() == tokenizer.KEYWORD && (tokenizer.GetValue() == tokenizer.INT || tokenizer.GetValue() == tokenizer.CHAR || tokenizer.GetValue() == tokenizer.BOOLEAN)) {
+        if( Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.INT) || Equal(tokenizer.GetValue(), tokenizer.CHAR) || Equal(tokenizer.GetValue(), tokenizer.BOOLEAN)) {
             Write(tokenizer.GetToken());
             return;
         }
-        if(tokenizer.GetType() == tokenizer.IDENTIFIER) {
+        if( Equal(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
             Write(tokenizer.GetToken());
             return;
         }
@@ -109,7 +110,7 @@ public class CompilationEngine {
     public void CompileClass() {
         tokenizer.Advance();
 
-        if(tokenizer.GetType() != tokenizer.KEYWORD || tokenizer.GetValue() != tokenizer.CLASS) {
+        if(NotEqual(tokenizer.GetType(), tokenizer.KEYWORD) || NotEqual(tokenizer.GetValue(), tokenizer.CLASS)) {
             Exception("Class");
         }
 
@@ -117,7 +118,7 @@ public class CompilationEngine {
         Write(tokenizer.GetToken());
         tokenizer.Advance();
 
-        if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+        if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
             Exception("ClassName");
         }
         Write(tokenizer.GetToken());
@@ -138,23 +139,23 @@ public class CompilationEngine {
     public void CompileClassVarDec() {
         tokenizer.Advance();
 
-        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "}") {
+        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "}")) {
             tokenizer.Back();
             return;
         }
 
-        if(tokenizer.GetType() != tokenizer.KEYWORD) {
+        if(NotEqual(tokenizer.GetType(), tokenizer.KEYWORD)) {
             Exception("Keyword");
         }
 
-        if(tokenizer.GetValue() == tokenizer.CONSTRUCTOR || tokenizer.GetValue() == tokenizer.FUNCTION || tokenizer.GetValue() == tokenizer.METHOD) {
+        if(Equal(tokenizer.GetValue(), tokenizer.CONSTRUCTOR) || Equal(tokenizer.GetValue(), tokenizer.FUNCTION) || Equal(tokenizer.GetValue(), tokenizer.METHOD)) {
             tokenizer.Back();
             return;
         }
 
         WriteTag("<classVarDec>");
 
-        if(tokenizer.GetValue() != tokenizer.STATIC && tokenizer.GetValue() != tokenizer.FIELD) {
+        if(NotEqual(tokenizer.GetValue(), tokenizer.STATIC) && NotEqual(tokenizer.GetValue(),tokenizer.FIELD)) {
             Exception("Static or Field");
         }
 
@@ -164,15 +165,15 @@ public class CompilationEngine {
 
         do {
             tokenizer.Advance();
-            if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+            if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
                 Exception("Identifier");
             }
             Write(tokenizer.GetToken());
             tokenizer.Advance();
-            if(tokenizer.GetType() != tokenizer.SYMBOL || (tokenizer.GetValue() != "," && tokenizer.GetValue() != ";")) {
+            if(NotEqual(tokenizer.GetType(), tokenizer.SYMBOL) || ( NotEqual(tokenizer.GetValue(), ",") && NotEqual(tokenizer.GetValue(), ";"))) {
                 Exception("',' or ';'");
             }
-            if(tokenizer.GetValue() == ",") {
+            if(Equal(tokenizer.GetValue(), ",")) {
                 Write(tokenizer.GetToken());
             } else {
                 Write(tokenizer.GetToken());
@@ -189,19 +190,19 @@ public class CompilationEngine {
 
         tokenizer.Advance();
 
-        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "}") {
+        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "}")) {
             tokenizer.Back();
             return;
         }
 
-        if(tokenizer.GetType() != tokenizer.KEYWORD || (tokenizer.GetValue() != tokenizer.CONSTRUCTOR && tokenizer.GetValue() != tokenizer.FUNCTION && tokenizer.GetValue() != tokenizer.METHOD)) {
+        if(NotEqual(tokenizer.GetType(), tokenizer.KEYWORD) || ( NotEqual(tokenizer.GetValue(), tokenizer.CONSTRUCTOR) && NotEqual(tokenizer.GetValue(), tokenizer.FUNCTION) && NotEqual(tokenizer.GetValue(), tokenizer.METHOD))) {
             Exception("Constructor | Function | Method");
         }
 
         WriteTag("<subRoutineDec>");
         Write(tokenizer.GetToken());
         tokenizer.Advance();
-        if(tokenizer.GetType() == tokenizer.KEYWORD && tokenizer.GetValue() == tokenizer.VOID) {
+        if(Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.VOID)) {
             Write(tokenizer.GetToken());
         } else {
             tokenizer.Back();
@@ -209,7 +210,7 @@ public class CompilationEngine {
         }
 
         tokenizer.Advance();
-        if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+        if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
             Exception("SubroutineName");
         }
         Write(tokenizer.GetToken());
@@ -235,19 +236,19 @@ public class CompilationEngine {
 
     public void CompileSubroutineCall() {
         tokenizer.Advance();
-        if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+        if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
             Exception("Identifier");
         }
         Write(tokenizer.GetToken());
         tokenizer.Advance();
-        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "(") {
+        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "(")) {
             Write(tokenizer.GetToken());
             CompileExpressionList();
             Expect(")");
-        } else if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == ".") {
+        } else if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ".")) {
             Write(tokenizer.GetToken());
             tokenizer.Advance();
-            if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+            if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
                 Exception("Identifier");
             }
             Write(tokenizer.GetToken());
@@ -263,7 +264,7 @@ public class CompilationEngine {
     public void CompileParameterList() {
         WriteTag("<parameterList>");
         tokenizer.Advance();
-        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == ")") {
+        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ")")) {
             tokenizer.Back();
             return;
         }
@@ -272,15 +273,15 @@ public class CompilationEngine {
             CompileType();
 
             tokenizer.Advance();
-            if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+            if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
                 Exception("Identifier");
             }
             Write(tokenizer.GetToken());
             tokenizer.Advance();
-            if(tokenizer.GetType() != tokenizer.SYMBOL || (tokenizer.GetValue() != "," && tokenizer.GetValue() != ")")) {
+            if(NotEqual(tokenizer.GetType(), tokenizer.SYMBOL) || ( NotEqual(tokenizer.GetValue(), ",") && NotEqual(tokenizer.GetValue(), ")"))) {
                 Exception("',' or ')'" );
             }
-            if(tokenizer.GetValue() == ",") {
+            if(Equal(tokenizer.GetValue(), ",")) {
                 Write(tokenizer.GetToken());
             } else {
                 tokenizer.Back();
@@ -292,7 +293,7 @@ public class CompilationEngine {
 
     public void CompileVarDec() {
         tokenizer.Advance();
-        if(tokenizer.GetType() != tokenizer.KEYWORD || tokenizer.GetValue() != tokenizer.VAR) {
+        if(NotEqual(tokenizer.GetType(), tokenizer.KEYWORD) || NotEqual(tokenizer.GetValue(), tokenizer.VAR)) {
             tokenizer.Back();
             return;
         }
@@ -301,15 +302,15 @@ public class CompilationEngine {
         CompileType();
         do {
             tokenizer.Advance();
-            if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+            if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
                 Exception("Identifier");
             }
             Write(tokenizer.GetToken());
             tokenizer.Advance();
-            if(tokenizer.GetType() != tokenizer.SYMBOL || (tokenizer.GetValue() != "," && tokenizer.GetValue() != ";")) {
+            if(NotEqual(tokenizer.GetType(), tokenizer.SYMBOL) || ( NotEqual(tokenizer.GetValue(), ",") && NotEqual(tokenizer.GetValue(), ";"))) {
                 Exception("',' or ';'");
             }
-            if(tokenizer.GetValue() == ",") {
+            if(Equal(tokenizer.GetValue(), ",")) {
                 Write(tokenizer.GetToken());
             } else {
                 Write(tokenizer.GetToken());
@@ -322,23 +323,23 @@ public class CompilationEngine {
 
     public void CompileStatements() {
         tokenizer.Advance();
-        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "}") {
+        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "}")) {
             tokenizer.Back();
             return;
         }
 
-        if(tokenizer.GetType() != tokenizer.KEYWORD) {
+        if(NotEqual(tokenizer.GetType(), tokenizer.KEYWORD)) {
             Exception("Keyword");
         } else {
-            if(tokenizer.GetValue() == tokenizer.LET) {
+            if(Equal(tokenizer.GetValue(), tokenizer.LET)) {
                 CompileLet();
-            } else if(tokenizer.GetValue() == tokenizer.IF) {
+            } else if(Equal(tokenizer.GetValue(), tokenizer.IF)) {
                 CompileIf();
-            } else if(tokenizer.GetValue() == tokenizer.WHILE) {
+            } else if(Equal(tokenizer.GetValue(), tokenizer.WHILE)) {
                 CompileWhile();
-            } else if(tokenizer.GetValue() == tokenizer.DO) {
+            } else if(Equal(tokenizer.GetValue(), tokenizer.DO)) {
                 CompileDo();
-            } else if(tokenizer.GetValue() == tokenizer.RETURN) {
+            } else if(Equal(tokenizer.GetValue(), tokenizer.RETURN)) {
                 CompileReturn();
             } else {
                 Exception("Let | If | While | Do | Return");
@@ -361,22 +362,22 @@ public class CompilationEngine {
         tokenizer.Advance();
         Write(tokenizer.GetToken());
         tokenizer.Advance();
-        if(tokenizer.GetType() != tokenizer.IDENTIFIER) {
+        if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
             Exception("VarName");
         }
         Write(tokenizer.GetToken());
         tokenizer.Advance();
-        if(tokenizer.GetType() != tokenizer.SYMBOL || (tokenizer.GetValue() != "[" && tokenizer.GetValue() != "=")) {
+        if(NotEqual(tokenizer.GetType(), tokenizer.SYMBOL) || ( NotEqual(tokenizer.GetValue(), "[") && NotEqual(tokenizer.GetValue(), "="))) {
             Exception("'[' or '='");
         }
 
         boolean KeepGoing = false;
-        if(tokenizer.GetValue() == "[") {
+        if(Equal(tokenizer.GetValue(), "[")) {
             KeepGoing = true;
             Write(tokenizer.GetToken());
             CompileExpression();
             tokenizer.Advance();
-            if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "]") {
+            if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "]")) {
                 Write(tokenizer.GetToken());
             } else {
                 Exception("']");
@@ -410,7 +411,7 @@ public class CompilationEngine {
         tokenizer.Advance();
         Write(tokenizer.GetToken());
         tokenizer.Advance();
-        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == ";") {
+        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ";")) {
             Write(tokenizer.GetToken());
             WriteTag("</returnStatement>");
             return;
@@ -436,7 +437,7 @@ public class CompilationEngine {
         Expect("}");
 
         tokenizer.Advance();
-        if(tokenizer.GetType() == tokenizer.KEYWORD && tokenizer.GetValue() == tokenizer.ELSE) {
+        if(Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.ELSE)) {
             Write(tokenizer.GetToken());
             Expect("{");
             WriteTag("<statements>");
@@ -454,12 +455,12 @@ public class CompilationEngine {
         CompileTerm();
         do {
             tokenizer.Advance();
-            if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.IsOperator()) {
-                if(tokenizer.GetValue() == ">") {
+            if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && tokenizer.IsOperator()) {
+                if(Equal(tokenizer.GetValue(), ">")) {
                     Write(tokenizer.GetToken());
-                } else if(tokenizer.GetValue() == "<") {
+                } else if(Equal(tokenizer.GetValue(), "<")) {
                     Write(tokenizer.GetToken());
-                } else if(tokenizer.GetValue() == "&") {
+                } else if(Equal(tokenizer.GetValue(), "&")) {
                     Write(tokenizer.GetToken());
                 } else {
                     Write(tokenizer.GetToken());
@@ -476,15 +477,15 @@ public class CompilationEngine {
     public void CompileTerm() {
         WriteTag("<term>");
         tokenizer.Advance();
-        if(tokenizer.GetType() == tokenizer.IDENTIFIER) {
+        if(Equal(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
             Token identifier = tokenizer.GetToken();
             tokenizer.Advance();
-            if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "[") {
+            if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "[")) {
                 Write(identifier);
                 Write(tokenizer.GetToken());
                 CompileExpression();
                 Expect("]");
-            } else if(tokenizer.GetType() == tokenizer.SYMBOL && (tokenizer.GetValue() == "(" || tokenizer.GetValue() == ".")) {
+            } else if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && ( Equal(tokenizer.GetValue(), "(") || Equal(tokenizer.GetValue(), "."))) {
                 tokenizer.Back();
                 tokenizer.Back();
                 CompileSubroutineCall();
@@ -493,17 +494,17 @@ public class CompilationEngine {
                 tokenizer.Back();
             }
         } else {
-            if(tokenizer.GetType() == tokenizer.INT_CONST) {
+            if(Equal(tokenizer.GetType(), tokenizer.INT_CONST)) {
                 Write(tokenizer.GetToken());
-            } else if(tokenizer.GetType() == tokenizer.STRING_CONST) {
+            } else if(Equal(tokenizer.GetType(), tokenizer.STRING_CONST)) {
                 Write(tokenizer.GetToken());
-            } else if(tokenizer.GetType() == tokenizer.KEYWORD && (tokenizer.GetValue() == tokenizer.TRUE || tokenizer.GetValue() == tokenizer.FALSE || tokenizer.GetValue() == tokenizer.NULL || tokenizer.GetValue() == tokenizer.THIS)) {
+            } else if(Equal(tokenizer.GetType(), tokenizer.KEYWORD) && ( Equal(tokenizer.GetValue(), tokenizer.TRUE) || Equal(tokenizer.GetValue(), tokenizer.FALSE) || Equal(tokenizer.GetValue(), tokenizer.NULL) || Equal(tokenizer.GetValue(), tokenizer.THIS))) {
                 Write(tokenizer.GetToken());
-            } else if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == "(") {
+            } else if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "(")) {
                 Write(tokenizer.GetToken());
                 CompileExpression();
                 Expect(")");
-            } else if(tokenizer.GetType() == tokenizer.SYMBOL && (tokenizer.GetValue() == "-" || tokenizer.GetValue() == "~")) {
+            } else if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && ( Equal(tokenizer.GetValue(), "-") || Equal(tokenizer.GetValue(), "~"))) {
                 Write(tokenizer.GetToken());
                 CompileTerm();
             } else {
@@ -516,14 +517,14 @@ public class CompilationEngine {
     public void CompileExpressionList() {
         WriteTag("<expressionList>");
         tokenizer.Advance();
-        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == ")") {
+        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ")")) {
             tokenizer.Back();
         } else {
             tokenizer.Back();
             CompileExpression();
             do {
                 tokenizer.Advance();
-                if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == ",") {
+                if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ",")) {
                     Write(tokenizer.GetToken());
                     CompileExpression();
                 } else {
@@ -535,13 +536,21 @@ public class CompilationEngine {
         WriteTag("</expressionList>");
     }
 
+    public boolean Equal(String value1, String value2) {
+        return value1.equals(value2);
+    }
+
+    public boolean NotEqual(String value1, String value2) {
+        return !value1.equals(value2);
+    }
+
     public void Exception(String message) {
         throw new IllegalStateException("Expected : " + message + ", But :" + tokenizer.GetValue());
     }
 
     public void Expect(String symbol) {
         tokenizer.Advance();
-        if(tokenizer.GetType() == tokenizer.SYMBOL && tokenizer.GetValue() == symbol) {
+        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), symbol)) {
             Write(tokenizer.GetToken());
         } else {
             Exception(symbol);
