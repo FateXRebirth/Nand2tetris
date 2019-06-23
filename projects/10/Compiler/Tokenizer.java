@@ -9,9 +9,11 @@ public class Tokenizer {
     private FileReader fileReader;
     private BufferedReader bufferedReader;
     private ArrayList<String> INPUT;
+
     private int INDEX;
     private Token TOKEN;
     private ArrayList<Token> TOKENS;
+
     private ArrayList<String> KEYWORDS;
     private ArrayList<String> SYMBOLS;
     private ArrayList<String> OPERATORS;
@@ -21,11 +23,13 @@ public class Tokenizer {
     public String STRING_CONST = "stringConstant";
     public String INT_CONST = "integerConstant";
     public String IDENTIFIER = "identifier";
+
     public String CLASS = "class";
     public String METHOD = "method";
     public String FUNCTION = "function";
     public String CONSTRUCTOR = "constructor";
     public String INT = "int";
+    public String ARRAY = "Array";
     public String BOOLEAN = "boolean";
     public String CHAR = "char";
     public String VOID = "void";
@@ -50,7 +54,7 @@ public class Tokenizer {
         KEYWORDS = new ArrayList<String>();
         SYMBOLS = new ArrayList<String>();
         OPERATORS = new ArrayList<String>();
-        String[] keywords = { "class", "constructor", "function", "method", "field", "static", "var", "int", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
+        String[] keywords = { "class", "constructor", "function", "method", "field", "static", "var", "int", "Array", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
         String[] symbols = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=", "~" };
         String[] operators = { "+", "-", "*", "/", "&", "|", "<", ">", "=" };
         for(String keyword : keywords) {
@@ -68,14 +72,22 @@ public class Tokenizer {
             int value = 0;
             // reads to the end of the stream
             while((value = bufferedReader.read()) != -1) {
-                // ignore space and \n
+                // ignore space
                 if(value != 32) {
-                    // converts int to character
-                    char c = (char)value;
-                    // prints character and its ascii code for debug
-                    // System.out.println("char(" + c + ") -> int(" + value +")");
-                    // save tokens
-                    INPUT.add(Character.toString(c));
+                    if(value == 47 && bufferedReader.read() == 47) {
+                        // skip comment's content
+                        while(bufferedReader.read() != 10) {
+                            // record last position
+                            bufferedReader.mark(0);
+                        }
+                        // back to last position
+                        bufferedReader.reset();
+                    } else {
+                        // converts int to character
+                        char c = (char)value;
+                        // save tokens
+                        INPUT.add(Character.toString(c));
+                    }
                 }
             }
             bufferedReader.close();
@@ -96,7 +108,7 @@ public class Tokenizer {
             last = INPUT.get(pos);
             stream = stream + INPUT.get(pos);
             if (SYMBOLS.contains(last)) {
-                if (last.equals("/") || last.equals("*")) {
+                if (last.equals("/")) {
                     commentString = commentString + last;
                     if (commentString.equals("//") || commentString.equals("/*")) {
                         String c;
@@ -150,7 +162,7 @@ public class Tokenizer {
     }
 
     public boolean HasMoreTokens() {
-        return INDEX + 1 != TOKENS.size();
+        return INDEX != TOKENS.size();
     }
 
     public void Advance() {
@@ -163,8 +175,7 @@ public class Tokenizer {
     }
 
     public void Back() {
-        INDEX = INDEX - 1;
-        TOKEN = TOKENS.get(INDEX);
+        if(INDEX > 0) INDEX = INDEX - 1;
     }
 
     public boolean IsOperator() {

@@ -1,10 +1,6 @@
 package com.example.compile;
 
-import com.sun.tools.corba.se.idl.constExpr.Not;
-import sun.jvm.hotspot.opto.Compile;
-
 import java.io.*;
-import java.util.ArrayList;
 
 public class CompilationEngine {
 
@@ -14,35 +10,13 @@ public class CompilationEngine {
     private FileWriter TokenfileWriter;
     private BufferedWriter TokenbufferedWriter;
 
-    private ArrayList<Token> TOKENS;
-
     public CompilationEngine(File inFile, File outFile, File outTokenFile) {
-        TOKENS = new ArrayList<Token>();
         try {
             tokenizer = new Tokenizer(inFile);
             fileWriter = new FileWriter(outFile);
             bufferedWriter = new BufferedWriter(fileWriter);
             TokenfileWriter = new FileWriter(outTokenFile);
             TokenbufferedWriter = new BufferedWriter(TokenfileWriter);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void Test() {
-        try {
-            bufferedWriter.write("<class>");
-            bufferedWriter.newLine();
-            TokenbufferedWriter.write("<token>");
-            TokenbufferedWriter.newLine();
-            for(Token t : tokenizer.GetTokens()) {
-                bufferedWriter.write(t.XmlFormat());
-                bufferedWriter.newLine();
-                TokenbufferedWriter.write(t.XmlFormat());
-                TokenbufferedWriter.newLine();
-            }
-            bufferedWriter.write("</class>");
-            TokenbufferedWriter.write("</token>");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -95,7 +69,7 @@ public class CompilationEngine {
     public void  CompileType() {
         tokenizer.Advance();
 
-        if( Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.INT) || Equal(tokenizer.GetValue(), tokenizer.CHAR) || Equal(tokenizer.GetValue(), tokenizer.BOOLEAN)) {
+        if( Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.INT) || Equal(tokenizer.GetValue(), tokenizer.ARRAY) || Equal(tokenizer.GetValue(), tokenizer.CHAR) || Equal(tokenizer.GetValue(), tokenizer.BOOLEAN)) {
             Write(tokenizer.GetToken());
             return;
         }
@@ -103,7 +77,7 @@ public class CompilationEngine {
             Write(tokenizer.GetToken());
             return;
         }
-        Exception("Int | Char | Boolean | ClassName");
+        Exception("Int | Array | Char | Boolean | ClassName");
         return;
     }
 
@@ -195,7 +169,7 @@ public class CompilationEngine {
             return;
         }
 
-        if(NotEqual(tokenizer.GetType(), tokenizer.KEYWORD) || ( NotEqual(tokenizer.GetValue(), tokenizer.CONSTRUCTOR) && NotEqual(tokenizer.GetValue(), tokenizer.FUNCTION) && NotEqual(tokenizer.GetValue(), tokenizer.METHOD))) {
+        if(NotEqual(tokenizer.GetType(), tokenizer.KEYWORD) || (NotEqual(tokenizer.GetValue(), tokenizer.CONSTRUCTOR)) && (NotEqual(tokenizer.GetValue(), tokenizer.FUNCTION)) && (NotEqual(tokenizer.GetValue(), tokenizer.METHOD))) {
             Exception("Constructor | Function | Method");
         }
 
@@ -252,7 +226,6 @@ public class CompilationEngine {
                 Exception("Identifier");
             }
             Write(tokenizer.GetToken());
-            tokenizer.Advance();
             Expect("(");
             CompileExpressionList();
             Expect(")");
@@ -262,12 +235,12 @@ public class CompilationEngine {
     }
 
     public void CompileParameterList() {
-        WriteTag("<parameterList>");
         tokenizer.Advance();
         if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ")")) {
             tokenizer.Back();
             return;
         }
+        WriteTag("<parameterList>");
         tokenizer.Advance();
         do {
             CompileType();
@@ -350,7 +323,6 @@ public class CompilationEngine {
 
     public void CompileDo() {
         WriteTag("<doStatement>");
-        tokenizer.Advance();
         Write(tokenizer.GetToken());
         CompileSubroutineCall();
         Expect(";");
@@ -408,7 +380,6 @@ public class CompilationEngine {
 
     public void CompileReturn() {
         WriteTag("<returnStatement>");
-        tokenizer.Advance();
         Write(tokenizer.GetToken());
         tokenizer.Advance();
         if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ";")) {

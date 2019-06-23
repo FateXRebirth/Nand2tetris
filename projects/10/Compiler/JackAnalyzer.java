@@ -9,13 +9,12 @@ class JackAnalyzer {
 
         // check if user provides argument to handle
         if(args.length < 1) {
-            throw new IllegalArgumentException("Missing argument! (e.g. java Tokenizer Test.jack) ");
+            throw new IllegalArgumentException("Missing argument! (e.g. java JackAnalyzer Test.jack) ");
         }
 
         File fileIn = new File(args[0]);
         File fileOut, TokenfileOut;
-        String fileOutPath = "";
-        String TokenfileOutPath = "";
+        String fileOutPath, TokenfileOutPath;
         ArrayList<File> files = new ArrayList<File>();
 
         if( fileIn.isFile() ) {
