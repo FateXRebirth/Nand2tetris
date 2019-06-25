@@ -10,7 +10,10 @@ public class CompilationEngine {
     private FileWriter TokenfileWriter;
     private BufferedWriter TokenbufferedWriter;
 
+    private int TabSize;
+
     public CompilationEngine(File inFile, File outFile, File outTokenFile) {
+        TabSize = 1;
         try {
             tokenizer = new Tokenizer(inFile);
             fileWriter = new FileWriter(outFile);
@@ -46,18 +49,30 @@ public class CompilationEngine {
         }
     }
 
-    public void WriteTag(String tag) {
-        try {
-            bufferedWriter.write(tag);
-            bufferedWriter.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void WriteTag(String type, String tag) {
+        if(type.equals("start")) {
+            try {
+                bufferedWriter.write( Indentation() + "<" + tag + ">");
+                bufferedWriter.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Indent();
+        } else {
+            Dedent();
+            try {
+                bufferedWriter.write( Indentation() +  "</" + tag + ">");
+                bufferedWriter.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
     }
 
     public void Write(Token token) {
         try {
-            bufferedWriter.write(token.XmlFormat());
+            bufferedWriter.write( Indentation() + token.XmlFormat());
             bufferedWriter.newLine();
             TokenbufferedWriter.write(token.XmlFormat());
             TokenbufferedWriter.newLine();
@@ -127,7 +142,7 @@ public class CompilationEngine {
             return;
         }
 
-        WriteTag("<classVarDec>");
+        WriteTag("start", "classVarDec");
 
         if(NotEqual(tokenizer.GetValue(), tokenizer.STATIC) && NotEqual(tokenizer.GetValue(),tokenizer.FIELD)) {
             Exception("Static or Field");
@@ -155,13 +170,12 @@ public class CompilationEngine {
             }
         } while (true);
 
-        WriteTag("</classVarDec>");
+        WriteTag("end", "classVarDec");
 
         CompileClassVarDec();
     }
 
     public void CompileSubRoutineDec() {
-
         tokenizer.Advance();
 
         if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "}")) {
@@ -173,7 +187,8 @@ public class CompilationEngine {
             Exception("Constructor | Function | Method");
         }
 
-        WriteTag("<subRoutineDec>");
+        WriteTag("start", "subRoutineDec");
+
         Write(tokenizer.GetToken());
         tokenizer.Advance();
         if(Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.VOID)) {
@@ -193,19 +208,19 @@ public class CompilationEngine {
         CompileParameterList();
         Expect(")");
         CompileSubRoutineBody();
-        WriteTag("</subRoutineDec>");
+        WriteTag("end", "subRoutineDec");
         CompileSubRoutineDec();
     }
 
     public void CompileSubRoutineBody() {
-        WriteTag("<subRoutineBody>");
+        WriteTag("start", "subRoutineBody");
         Expect("{");
         CompileVarDec();
-        WriteTag("<statements>");
+        WriteTag("start", "statements");
         CompileStatements();
-        WriteTag("</statements>");
+        WriteTag("end", "statements");
         Expect("}");
-        WriteTag("</subRoutineBody>");
+        WriteTag("end", "subRoutineBody");
     }
 
     public void CompileSubroutineCall() {
@@ -240,7 +255,7 @@ public class CompilationEngine {
             tokenizer.Back();
             return;
         }
-        WriteTag("<parameterList>");
+        WriteTag("start", "parameterList");
         tokenizer.Advance();
         do {
             CompileType();
@@ -261,7 +276,7 @@ public class CompilationEngine {
                 break;
             }
         } while (true);
-        WriteTag("</parameterList>");
+        WriteTag("end", "parameterList");
     }
 
     public void CompileVarDec() {
@@ -270,7 +285,7 @@ public class CompilationEngine {
             tokenizer.Back();
             return;
         }
-        WriteTag("<varDec>");
+        WriteTag("start", "varDec");
         Write(tokenizer.GetToken());
         CompileType();
         do {
@@ -290,7 +305,7 @@ public class CompilationEngine {
                 break;
             }
         } while (true);
-        WriteTag("</varDec>");
+        WriteTag("end", "varDec");
         CompileVarDec();
     }
 
@@ -322,15 +337,15 @@ public class CompilationEngine {
     }
 
     public void CompileDo() {
-        WriteTag("<doStatement>");
+        WriteTag("start", "doStatement");
         Write(tokenizer.GetToken());
         CompileSubroutineCall();
         Expect(";");
-        WriteTag("</doStatement>");
+        WriteTag("end", "doStatement");
     }
 
     public void CompileLet() {
-        WriteTag("<letStatement>");
+        WriteTag("start", "letStatement");
         tokenizer.Advance();
         Write(tokenizer.GetToken());
         tokenizer.Advance();
@@ -360,69 +375,69 @@ public class CompilationEngine {
         Write(tokenizer.GetToken());
         CompileExpression();
         Expect(";");
-        WriteTag("</letStatement>");
+        WriteTag("end", "letStatement");
     }
 
     public void CompileWhile() {
-        WriteTag("<whileStatement>");
+        WriteTag("start", "whileStatement");
         tokenizer.Advance();
         Write(tokenizer.GetToken());
         Expect("(");
         CompileExpression();
         Expect(")");
         Expect("{");
-        WriteTag("<statements>");
+        WriteTag("start", "statements");
         CompileStatements();
-        WriteTag("</statements>");
+        WriteTag("end", "statements");
         Expect("}");
-        WriteTag("</whileStatement>");
+        WriteTag("end", "whileStatement");
     }
 
     public void CompileReturn() {
-        WriteTag("<returnStatement>");
+        WriteTag("start", "returnStatement");
         Write(tokenizer.GetToken());
         tokenizer.Advance();
         if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ";")) {
             Write(tokenizer.GetToken());
-            WriteTag("</returnStatement>");
+            WriteTag("end", "returnStatement");
             return;
         }
 
         tokenizer.Back();
         CompileExpression();
         Expect(";");
-        WriteTag("</returnStatement>");
+        WriteTag("end", "returnStatement");
     }
 
     public void CompileIf() {
-        WriteTag("<ifStatement>");
+        WriteTag("start", "ifStatement");
         tokenizer.Advance();
         Write(tokenizer.GetToken());
         Expect("(");
         CompileExpression();
         Expect(")");
         Expect("{");
-        WriteTag("<statements>");
+        WriteTag("start", "statements");
         CompileStatements();
-        WriteTag("</statements>");
+        WriteTag("end", "statements");
         Expect("}");
 
         tokenizer.Advance();
         if(Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.ELSE)) {
             Write(tokenizer.GetToken());
             Expect("{");
-            WriteTag("<statements>");
+            WriteTag("start", "statements");
             CompileStatements();
-            WriteTag("</statements>");
+            WriteTag("end", "statements");
             Expect("}");
         } else {
             tokenizer.Back();
         }
-        WriteTag("</ifStatement>");
+        WriteTag("end", "ifStatement");
     }
 
     public void CompileExpression() {
-        WriteTag("<expression>");
+        WriteTag("start", "expression");
         CompileTerm();
         do {
             tokenizer.Advance();
@@ -442,11 +457,11 @@ public class CompilationEngine {
                 break;
             }
         } while (true);
-        WriteTag("</expression>");
+        WriteTag("end", "expression");
     }
 
     public void CompileTerm() {
-        WriteTag("<term>");
+        WriteTag("start", "term");
         tokenizer.Advance();
         if(Equal(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
             Token identifier = tokenizer.GetToken();
@@ -482,11 +497,11 @@ public class CompilationEngine {
                 Exception("IntegerConstant | StringConstant | KeywordConstant| '(' expression ')' | unaryOp term");
             }
         }
-        WriteTag("</term>");
+        WriteTag("end", "term");
     }
 
     public void CompileExpressionList() {
-        WriteTag("<expressionList>");
+        WriteTag("start", "expressionList");
         tokenizer.Advance();
         if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ")")) {
             tokenizer.Back();
@@ -504,7 +519,7 @@ public class CompilationEngine {
                 }
             } while (true);
         }
-        WriteTag("</expressionList>");
+        WriteTag("end", "expressionList");
     }
 
     public boolean Equal(String value1, String value2) {
@@ -526,5 +541,21 @@ public class CompilationEngine {
         } else {
             Exception(symbol);
         }
+    }
+
+    public void Indent() {
+        TabSize = TabSize + 1;
+    }
+
+    public void Dedent() {
+        TabSize = TabSize - 1;
+    }
+
+    public String Indentation() {
+        String result = "";
+        for(int i = 0; i < TabSize; i++) {
+            result += "  ";
+        }
+        return result;
     }
 }

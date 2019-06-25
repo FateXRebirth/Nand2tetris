@@ -31,7 +31,7 @@ public class Token {
     }
 
     public String XmlFormat() {
-        return "  <" + this.type + "> " + this.value + " </" + this.type + ">";
+        return "<" + this.type + "> " + this.value + " </" + this.type + ">";
     }
 
 }
