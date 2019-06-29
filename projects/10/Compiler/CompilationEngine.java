@@ -554,7 +554,7 @@ public class CompilationEngine {
     public String Indentation() {
         String result = "";
         for(int i = 0; i < TabSize; i++) {
-            result += "  ";
+            result += "   ";
         }
         return result;
     }

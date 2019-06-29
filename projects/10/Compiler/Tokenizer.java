@@ -24,6 +24,12 @@ public class Tokenizer {
     public String INT_CONST = "integerConstant";
     public String IDENTIFIER = "identifier";
 
+    public String KeywordRegex = "";
+    public String SymbolRegex = "";
+    public String IntegerRegex = "";
+    public String StringRegex = "";
+    public String IdentifierRegex = "";
+
     public String CLASS = "class";
     public String METHOD = "method";
     public String FUNCTION = "function";
@@ -59,34 +65,66 @@ public class Tokenizer {
         String[] operators = { "+", "-", "*", "/", "&", "|", "<", ">", "=" };
         for(String keyword : keywords) {
             KEYWORDS.add(keyword);
+            KeywordRegex += keyword + "|";
         }
+        SymbolRegex += "[";
         for(String symbol : symbols) {
             SYMBOLS.add(symbol);
+            SymbolRegex += "\\" + symbol;
         }
+        SymbolRegex += "]";
         for(String operator : operators) {
             OPERATORS.add(operator);
         }
+        IntegerRegex = "^[0-9]{1,5}$";
+        StringRegex = "\"[^\"\n]*\"";
+        IdentifierRegex = "[\\w_]+";
         try {
             fileReader = new FileReader(input);
             bufferedReader = new BufferedReader(fileReader);
-            int value = 0;
-            // reads to the end of the stream
-            while((value = bufferedReader.read()) != -1) {
-                // ignore space
-                if(value != 32) {
-                    if(value == 47 && bufferedReader.read() == 47) {
-                        // skip comment's content
-                        while(bufferedReader.read() != 10) {
-                            // record last position
-                            bufferedReader.mark(0);
+
+            String value = "";
+            String next = "";
+            String fragment = "";
+            boolean isString = false;
+            String line = null;
+
+            while ((line = bufferedReader.readLine()) != null) {
+                if(!line.startsWith("//") && !line.startsWith("/*") && !line.equals("")) {
+                    for(int i = 0; i < line.length(); i++) {
+                        value = String.valueOf(line.charAt(i));
+                        if(i < line.length()-1) next = String.valueOf(line.charAt(i+1));
+                        if(value.equals(" ") || value.equals("\t")) {
+                            continue;
+                        } else if(value.equals("\"") && !isString) {
+                            isString = true;
+                            while (isString) {
+                                fragment = fragment + String.valueOf(line.charAt(i));
+                                i = i + 1;
+                                if(String.valueOf(line.charAt(i)).equals("\"")) {
+                                    isString = false;
+                                }
+                            }
+                            fragment = fragment + "\"";
+                            INPUT.add(fragment);
+                            fragment = "";
+                        } else {
+                            if(OPERATORS.contains(value) || SYMBOLS.contains(value)) {
+                                INPUT.add(value);
+                            } else {
+                                fragment = fragment + value;
+                                if(KEYWORDS.contains(fragment)) {
+                                    INPUT.add(fragment);
+                                    fragment = "";
+                                } else if(next.equals(" ")) {
+                                    INPUT.add(fragment);
+                                    fragment = "";
+                                } else if(SYMBOLS.contains(next)) {
+                                    INPUT.add(fragment);
+                                    fragment = "";
+                                }
+                            }
                         }
-                        // back to last position
-                        bufferedReader.reset();
-                    } else {
-                        // converts int to character
-                        char c = (char)value;
-                        // save tokens
-                        INPUT.add(Character.toString(c));
                     }
                 }
             }
@@ -99,49 +137,33 @@ public class Tokenizer {
     }
 
     public void Analyze() {
-        String stream = "";
-        String last = "";
-        String commentString = "";
-        boolean comment = false;
-        int pos = 0;
-        while(pos < INPUT.size()) {
-            last = INPUT.get(pos);
-            stream = stream + INPUT.get(pos);
-            if (SYMBOLS.contains(last)) {
-                if (last.equals("/")) {
-                    commentString = commentString + last;
-                    if (commentString.equals("//") || commentString.equals("/*")) {
-                        String c;
-                        int index = 1;
-                        comment = true;
-                        while (comment) {
-                            c = INPUT.get(pos + index);
-                            if (c.equals("/") || c.equals("\n")) {
-                                pos = pos + index;
-                                comment = false;
-                            } else {
-                                index = index + 1;
-                            }
-                        }
-                    }
+        for(String input : INPUT) {
+            if (input.matches(KeywordRegex)){
+                TOKENS.add(new Token(KEYWORD, input));
+            } else if (input.matches(SymbolRegex)){
+                if(input.equals("<")) {
+                    TOKENS.add(new Token(SYMBOL, "&lt;"));
+                } else if(input.equals(">")) {
+                    TOKENS.add(new Token(SYMBOL, "&gt;"));
+                } else if(input.equals("\"")) {
+                    TOKENS.add(new Token(SYMBOL, "&quot;"));
+                } else if(input.equals("&")) {
+                    TOKENS.add(new Token(SYMBOL, "&amp;"));
                 } else {
-                    if (stream.length() > 1) {
-                        String subString = stream.substring(0, stream.length() - 1);
-                        TOKENS.add(Classify(subString));
-                    }
-                    TOKENS.add(Classify(last));
-                    stream = "";
+                    TOKENS.add(new Token(SYMBOL, input));
                 }
-
-            } else if (last.equals("\n")) {
-                stream = "";
+            } else if (input.matches(IntegerRegex) && Integer.valueOf(input) >= 0 && Integer.valueOf(input) <= 32767){
+                TOKENS.add(new Token(INT_CONST, input));
+            } else if (input.matches(StringRegex)){
+                TOKENS.add(new Token(STRING_CONST, input.substring(1, input.length()-1)));
+            } else if (input.matches(IdentifierRegex)){
+                TOKENS.add(new Token(IDENTIFIER, input));
             } else {
-                if (SYMBOLS.contains(stream) || KEYWORDS.contains(stream)) {
-                    TOKENS.add(Classify(stream));
-                    stream = "";
-                }
+                throw new IllegalArgumentException("Unknown token: " + input);
             }
-            pos = pos + 1;
+        }
+        for(Token token : TOKENS) {
+            System.out.println(token.XmlFormat());
         }
     }
 
