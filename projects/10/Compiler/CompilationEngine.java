@@ -84,7 +84,7 @@ public class CompilationEngine {
     public void  CompileType() {
         tokenizer.Advance();
 
-        if( Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.INT) || Equal(tokenizer.GetValue(), tokenizer.ARRAY) || Equal(tokenizer.GetValue(), tokenizer.CHAR) || Equal(tokenizer.GetValue(), tokenizer.BOOLEAN)) {
+        if( Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.INT) || Equal(tokenizer.GetValue(), tokenizer.CHAR) || Equal(tokenizer.GetValue(), tokenizer.BOOLEAN)) {
             Write(tokenizer.GetToken());
             return;
         }
@@ -92,7 +92,7 @@ public class CompilationEngine {
             Write(tokenizer.GetToken());
             return;
         }
-        Exception("Int | Array | Char | Boolean | ClassName");
+        Exception("Int | Char | Boolean | ClassName");
         return;
     }
 
@@ -256,7 +256,7 @@ public class CompilationEngine {
             return;
         }
         WriteTag("start", "parameterList");
-        tokenizer.Advance();
+        tokenizer.Back();
         do {
             CompileType();
 
@@ -348,7 +348,6 @@ public class CompilationEngine {
         WriteTag("start", "letStatement");
         tokenizer.Advance();
         Write(tokenizer.GetToken());
-        tokenizer.Advance();
         if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
             Exception("VarName");
         }
@@ -380,7 +379,6 @@ public class CompilationEngine {
 
     public void CompileWhile() {
         WriteTag("start", "whileStatement");
-        tokenizer.Advance();
         Write(tokenizer.GetToken());
         Expect("(");
         CompileExpression();
@@ -411,7 +409,6 @@ public class CompilationEngine {
 
     public void CompileIf() {
         WriteTag("start", "ifStatement");
-        tokenizer.Advance();
         Write(tokenizer.GetToken());
         Expect("(");
         CompileExpression();
@@ -442,15 +439,7 @@ public class CompilationEngine {
         do {
             tokenizer.Advance();
             if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && tokenizer.IsOperator()) {
-                if(Equal(tokenizer.GetValue(), ">")) {
-                    Write(tokenizer.GetToken());
-                } else if(Equal(tokenizer.GetValue(), "<")) {
-                    Write(tokenizer.GetToken());
-                } else if(Equal(tokenizer.GetValue(), "&")) {
-                    Write(tokenizer.GetToken());
-                } else {
-                    Write(tokenizer.GetToken());
-                }
+                Write(tokenizer.GetToken());
                 CompileTerm();
             } else {
                 tokenizer.Back();
@@ -531,7 +520,7 @@ public class CompilationEngine {
     }
 
     public void Exception(String message) {
-        throw new IllegalStateException("Expected : " + message + ", But :" + tokenizer.GetValue());
+        throw new IllegalStateException("Expected : " + message + ", But : " + tokenizer.GetValue());
     }
 
     public void Expect(String symbol) {
@@ -554,7 +543,7 @@ public class CompilationEngine {
     public String Indentation() {
         String result = "";
         for(int i = 0; i < TabSize; i++) {
-            result += "   ";
+            result += "  ";
         }
         return result;
     }

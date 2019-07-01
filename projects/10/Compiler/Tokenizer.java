@@ -60,9 +60,9 @@ public class Tokenizer {
         KEYWORDS = new ArrayList<String>();
         SYMBOLS = new ArrayList<String>();
         OPERATORS = new ArrayList<String>();
-        String[] keywords = { "class", "constructor", "function", "method", "field", "static", "var", "int", "Array", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
+        String[] keywords = { "class", "constructor", "function", "method", "field", "static", "var", "int", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
         String[] symbols = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=", "~" };
-        String[] operators = { "+", "-", "*", "/", "&", "|", "<", ">", "=" };
+        String[] operators = { "+", "-", "*", "/", "&", "|", "<", ">", "=" , "&lt;", "&gt;", "&amp;", "&quot;" };
         for(String keyword : keywords) {
             KEYWORDS.add(keyword);
             KeywordRegex += keyword + "|";
@@ -90,12 +90,15 @@ public class Tokenizer {
             String line = null;
 
             while ((line = bufferedReader.readLine()) != null) {
-                if(!line.startsWith("//") && !line.startsWith("/*") && !line.equals("")) {
+                line = line.trim();
+                if( !line.equals("") && !line.startsWith("//") && !line.startsWith("/*") && !line.startsWith("/**") && !line.startsWith("*") ) {
                     for(int i = 0; i < line.length(); i++) {
                         value = String.valueOf(line.charAt(i));
                         if(i < line.length()-1) next = String.valueOf(line.charAt(i+1));
                         if(value.equals(" ") || value.equals("\t")) {
                             continue;
+                        } else if(value.equals("/") && next.equals("/")) {
+                            break;
                         } else if(value.equals("\"") && !isString) {
                             isString = true;
                             while (isString) {
@@ -161,9 +164,6 @@ public class Tokenizer {
             } else {
                 throw new IllegalArgumentException("Unknown token: " + input);
             }
-        }
-        for(Token token : TOKENS) {
-            System.out.println(token.XmlFormat());
         }
     }
 
