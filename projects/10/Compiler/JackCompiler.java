@@ -1,9 +1,7 @@
-package com.example.compile;
-
 import java.io.File;
 import java.util.ArrayList;
 
-class JackAnalyzer {
+public class JackCompiler {
 
     public static void main(String[] args) {
 

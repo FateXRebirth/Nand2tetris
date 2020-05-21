@@ -1,10 +1,8 @@
-package com.example.compile;
-
 import java.io.*;
 import java.util.regex.*;
 import java.util.ArrayList;
 
-public class Tokenizer {
+public class JackTokenizer {
 
     private FileReader fileReader;
     private BufferedReader bufferedReader;
@@ -53,7 +51,7 @@ public class Tokenizer {
     public String NULL = "null";
     public String THIS = "this";
 
-    public Tokenizer(File input) {
+    public JackTokenizer(File input) {
         INDEX = 0;
         INPUT = new ArrayList<String>();
         TOKENS = new ArrayList<Token>();

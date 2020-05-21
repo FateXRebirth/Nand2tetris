@@ -1,10 +1,8 @@
-package com.example.compile;
-
 import java.io.*;
 
 public class CompilationEngine {
 
-    private Tokenizer tokenizer;
+    private JackTokenizer tokenizer;
     private FileWriter fileWriter;
     private BufferedWriter bufferedWriter;
     private FileWriter TokenfileWriter;
@@ -15,7 +13,7 @@ public class CompilationEngine {
     public CompilationEngine(File inFile, File outFile, File outTokenFile) {
         TabSize = 1;
         try {
-            tokenizer = new Tokenizer(inFile);
+            tokenizer = new JackTokenizer(inFile);
             fileWriter = new FileWriter(outFile);
             bufferedWriter = new BufferedWriter(fileWriter);
             TokenfileWriter = new FileWriter(outTokenFile);
@@ -29,7 +27,7 @@ public class CompilationEngine {
         try {
             bufferedWriter.write("<class>");
             bufferedWriter.newLine();
-            TokenbufferedWriter.write("<token>");
+            TokenbufferedWriter.write("<tokens>");
             TokenbufferedWriter.newLine();
         } catch (IOException e) {
             e.printStackTrace();
@@ -39,7 +37,9 @@ public class CompilationEngine {
     public void End() {
         try {
             bufferedWriter.write("</class>");
-            TokenbufferedWriter.write("</token>");
+            bufferedWriter.newLine();
+            TokenbufferedWriter.write("</tokens>");
+            TokenbufferedWriter.newLine();
             bufferedWriter.close();
             fileWriter.close();
             TokenbufferedWriter.close();
@@ -187,7 +187,7 @@ public class CompilationEngine {
             Exception("Constructor | Function | Method");
         }
 
-        WriteTag("start", "subRoutineDec");
+        WriteTag("start", "subroutineDec");
 
         Write(tokenizer.GetToken());
         tokenizer.Advance();
@@ -205,22 +205,24 @@ public class CompilationEngine {
         Write(tokenizer.GetToken());
 
         Expect("(");
+        WriteTag("start", "parameterList");
         CompileParameterList();
+        WriteTag("end", "parameterList");
         Expect(")");
         CompileSubRoutineBody();
-        WriteTag("end", "subRoutineDec");
+        WriteTag("end", "subroutineDec");
         CompileSubRoutineDec();
     }
 
     public void CompileSubRoutineBody() {
-        WriteTag("start", "subRoutineBody");
+        WriteTag("start", "subroutineBody");
         Expect("{");
         CompileVarDec();
         WriteTag("start", "statements");
         CompileStatements();
         WriteTag("end", "statements");
         Expect("}");
-        WriteTag("end", "subRoutineBody");
+        WriteTag("end", "subroutineBody");
     }
 
     public void CompileSubroutineCall() {
@@ -255,7 +257,6 @@ public class CompilationEngine {
             tokenizer.Back();
             return;
         }
-        WriteTag("start", "parameterList");
         tokenizer.Back();
         do {
             CompileType();
@@ -276,7 +277,6 @@ public class CompilationEngine {
                 break;
             }
         } while (true);
-        WriteTag("end", "parameterList");
     }
 
     public void CompileVarDec() {
@@ -346,8 +346,8 @@ public class CompilationEngine {
 
     public void CompileLet() {
         WriteTag("start", "letStatement");
-        tokenizer.Advance();
         Write(tokenizer.GetToken());
+        tokenizer.Advance();
         if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
             Exception("VarName");
         }

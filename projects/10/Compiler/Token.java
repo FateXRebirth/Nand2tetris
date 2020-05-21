@@ -1,5 +1,3 @@
-package com.example.compile;
-
 public class Token {
 
     private String type;
