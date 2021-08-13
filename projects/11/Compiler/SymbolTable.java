@@ -1,9 +1,10 @@
+import java.util.Map;
 import java.util.HashMap;
 
 public class SymbolTable {
 
-    private HashMap<String, Symbol> ClassScope;
-    private HashMap<String, Symbol> SubroutineScope;
+    private Map<String, Symbol> ClassScope;
+    private Map<String, Symbol> SubroutineScope;
     private String STATIC = "static";
     private String FIELD = "field";
     private String ARGUMENT = "argument";
@@ -14,7 +15,10 @@ public class SymbolTable {
     private int LocalIndex = 0;
 
     public SymbolTable() {
-
+        ClassScope = new HashMap<String, Symbol>();
+        SubroutineScope = new HashMap<String, Symbol>();
+        resetClassScope();
+        resetSubroutineScope();
     }
 
     public void define(String name, String type, String kind) {
@@ -33,6 +37,28 @@ public class SymbolTable {
                 break;
             default:
                 break;
+        }
+    }
+
+    public void resetClassScope() {
+        ClassScope.clear();
+        StaticIndex = 0;
+        FieldIndex = 0;
+    }
+
+    public void resetSubroutineScope() {
+        SubroutineScope.clear();
+        ArgumentIndex = 0;
+        LocalIndex = 0;
+    }
+
+    // Development Tool for Developer
+    public void showSymbolTable() {
+        System.out.println("------TABLE-------");
+        for (Map.Entry<String, Symbol> entry : ClassScope.entrySet()) {
+            String name = entry.getKey();
+            String info = entry.getValue().getInfo();
+            System.out.println(name + " --- > " + String.valueOf(info));
         }
     }
 }

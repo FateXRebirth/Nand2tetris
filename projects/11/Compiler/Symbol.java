@@ -14,10 +14,14 @@ public class Symbol {
     }
 
     public String getKind() {
-        return this.type;
+        return this.kind;
     }
 
     public int getIndex() {
         return this.index;
+    }
+
+    public String getInfo() {
+        return "Type: " + this.type + " Kind: " + this.kind + " Index: " + this.index;
     }
 }
