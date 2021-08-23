@@ -1,4 +1,5 @@
 public class Symbol {
+
     private String type;
     private String kind;
     private int index;
@@ -22,6 +23,6 @@ public class Symbol {
     }
 
     public String getInfo() {
-        return "Type: " + this.type + " Kind: " + this.kind + " Index: " + this.index;
+        return "Type: " + this.type + ", Kind: " + this.kind + ", Index: " + this.index;
     }
 }

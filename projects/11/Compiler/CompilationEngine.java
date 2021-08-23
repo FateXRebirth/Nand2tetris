@@ -3,6 +3,7 @@ import java.io.*;
 public class CompilationEngine {
 
     private JackTokenizer tokenizer;
+    private SymbolTable symbolTable;
     private FileWriter fileWriter;
     private BufferedWriter bufferedWriter;
     private FileWriter TokenfileWriter;
@@ -14,6 +15,7 @@ public class CompilationEngine {
         TabSize = 1;
         try {
             tokenizer = new JackTokenizer(inFile);
+            symbolTable = new SymbolTable();
             fileWriter = new FileWriter(outFile);
             bufferedWriter = new BufferedWriter(fileWriter);
             TokenfileWriter = new FileWriter(outTokenFile);
@@ -86,10 +88,12 @@ public class CompilationEngine {
 
         if( Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.INT) || Equal(tokenizer.GetValue(), tokenizer.CHAR) || Equal(tokenizer.GetValue(), tokenizer.BOOLEAN)) {
             Write(tokenizer.GetToken());
+            symbolTable.setCurrentType(tokenizer.GetValue());
             return;
         }
         if( Equal(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
             Write(tokenizer.GetToken());
+            symbolTable.setCurrentType(tokenizer.GetValue());
             return;
         }
         Exception("Int | Char | Boolean | ClassName");
@@ -123,6 +127,7 @@ public class CompilationEngine {
         }
 
         End();
+        symbolTable.showSymbolTable();
     }
 
     public void CompileClassVarDec() {
@@ -150,6 +155,8 @@ public class CompilationEngine {
 
         Write(tokenizer.GetToken());
 
+        symbolTable.setCurrentKind(tokenizer.GetValue());
+
         CompileType();
 
         do {
@@ -158,6 +165,9 @@ public class CompilationEngine {
                 Exception("Identifier");
             }
             Write(tokenizer.GetToken());
+
+            symbolTable.Define(tokenizer.GetValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
+
             tokenizer.Advance();
             if(NotEqual(tokenizer.GetType(), tokenizer.SYMBOL) || ( NotEqual(tokenizer.GetValue(), ",") && NotEqual(tokenizer.GetValue(), ";"))) {
                 Exception("',' or ';'");
@@ -259,6 +269,8 @@ public class CompilationEngine {
         }
         tokenizer.Back();
         do {
+            symbolTable.setCurrentKind("argument");
+
             CompileType();
 
             tokenizer.Advance();
@@ -266,6 +278,9 @@ public class CompilationEngine {
                 Exception("Identifier");
             }
             Write(tokenizer.GetToken());
+
+            symbolTable.Define(tokenizer.GetValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
+
             tokenizer.Advance();
             if(NotEqual(tokenizer.GetType(), tokenizer.SYMBOL) || ( NotEqual(tokenizer.GetValue(), ",") && NotEqual(tokenizer.GetValue(), ")"))) {
                 Exception("',' or ')'" );
@@ -287,6 +302,9 @@ public class CompilationEngine {
         }
         WriteTag("start", "varDec");
         Write(tokenizer.GetToken());
+
+        symbolTable.setCurrentKind(tokenizer.GetValue());
+        
         CompileType();
         do {
             tokenizer.Advance();
@@ -294,6 +312,9 @@ public class CompilationEngine {
                 Exception("Identifier");
             }
             Write(tokenizer.GetToken());
+
+            symbolTable.Define(tokenizer.GetValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
+
             tokenizer.Advance();
             if(NotEqual(tokenizer.GetType(), tokenizer.SYMBOL) || ( NotEqual(tokenizer.GetValue(), ",") && NotEqual(tokenizer.GetValue(), ";"))) {
                 Exception("',' or ';'");

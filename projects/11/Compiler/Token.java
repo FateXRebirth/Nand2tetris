@@ -3,21 +3,21 @@ public class Token {
     private String type;
     private String value;
 
-    public Token(String Type, String Value) {
-        this.type = Type;
-        this.value = Value;
+    public Token(String type, String value) {
+        this.type = type;
+        this.value = value;
     }
 
-    public void setType(String Type) {
-        this.type = Type;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getType() {
         return this.type;
     }
 
-    public void setValue(String Value) {
-        this.value = Value;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public String getValue() {
@@ -31,5 +31,4 @@ public class Token {
     public String XmlFormat() {
         return "<" + this.type + "> " + this.value + " </" + this.type + ">";
     }
-
 }
