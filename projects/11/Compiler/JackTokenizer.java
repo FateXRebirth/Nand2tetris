@@ -6,27 +6,27 @@ public class JackTokenizer {
 
     private FileReader fileReader;
     private BufferedReader bufferedReader;
-    private ArrayList<String> INPUT;
+    private ArrayList<String> input;
 
-    private int INDEX;
-    private Token TOKEN;
-    private ArrayList<Token> TOKENS;
+    private int index;
+    private Token token;
+    private ArrayList<Token> tokens;
 
-    private ArrayList<String> KEYWORDS;
-    private ArrayList<String> SYMBOLS;
-    private ArrayList<String> OPERATORS;
+    private ArrayList<String> keywords;
+    private ArrayList<String> symbols;
+    private ArrayList<String> operators;
+
+    public String keywordRegex = "";
+    public String symbolRegex = "";
+    public String integerRegex = "";
+    public String stringRegex = "";
+    public String identifierRegex = "";
 
     public String KEYWORD = "keyword";
     public String SYMBOL = "symbol";
     public String STRING_CONST = "stringConstant";
     public String INT_CONST = "integerConstant";
     public String IDENTIFIER = "identifier";
-
-    public String KeywordRegex = "";
-    public String SymbolRegex = "";
-    public String IntegerRegex = "";
-    public String StringRegex = "";
-    public String IdentifierRegex = "";
 
     public String CLASS = "class";
     public String METHOD = "method";
@@ -51,34 +51,36 @@ public class JackTokenizer {
     public String NULL = "null";
     public String THIS = "this";
 
-    public JackTokenizer(File input) {
-        INDEX = 0;
-        INPUT = new ArrayList<String>();
-        TOKENS = new ArrayList<Token>();
-        KEYWORDS = new ArrayList<String>();
-        SYMBOLS = new ArrayList<String>();
-        OPERATORS = new ArrayList<String>();
-        String[] keywords = { "class", "constructor", "function", "method", "field", "static", "var", "int", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
-        String[] symbols = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=", "~" };
-        String[] operators = { "+", "-", "*", "/", "&", "|", "<", ">", "=" , "&lt;", "&gt;", "&amp;", "&quot;" };
-        for(String keyword : keywords) {
-            KEYWORDS.add(keyword);
-            KeywordRegex += keyword + "|";
+    public JackTokenizer(File file) {
+        index = 0;
+        input = new ArrayList<String>();
+        tokens = new ArrayList<Token>();
+        keywords = new ArrayList<String>();
+        symbols = new ArrayList<String>();
+        operators = new ArrayList<String>();
+        String[] KEYWORDS = { "class", "constructor", "function", "method", "field", "static", "var", "int", "char",
+                "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
+        String[] SYMBOLS = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=",
+                "~" };
+        String[] OPERATORS = { "+", "-", "*", "/", "&", "|", "<", ">", "=", "&lt;", "&gt;", "&amp;", "&quot;" };
+        for (String KEYWORD : KEYWORDS) {
+            keywords.add(KEYWORD);
+            keywordRegex += KEYWORD + "|";
         }
-        SymbolRegex += "[";
-        for(String symbol : symbols) {
-            SYMBOLS.add(symbol);
-            SymbolRegex += "\\" + symbol;
+        symbolRegex += "[";
+        for (String SYMBOL : SYMBOLS) {
+            symbols.add(SYMBOL);
+            symbolRegex += "\\" + SYMBOL;
         }
-        SymbolRegex += "]";
-        for(String operator : operators) {
-            OPERATORS.add(operator);
+        symbolRegex += "]";
+        for (String OPERATOR : OPERATORS) {
+            operators.add(OPERATOR);
         }
-        IntegerRegex = "^[0-9]{1,5}$";
-        StringRegex = "\"[^\"\n]*\"";
-        IdentifierRegex = "[\\w_]+";
+        integerRegex = "^[0-9]{1,5}$";
+        stringRegex = "\"[^\"\n]*\"";
+        identifierRegex = "[\\w_]+";
         try {
-            fileReader = new FileReader(input);
+            fileReader = new FileReader(file);
             bufferedReader = new BufferedReader(fileReader);
 
             String value = "";
@@ -89,39 +91,41 @@ public class JackTokenizer {
 
             while ((line = bufferedReader.readLine()) != null) {
                 line = line.trim();
-                if( !line.equals("") && !line.startsWith("//") && !line.startsWith("/*") && !line.startsWith("/**") && !line.startsWith("*") ) {
-                    for(int i = 0; i < line.length(); i++) {
+                if (!line.equals("") && !line.startsWith("//") && !line.startsWith("/*") && !line.startsWith("/**")
+                        && !line.startsWith("*")) {
+                    for (int i = 0; i < line.length(); i++) {
                         value = String.valueOf(line.charAt(i));
-                        if(i < line.length()-1) next = String.valueOf(line.charAt(i+1));
-                        if(value.equals(" ") || value.equals("\t")) {
+                        if (i < line.length() - 1)
+                            next = String.valueOf(line.charAt(i + 1));
+                        if (value.equals(" ") || value.equals("\t")) {
                             continue;
-                        } else if(value.equals("/") && next.equals("/")) {
+                        } else if (value.equals("/") && next.equals("/")) {
                             break;
-                        } else if(value.equals("\"") && !isString) {
+                        } else if (value.equals("\"") && !isString) {
                             isString = true;
                             while (isString) {
                                 fragment = fragment + String.valueOf(line.charAt(i));
                                 i = i + 1;
-                                if(String.valueOf(line.charAt(i)).equals("\"")) {
+                                if (String.valueOf(line.charAt(i)).equals("\"")) {
                                     isString = false;
                                 }
                             }
                             fragment = fragment + "\"";
-                            INPUT.add(fragment);
+                            input.add(fragment);
                             fragment = "";
                         } else {
-                            if(OPERATORS.contains(value) || SYMBOLS.contains(value)) {
-                                INPUT.add(value);
+                            if (operators.contains(value) || symbols.contains(value)) {
+                                input.add(value);
                             } else {
                                 fragment = fragment + value;
-                                if(KEYWORDS.contains(fragment)) {
-                                    INPUT.add(fragment);
+                                if (keywords.contains(fragment)) {
+                                    input.add(fragment);
                                     fragment = "";
-                                } else if(next.equals(" ")) {
-                                    INPUT.add(fragment);
+                                } else if (next.equals(" ")) {
+                                    input.add(fragment);
                                     fragment = "";
-                                } else if(SYMBOLS.contains(next)) {
-                                    INPUT.add(fragment);
+                                } else if (symbols.contains(next)) {
+                                    input.add(fragment);
                                     fragment = "";
                                 }
                             }
@@ -134,92 +138,94 @@ public class JackTokenizer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Analyze();
+        analyze();
     }
 
-    public void Analyze() {
-        for(String input : INPUT) {
-            if (input.matches(KeywordRegex)){
-                TOKENS.add(new Token(KEYWORD, input));
-            } else if (input.matches(SymbolRegex)){
-                if(input.equals("<")) {
-                    TOKENS.add(new Token(SYMBOL, "&lt;"));
-                } else if(input.equals(">")) {
-                    TOKENS.add(new Token(SYMBOL, "&gt;"));
-                } else if(input.equals("\"")) {
-                    TOKENS.add(new Token(SYMBOL, "&quot;"));
-                } else if(input.equals("&")) {
-                    TOKENS.add(new Token(SYMBOL, "&amp;"));
+    public void analyze() {
+        for (String token : input) {
+            if (token.matches(keywordRegex)) {
+                tokens.add(new Token(KEYWORD, token));
+            } else if (token.matches(symbolRegex)) {
+                if (token.equals("<")) {
+                    tokens.add(new Token(SYMBOL, "&lt;"));
+                } else if (token.equals(">")) {
+                    tokens.add(new Token(SYMBOL, "&gt;"));
+                } else if (token.equals("\"")) {
+                    tokens.add(new Token(SYMBOL, "&quot;"));
+                } else if (token.equals("&")) {
+                    tokens.add(new Token(SYMBOL, "&amp;"));
                 } else {
-                    TOKENS.add(new Token(SYMBOL, input));
+                    tokens.add(new Token(SYMBOL, token));
                 }
-            } else if (input.matches(IntegerRegex) && Integer.valueOf(input) >= 0 && Integer.valueOf(input) <= 32767){
-                TOKENS.add(new Token(INT_CONST, input));
-            } else if (input.matches(StringRegex)){
-                TOKENS.add(new Token(STRING_CONST, input.substring(1, input.length()-1)));
-            } else if (input.matches(IdentifierRegex)){
-                TOKENS.add(new Token(IDENTIFIER, input));
+            } else if (token.matches(integerRegex) && Integer.valueOf(token) >= 0 && Integer.valueOf(token) <= 32767) {
+                tokens.add(new Token(INT_CONST, token));
+            } else if (token.matches(stringRegex)) {
+                tokens.add(new Token(STRING_CONST, token.substring(1, token.length() - 1)));
+            } else if (token.matches(identifierRegex)) {
+                tokens.add(new Token(IDENTIFIER, token));
             } else {
-                throw new IllegalArgumentException("Unknown token: " + input);
+                throw new IllegalArgumentException("Unknown token: " + token);
             }
         }
     }
 
-    public Token GetToken() {
-        return TOKEN;
+    public Token getToken() {
+        return token;
     }
 
-    public ArrayList<Token> GetTokens() {
-        return TOKENS;
+    public ArrayList<Token> getTokens() {
+        return tokens;
     }
 
-    public String GetType() {
-        return TOKEN.getType();
+    public String getType() {
+        return token.getType();
     }
 
-    public String GetValue() {
-        return TOKEN.getValue();
+    public String getValue() {
+        return token.getValue();
     }
 
-    public boolean HasMoreTokens() {
-        return INDEX != TOKENS.size();
+    public boolean hasMoreTokens() {
+        return index != tokens.size();
     }
 
-    public void Advance() {
-        if(HasMoreTokens()) {
-            TOKEN = TOKENS.get(INDEX);
-            INDEX = INDEX + 1;
+    public void advance() {
+        if (hasMoreTokens()) {
+            token = tokens.get(index);
+            index = index + 1;
         } else {
             throw new IllegalStateException("No more tokens");
         }
     }
 
-    public void Back() {
-        if(INDEX > 0) INDEX = INDEX - 1;
+    public void back() {
+        if (index > 0)
+            index = index - 1;
     }
 
-    public boolean IsOperator() {
-        return OPERATORS.contains(TOKEN.getValue());
+    public boolean isOperator() {
+        return operators.contains(token.getValue());
     }
 
-    public Token Classify(String value) {
-        if(KEYWORDS.contains(value)) {
+    public Token classify(String value) {
+        if (keywords.contains(value)) {
             return new Token(KEYWORD, value);
-        } else if(SYMBOLS.contains(value)) {
-            if(value.equals("<")) {
+        } else if (symbols.contains(value)) {
+            if (value.equals("<")) {
                 return new Token(SYMBOL, "&lt;");
-            } else if(value.equals(">")) {
+            } else if (value.equals(">")) {
                 return new Token(SYMBOL, "&gt;");
-            } else if(value.equals("\"")) {
+            } else if (value.equals("\"")) {
                 return new Token(SYMBOL, "&quot;");
-            } else if(value.equals("&")) {
+            } else if (value.equals("&")) {
                 return new Token(SYMBOL, "&amp;");
             } else {
                 return new Token(SYMBOL, value);
             }
-        } else if(Pattern.matches("^\".+\"$", value)) {
-            return new Token(STRING_CONST, value.substring(1, value.length()-1));
-        } else if(Pattern.matches("^[0-9]{1,5}$", value) && Integer.valueOf(value) >= 0 && Integer.valueOf(value) <= 32767) {
+        } else if (Pattern.matches("^\".+\"$", value)) {
+            return new Token(STRING_CONST, value.substring(1, value.length() - 1));
+        } else if (Pattern.matches("^[0-9]{1,5}$", value) && Integer.valueOf(value) >= 0
+                && Integer.valueOf(value) <= 32767) {
             return new Token(INT_CONST, value);
         } else {
             return new Token(IDENTIFIER, value);

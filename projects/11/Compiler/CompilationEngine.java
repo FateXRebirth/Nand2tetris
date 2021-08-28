@@ -6,64 +6,64 @@ public class CompilationEngine {
     private SymbolTable symbolTable;
     private FileWriter fileWriter;
     private BufferedWriter bufferedWriter;
-    private FileWriter TokenfileWriter;
-    private BufferedWriter TokenbufferedWriter;
+    private FileWriter tokenFileWriter;
+    private BufferedWriter tokenBufferedWriter;
 
-    private int TabSize;
+    private int tabSize;
 
     public CompilationEngine(File inFile, File outFile, File outTokenFile) {
-        TabSize = 1;
+        tabSize = 1;
         try {
             tokenizer = new JackTokenizer(inFile);
             symbolTable = new SymbolTable();
             fileWriter = new FileWriter(outFile);
             bufferedWriter = new BufferedWriter(fileWriter);
-            TokenfileWriter = new FileWriter(outTokenFile);
-            TokenbufferedWriter = new BufferedWriter(TokenfileWriter);
+            tokenFileWriter = new FileWriter(outTokenFile);
+            tokenBufferedWriter = new BufferedWriter(tokenFileWriter);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void Start() {
+    public void start() {
         try {
             bufferedWriter.write("<class>");
             bufferedWriter.newLine();
-            TokenbufferedWriter.write("<tokens>");
-            TokenbufferedWriter.newLine();
+            tokenBufferedWriter.write("<tokens>");
+            tokenBufferedWriter.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void End() {
+    public void end() {
         try {
             bufferedWriter.write("</class>");
             bufferedWriter.newLine();
-            TokenbufferedWriter.write("</tokens>");
-            TokenbufferedWriter.newLine();
+            tokenBufferedWriter.write("</tokens>");
+            tokenBufferedWriter.newLine();
             bufferedWriter.close();
             fileWriter.close();
-            TokenbufferedWriter.close();
-            TokenfileWriter.close();
+            tokenBufferedWriter.close();
+            tokenFileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void WriteTag(String type, String tag) {
-        if(type.equals("start")) {
+    public void writeTag(String type, String tag) {
+        if (type.equals("start")) {
             try {
-                bufferedWriter.write( Indentation() + "<" + tag + ">");
+                bufferedWriter.write(indentation() + "<" + tag + ">");
                 bufferedWriter.newLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Indent();
+            indent();
         } else {
-            Dedent();
+            dedent();
             try {
-                bufferedWriter.write( Indentation() +  "</" + tag + ">");
+                bufferedWriter.write(indentation() + "</" + tag + ">");
                 bufferedWriter.newLine();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -72,498 +72,511 @@ public class CompilationEngine {
 
     }
 
-    public void Write(Token token) {
+    public void write(Token token) {
         try {
-            bufferedWriter.write( Indentation() + token.XmlFormat());
+            bufferedWriter.write(indentation() + token.xmlFormat());
             bufferedWriter.newLine();
-            TokenbufferedWriter.write(token.XmlFormat());
-            TokenbufferedWriter.newLine();
+            tokenBufferedWriter.write(token.xmlFormat());
+            tokenBufferedWriter.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void  CompileType() {
-        tokenizer.Advance();
+    public void compileType() {
+        tokenizer.advance();
 
-        if( Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.INT) || Equal(tokenizer.GetValue(), tokenizer.CHAR) || Equal(tokenizer.GetValue(), tokenizer.BOOLEAN)) {
-            Write(tokenizer.GetToken());
-            symbolTable.setCurrentType(tokenizer.GetValue());
+        if (equal(tokenizer.getType(), tokenizer.KEYWORD) && equal(tokenizer.getValue(), tokenizer.INT)
+                || equal(tokenizer.getValue(), tokenizer.CHAR) || equal(tokenizer.getValue(), tokenizer.BOOLEAN)) {
+            write(tokenizer.getToken());
+            symbolTable.setCurrentType(tokenizer.getValue());
             return;
         }
-        if( Equal(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
-            Write(tokenizer.GetToken());
-            symbolTable.setCurrentType(tokenizer.GetValue());
+        if (equal(tokenizer.getType(), tokenizer.IDENTIFIER)) {
+            write(tokenizer.getToken());
+            symbolTable.setCurrentType(tokenizer.getValue());
             return;
         }
-        Exception("Int | Char | Boolean | ClassName");
+        exception("Int | Char | Boolean | ClassName");
         return;
     }
 
-    public void CompileClass() {
-        tokenizer.Advance();
+    public void compileClass() {
+        tokenizer.advance();
 
-        if(NotEqual(tokenizer.GetType(), tokenizer.KEYWORD) || NotEqual(tokenizer.GetValue(), tokenizer.CLASS)) {
-            Exception("Class");
+        if (notEqual(tokenizer.getType(), tokenizer.KEYWORD) || notEqual(tokenizer.getValue(), tokenizer.CLASS)) {
+            exception("Class");
         }
 
-        Start();
-        Write(tokenizer.GetToken());
-        tokenizer.Advance();
+        start();
+        write(tokenizer.getToken());
+        tokenizer.advance();
 
-        if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
-            Exception("ClassName");
+        if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
+            exception("ClassName");
         }
-        Write(tokenizer.GetToken());
-        Expect("{");
+        write(tokenizer.getToken());
+        expect("{");
 
-        CompileClassVarDec();
-        CompileSubRoutineDec();
+        compileClassVarDec();
+        compileSubRoutineDec();
 
-        Expect("}");
+        expect("}");
 
-        if(tokenizer.HasMoreTokens()) {
+        if (tokenizer.hasMoreTokens()) {
             throw new IllegalStateException("Unexpected Tokens");
         }
 
-        End();
+        end();
         symbolTable.showSymbolTable();
     }
 
-    public void CompileClassVarDec() {
-        tokenizer.Advance();
+    public void compileClassVarDec() {
+        tokenizer.advance();
 
-        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "}")) {
-            tokenizer.Back();
+        if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "}")) {
+            tokenizer.back();
             return;
         }
 
-        if(NotEqual(tokenizer.GetType(), tokenizer.KEYWORD)) {
-            Exception("Keyword");
+        if (notEqual(tokenizer.getType(), tokenizer.KEYWORD)) {
+            exception("Keyword");
         }
 
-        if(Equal(tokenizer.GetValue(), tokenizer.CONSTRUCTOR) || Equal(tokenizer.GetValue(), tokenizer.FUNCTION) || Equal(tokenizer.GetValue(), tokenizer.METHOD)) {
-            tokenizer.Back();
+        if (equal(tokenizer.getValue(), tokenizer.CONSTRUCTOR) || equal(tokenizer.getValue(), tokenizer.FUNCTION)
+                || equal(tokenizer.getValue(), tokenizer.METHOD)) {
+            tokenizer.back();
             return;
         }
 
-        WriteTag("start", "classVarDec");
+        writeTag("start", "classVarDec");
 
-        if(NotEqual(tokenizer.GetValue(), tokenizer.STATIC) && NotEqual(tokenizer.GetValue(),tokenizer.FIELD)) {
-            Exception("Static or Field");
+        if (notEqual(tokenizer.getValue(), tokenizer.STATIC) && notEqual(tokenizer.getValue(), tokenizer.FIELD)) {
+            exception("Static or Field");
         }
 
-        Write(tokenizer.GetToken());
+        write(tokenizer.getToken());
 
-        symbolTable.setCurrentKind(tokenizer.GetValue());
+        symbolTable.setCurrentKind(tokenizer.getValue());
 
-        CompileType();
+        compileType();
 
         do {
-            tokenizer.Advance();
-            if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
-                Exception("Identifier");
+            tokenizer.advance();
+            if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
+                exception("Identifier");
             }
-            Write(tokenizer.GetToken());
+            write(tokenizer.getToken());
 
-            symbolTable.Define(tokenizer.GetValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
+            symbolTable.define(tokenizer.getValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
 
-            tokenizer.Advance();
-            if(NotEqual(tokenizer.GetType(), tokenizer.SYMBOL) || ( NotEqual(tokenizer.GetValue(), ",") && NotEqual(tokenizer.GetValue(), ";"))) {
-                Exception("',' or ';'");
+            tokenizer.advance();
+            if (notEqual(tokenizer.getType(), tokenizer.SYMBOL)
+                    || (notEqual(tokenizer.getValue(), ",") && notEqual(tokenizer.getValue(), ";"))) {
+                exception("',' or ';'");
             }
-            if(Equal(tokenizer.GetValue(), ",")) {
-                Write(tokenizer.GetToken());
+            if (equal(tokenizer.getValue(), ",")) {
+                write(tokenizer.getToken());
             } else {
-                Write(tokenizer.GetToken());
+                write(tokenizer.getToken());
                 break;
             }
         } while (true);
 
-        WriteTag("end", "classVarDec");
+        writeTag("end", "classVarDec");
 
-        CompileClassVarDec();
+        compileClassVarDec();
     }
 
-    public void CompileSubRoutineDec() {
-        tokenizer.Advance();
+    public void compileSubRoutineDec() {
+        tokenizer.advance();
 
-        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "}")) {
-            tokenizer.Back();
+        if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "}")) {
+            tokenizer.back();
             return;
         }
 
-        if(NotEqual(tokenizer.GetType(), tokenizer.KEYWORD) || (NotEqual(tokenizer.GetValue(), tokenizer.CONSTRUCTOR)) && (NotEqual(tokenizer.GetValue(), tokenizer.FUNCTION)) && (NotEqual(tokenizer.GetValue(), tokenizer.METHOD))) {
-            Exception("Constructor | Function | Method");
+        if (notEqual(tokenizer.getType(), tokenizer.KEYWORD) || (notEqual(tokenizer.getValue(), tokenizer.CONSTRUCTOR))
+                && (notEqual(tokenizer.getValue(), tokenizer.FUNCTION))
+                && (notEqual(tokenizer.getValue(), tokenizer.METHOD))) {
+            exception("Constructor | Function | Method");
         }
 
-        WriteTag("start", "subroutineDec");
+        writeTag("start", "subroutineDec");
 
-        Write(tokenizer.GetToken());
-        tokenizer.Advance();
-        if(Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.VOID)) {
-            Write(tokenizer.GetToken());
+        write(tokenizer.getToken());
+        tokenizer.advance();
+        if (equal(tokenizer.getType(), tokenizer.KEYWORD) && equal(tokenizer.getValue(), tokenizer.VOID)) {
+            write(tokenizer.getToken());
         } else {
-            tokenizer.Back();
-            CompileType();
+            tokenizer.back();
+            compileType();
         }
 
-        tokenizer.Advance();
-        if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
-            Exception("SubroutineName");
+        tokenizer.advance();
+        if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
+            exception("SubroutineName");
         }
-        Write(tokenizer.GetToken());
+        write(tokenizer.getToken());
 
-        Expect("(");
-        WriteTag("start", "parameterList");
-        CompileParameterList();
-        WriteTag("end", "parameterList");
-        Expect(")");
-        CompileSubRoutineBody();
-        WriteTag("end", "subroutineDec");
-        CompileSubRoutineDec();
+        expect("(");
+        writeTag("start", "parameterList");
+        compileParameterList();
+        writeTag("end", "parameterList");
+        expect(")");
+        compileSubRoutineBody();
+        writeTag("end", "subroutineDec");
+        compileSubRoutineDec();
     }
 
-    public void CompileSubRoutineBody() {
-        WriteTag("start", "subroutineBody");
-        Expect("{");
-        CompileVarDec();
-        WriteTag("start", "statements");
-        CompileStatements();
-        WriteTag("end", "statements");
-        Expect("}");
-        WriteTag("end", "subroutineBody");
+    public void compileSubRoutineBody() {
+        writeTag("start", "subroutineBody");
+        expect("{");
+        compileVarDec();
+        writeTag("start", "statements");
+        compileStatements();
+        writeTag("end", "statements");
+        expect("}");
+        writeTag("end", "subroutineBody");
     }
 
-    public void CompileSubroutineCall() {
-        tokenizer.Advance();
-        if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
-            Exception("Identifier");
+    public void compileSubroutineCall() {
+        tokenizer.advance();
+        if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
+            exception("Identifier");
         }
-        Write(tokenizer.GetToken());
-        tokenizer.Advance();
-        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "(")) {
-            Write(tokenizer.GetToken());
-            CompileExpressionList();
-            Expect(")");
-        } else if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ".")) {
-            Write(tokenizer.GetToken());
-            tokenizer.Advance();
-            if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
-                Exception("Identifier");
+        write(tokenizer.getToken());
+        tokenizer.advance();
+        if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "(")) {
+            write(tokenizer.getToken());
+            compileExpressionList();
+            expect(")");
+        } else if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ".")) {
+            write(tokenizer.getToken());
+            tokenizer.advance();
+            if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
+                exception("Identifier");
             }
-            Write(tokenizer.GetToken());
-            Expect("(");
-            CompileExpressionList();
-            Expect(")");
+            write(tokenizer.getToken());
+            expect("(");
+            compileExpressionList();
+            expect(")");
         } else {
-            Exception("'(' or '.'");
+            exception("'(' or '.'");
         }
     }
 
-    public void CompileParameterList() {
-        tokenizer.Advance();
-        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ")")) {
-            tokenizer.Back();
+    public void compileParameterList() {
+        tokenizer.advance();
+        if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ")")) {
+            tokenizer.back();
             return;
         }
-        tokenizer.Back();
+        tokenizer.back();
         do {
             symbolTable.setCurrentKind("argument");
 
-            CompileType();
+            compileType();
 
-            tokenizer.Advance();
-            if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
-                Exception("Identifier");
+            tokenizer.advance();
+            if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
+                exception("Identifier");
             }
-            Write(tokenizer.GetToken());
+            write(tokenizer.getToken());
 
-            symbolTable.Define(tokenizer.GetValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
+            symbolTable.define(tokenizer.getValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
 
-            tokenizer.Advance();
-            if(NotEqual(tokenizer.GetType(), tokenizer.SYMBOL) || ( NotEqual(tokenizer.GetValue(), ",") && NotEqual(tokenizer.GetValue(), ")"))) {
-                Exception("',' or ')'" );
+            tokenizer.advance();
+            if (notEqual(tokenizer.getType(), tokenizer.SYMBOL)
+                    || (notEqual(tokenizer.getValue(), ",") && notEqual(tokenizer.getValue(), ")"))) {
+                exception("',' or ')'");
             }
-            if(Equal(tokenizer.GetValue(), ",")) {
-                Write(tokenizer.GetToken());
+            if (equal(tokenizer.getValue(), ",")) {
+                write(tokenizer.getToken());
             } else {
-                tokenizer.Back();
+                tokenizer.back();
                 break;
             }
         } while (true);
     }
 
-    public void CompileVarDec() {
-        tokenizer.Advance();
-        if(NotEqual(tokenizer.GetType(), tokenizer.KEYWORD) || NotEqual(tokenizer.GetValue(), tokenizer.VAR)) {
-            tokenizer.Back();
+    public void compileVarDec() {
+        tokenizer.advance();
+        if (notEqual(tokenizer.getType(), tokenizer.KEYWORD) || notEqual(tokenizer.getValue(), tokenizer.VAR)) {
+            tokenizer.back();
             return;
         }
-        WriteTag("start", "varDec");
-        Write(tokenizer.GetToken());
+        writeTag("start", "varDec");
+        write(tokenizer.getToken());
 
-        symbolTable.setCurrentKind(tokenizer.GetValue());
-        
-        CompileType();
+        symbolTable.setCurrentKind(tokenizer.getValue());
+
+        compileType();
         do {
-            tokenizer.Advance();
-            if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
-                Exception("Identifier");
+            tokenizer.advance();
+            if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
+                exception("Identifier");
             }
-            Write(tokenizer.GetToken());
+            write(tokenizer.getToken());
 
-            symbolTable.Define(tokenizer.GetValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
+            symbolTable.define(tokenizer.getValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
 
-            tokenizer.Advance();
-            if(NotEqual(tokenizer.GetType(), tokenizer.SYMBOL) || ( NotEqual(tokenizer.GetValue(), ",") && NotEqual(tokenizer.GetValue(), ";"))) {
-                Exception("',' or ';'");
+            tokenizer.advance();
+            if (notEqual(tokenizer.getType(), tokenizer.SYMBOL)
+                    || (notEqual(tokenizer.getValue(), ",") && notEqual(tokenizer.getValue(), ";"))) {
+                exception("',' or ';'");
             }
-            if(Equal(tokenizer.GetValue(), ",")) {
-                Write(tokenizer.GetToken());
+            if (equal(tokenizer.getValue(), ",")) {
+                write(tokenizer.getToken());
             } else {
-                Write(tokenizer.GetToken());
+                write(tokenizer.getToken());
                 break;
             }
         } while (true);
-        WriteTag("end", "varDec");
-        CompileVarDec();
+        writeTag("end", "varDec");
+        compileVarDec();
     }
 
-    public void CompileStatements() {
-        tokenizer.Advance();
-        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "}")) {
-            tokenizer.Back();
+    public void compileStatements() {
+        tokenizer.advance();
+        if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "}")) {
+            tokenizer.back();
             return;
         }
 
-        if(NotEqual(tokenizer.GetType(), tokenizer.KEYWORD)) {
-            Exception("Keyword");
+        if (notEqual(tokenizer.getType(), tokenizer.KEYWORD)) {
+            exception("Keyword");
         } else {
-            if(Equal(tokenizer.GetValue(), tokenizer.LET)) {
-                CompileLet();
-            } else if(Equal(tokenizer.GetValue(), tokenizer.IF)) {
-                CompileIf();
-            } else if(Equal(tokenizer.GetValue(), tokenizer.WHILE)) {
-                CompileWhile();
-            } else if(Equal(tokenizer.GetValue(), tokenizer.DO)) {
-                CompileDo();
-            } else if(Equal(tokenizer.GetValue(), tokenizer.RETURN)) {
-                CompileReturn();
+            if (equal(tokenizer.getValue(), tokenizer.LET)) {
+                compileLet();
+            } else if (equal(tokenizer.getValue(), tokenizer.IF)) {
+                compileIf();
+            } else if (equal(tokenizer.getValue(), tokenizer.WHILE)) {
+                compileWhile();
+            } else if (equal(tokenizer.getValue(), tokenizer.DO)) {
+                compileDo();
+            } else if (equal(tokenizer.getValue(), tokenizer.RETURN)) {
+                compileReturn();
             } else {
-                Exception("Let | If | While | Do | Return");
+                exception("Let | If | While | Do | Return");
             }
         }
-        CompileStatements();
+        compileStatements();
     }
 
-    public void CompileDo() {
-        WriteTag("start", "doStatement");
-        Write(tokenizer.GetToken());
-        CompileSubroutineCall();
-        Expect(";");
-        WriteTag("end", "doStatement");
+    public void compileDo() {
+        writeTag("start", "doStatement");
+        write(tokenizer.getToken());
+        compileSubroutineCall();
+        expect(";");
+        writeTag("end", "doStatement");
     }
 
-    public void CompileLet() {
-        WriteTag("start", "letStatement");
-        Write(tokenizer.GetToken());
-        tokenizer.Advance();
-        if(NotEqual(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
-            Exception("VarName");
+    public void compileLet() {
+        writeTag("start", "letStatement");
+        write(tokenizer.getToken());
+        tokenizer.advance();
+        if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
+            exception("VarName");
         }
-        Write(tokenizer.GetToken());
-        tokenizer.Advance();
-        if(NotEqual(tokenizer.GetType(), tokenizer.SYMBOL) || ( NotEqual(tokenizer.GetValue(), "[") && NotEqual(tokenizer.GetValue(), "="))) {
-            Exception("'[' or '='");
+        write(tokenizer.getToken());
+        tokenizer.advance();
+        if (notEqual(tokenizer.getType(), tokenizer.SYMBOL)
+                || (notEqual(tokenizer.getValue(), "[") && notEqual(tokenizer.getValue(), "="))) {
+            exception("'[' or '='");
         }
 
-        boolean KeepGoing = false;
-        if(Equal(tokenizer.GetValue(), "[")) {
-            KeepGoing = true;
-            Write(tokenizer.GetToken());
-            CompileExpression();
-            tokenizer.Advance();
-            if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "]")) {
-                Write(tokenizer.GetToken());
+        boolean keepGoing = false;
+        if (equal(tokenizer.getValue(), "[")) {
+            keepGoing = true;
+            write(tokenizer.getToken());
+            compileExpression();
+            tokenizer.advance();
+            if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "]")) {
+                write(tokenizer.getToken());
             } else {
-                Exception("']");
+                exception("']");
             }
         }
-        if(KeepGoing) tokenizer.Advance();
+        if (keepGoing)
+            tokenizer.advance();
 
-        Write(tokenizer.GetToken());
-        CompileExpression();
-        Expect(";");
-        WriteTag("end", "letStatement");
+        write(tokenizer.getToken());
+        compileExpression();
+        expect(";");
+        writeTag("end", "letStatement");
     }
 
-    public void CompileWhile() {
-        WriteTag("start", "whileStatement");
-        Write(tokenizer.GetToken());
-        Expect("(");
-        CompileExpression();
-        Expect(")");
-        Expect("{");
-        WriteTag("start", "statements");
-        CompileStatements();
-        WriteTag("end", "statements");
-        Expect("}");
-        WriteTag("end", "whileStatement");
+    public void compileWhile() {
+        writeTag("start", "whileStatement");
+        write(tokenizer.getToken());
+        expect("(");
+        compileExpression();
+        expect(")");
+        expect("{");
+        writeTag("start", "statements");
+        compileStatements();
+        writeTag("end", "statements");
+        expect("}");
+        writeTag("end", "whileStatement");
     }
 
-    public void CompileReturn() {
-        WriteTag("start", "returnStatement");
-        Write(tokenizer.GetToken());
-        tokenizer.Advance();
-        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ";")) {
-            Write(tokenizer.GetToken());
-            WriteTag("end", "returnStatement");
+    public void compileReturn() {
+        writeTag("start", "returnStatement");
+        write(tokenizer.getToken());
+        tokenizer.advance();
+        if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ";")) {
+            write(tokenizer.getToken());
+            writeTag("end", "returnStatement");
             return;
         }
 
-        tokenizer.Back();
-        CompileExpression();
-        Expect(";");
-        WriteTag("end", "returnStatement");
+        tokenizer.back();
+        compileExpression();
+        expect(";");
+        writeTag("end", "returnStatement");
     }
 
-    public void CompileIf() {
-        WriteTag("start", "ifStatement");
-        Write(tokenizer.GetToken());
-        Expect("(");
-        CompileExpression();
-        Expect(")");
-        Expect("{");
-        WriteTag("start", "statements");
-        CompileStatements();
-        WriteTag("end", "statements");
-        Expect("}");
+    public void compileIf() {
+        writeTag("start", "ifStatement");
+        write(tokenizer.getToken());
+        expect("(");
+        compileExpression();
+        expect(")");
+        expect("{");
+        writeTag("start", "statements");
+        compileStatements();
+        writeTag("end", "statements");
+        expect("}");
 
-        tokenizer.Advance();
-        if(Equal(tokenizer.GetType(), tokenizer.KEYWORD) && Equal(tokenizer.GetValue(), tokenizer.ELSE)) {
-            Write(tokenizer.GetToken());
-            Expect("{");
-            WriteTag("start", "statements");
-            CompileStatements();
-            WriteTag("end", "statements");
-            Expect("}");
+        tokenizer.advance();
+        if (equal(tokenizer.getType(), tokenizer.KEYWORD) && equal(tokenizer.getValue(), tokenizer.ELSE)) {
+            write(tokenizer.getToken());
+            expect("{");
+            writeTag("start", "statements");
+            compileStatements();
+            writeTag("end", "statements");
+            expect("}");
         } else {
-            tokenizer.Back();
+            tokenizer.back();
         }
-        WriteTag("end", "ifStatement");
+        writeTag("end", "ifStatement");
     }
 
-    public void CompileExpression() {
-        WriteTag("start", "expression");
-        CompileTerm();
+    public void compileExpression() {
+        writeTag("start", "expression");
+        compileTerm();
         do {
-            tokenizer.Advance();
-            if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && tokenizer.IsOperator()) {
-                Write(tokenizer.GetToken());
-                CompileTerm();
+            tokenizer.advance();
+            if (equal(tokenizer.getType(), tokenizer.SYMBOL) && tokenizer.isOperator()) {
+                write(tokenizer.getToken());
+                compileTerm();
             } else {
-                tokenizer.Back();
+                tokenizer.back();
                 break;
             }
         } while (true);
-        WriteTag("end", "expression");
+        writeTag("end", "expression");
     }
 
-    public void CompileTerm() {
-        WriteTag("start", "term");
-        tokenizer.Advance();
-        if(Equal(tokenizer.GetType(), tokenizer.IDENTIFIER)) {
-            Token identifier = tokenizer.GetToken();
-            tokenizer.Advance();
-            if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "[")) {
-                Write(identifier);
-                Write(tokenizer.GetToken());
-                CompileExpression();
-                Expect("]");
-            } else if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && ( Equal(tokenizer.GetValue(), "(") || Equal(tokenizer.GetValue(), "."))) {
-                tokenizer.Back();
-                tokenizer.Back();
-                CompileSubroutineCall();
+    public void compileTerm() {
+        writeTag("start", "term");
+        tokenizer.advance();
+        if (equal(tokenizer.getType(), tokenizer.IDENTIFIER)) {
+            Token identifier = tokenizer.getToken();
+            tokenizer.advance();
+            if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "[")) {
+                write(identifier);
+                write(tokenizer.getToken());
+                compileExpression();
+                expect("]");
+            } else if (equal(tokenizer.getType(), tokenizer.SYMBOL)
+                    && (equal(tokenizer.getValue(), "(") || equal(tokenizer.getValue(), "."))) {
+                tokenizer.back();
+                tokenizer.back();
+                compileSubroutineCall();
             } else {
-                Write(identifier);
-                tokenizer.Back();
+                write(identifier);
+                tokenizer.back();
             }
         } else {
-            if(Equal(tokenizer.GetType(), tokenizer.INT_CONST)) {
-                Write(tokenizer.GetToken());
-            } else if(Equal(tokenizer.GetType(), tokenizer.STRING_CONST)) {
-                Write(tokenizer.GetToken());
-            } else if(Equal(tokenizer.GetType(), tokenizer.KEYWORD) && ( Equal(tokenizer.GetValue(), tokenizer.TRUE) || Equal(tokenizer.GetValue(), tokenizer.FALSE) || Equal(tokenizer.GetValue(), tokenizer.NULL) || Equal(tokenizer.GetValue(), tokenizer.THIS))) {
-                Write(tokenizer.GetToken());
-            } else if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), "(")) {
-                Write(tokenizer.GetToken());
-                CompileExpression();
-                Expect(")");
-            } else if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && ( Equal(tokenizer.GetValue(), "-") || Equal(tokenizer.GetValue(), "~"))) {
-                Write(tokenizer.GetToken());
-                CompileTerm();
+            if (equal(tokenizer.getType(), tokenizer.INT_CONST)) {
+                write(tokenizer.getToken());
+            } else if (equal(tokenizer.getType(), tokenizer.STRING_CONST)) {
+                write(tokenizer.getToken());
+            } else if (equal(tokenizer.getType(), tokenizer.KEYWORD) && (equal(tokenizer.getValue(), tokenizer.TRUE)
+                    || equal(tokenizer.getValue(), tokenizer.FALSE) || equal(tokenizer.getValue(), tokenizer.NULL)
+                    || equal(tokenizer.getValue(), tokenizer.THIS))) {
+                write(tokenizer.getToken());
+            } else if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "(")) {
+                write(tokenizer.getToken());
+                compileExpression();
+                expect(")");
+            } else if (equal(tokenizer.getType(), tokenizer.SYMBOL)
+                    && (equal(tokenizer.getValue(), "-") || equal(tokenizer.getValue(), "~"))) {
+                write(tokenizer.getToken());
+                compileTerm();
             } else {
-                Exception("IntegerConstant | StringConstant | KeywordConstant| '(' expression ')' | unaryOp term");
+                exception("IntegerConstant | StringConstant | KeywordConstant| '(' expression ')' | unaryOp term");
             }
         }
-        WriteTag("end", "term");
+        writeTag("end", "term");
     }
 
-    public void CompileExpressionList() {
-        WriteTag("start", "expressionList");
-        tokenizer.Advance();
-        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ")")) {
-            tokenizer.Back();
+    public void compileExpressionList() {
+        writeTag("start", "expressionList");
+        tokenizer.advance();
+        if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ")")) {
+            tokenizer.back();
         } else {
-            tokenizer.Back();
-            CompileExpression();
+            tokenizer.back();
+            compileExpression();
             do {
-                tokenizer.Advance();
-                if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), ",")) {
-                    Write(tokenizer.GetToken());
-                    CompileExpression();
+                tokenizer.advance();
+                if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ",")) {
+                    write(tokenizer.getToken());
+                    compileExpression();
                 } else {
-                    tokenizer.Back();
+                    tokenizer.back();
                     break;
                 }
             } while (true);
         }
-        WriteTag("end", "expressionList");
+        writeTag("end", "expressionList");
     }
 
-    public boolean Equal(String value1, String value2) {
+    public boolean equal(String value1, String value2) {
         return value1.equals(value2);
     }
 
-    public boolean NotEqual(String value1, String value2) {
+    public boolean notEqual(String value1, String value2) {
         return !value1.equals(value2);
     }
 
-    public void Exception(String message) {
-        throw new IllegalStateException("Expected : " + message + ", But : " + tokenizer.GetValue());
+    public void exception(String message) {
+        throw new IllegalStateException("Expected : " + message + ", But : " + tokenizer.getValue());
     }
 
-    public void Expect(String symbol) {
-        tokenizer.Advance();
-        if(Equal(tokenizer.GetType(), tokenizer.SYMBOL) && Equal(tokenizer.GetValue(), symbol)) {
-            Write(tokenizer.GetToken());
+    public void expect(String symbol) {
+        tokenizer.advance();
+        if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), symbol)) {
+            write(tokenizer.getToken());
         } else {
-            Exception(symbol);
+            exception(symbol);
         }
     }
 
-    public void Indent() {
-        TabSize = TabSize + 1;
+    public void indent() {
+        tabSize = tabSize + 1;
     }
 
-    public void Dedent() {
-        TabSize = TabSize - 1;
+    public void dedent() {
+        tabSize = tabSize - 1;
     }
 
-    public String Indentation() {
+    public String indentation() {
         String result = "";
-        for(int i = 0; i < TabSize; i++) {
+        for (int i = 0; i < tabSize; i++) {
             result += "  ";
         }
         return result;

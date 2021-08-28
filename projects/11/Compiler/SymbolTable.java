@@ -16,11 +16,11 @@ public class SymbolTable {
     public SymbolTable() {
         classScope = new HashMap<String, Symbol>();
         subroutineScope = new HashMap<String, Symbol>();
-        ResetClassScope();
-        ResetSubroutineScope();
+        resetClassScope();
+        resetSubroutineScope();
     }
 
-    public void Define(String name, String type, String kind) {
+    public void define(String name, String type, String kind) {
         switch (kind) {
             case "static":
                 classScope.put(name, new Symbol(type, kind, staticIndex++));
@@ -35,17 +35,17 @@ public class SymbolTable {
                 subroutineScope.put(name, new Symbol(type, kind, localIndex++));
                 break;
             default:
-                break;
+                throw new NoSuchFieldError("no such kind");
         }
     }
 
-    public void ResetClassScope() {
+    public void resetClassScope() {
         classScope.clear();
         staticIndex = 0;
         fieldIndex = 0;
     }
 
-    public void ResetSubroutineScope() {
+    public void resetSubroutineScope() {
         subroutineScope.clear();
         argumentIndex = 0;
         localIndex = 0;
