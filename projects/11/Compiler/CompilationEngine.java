@@ -4,6 +4,7 @@ public class CompilationEngine {
 
     private JackTokenizer tokenizer;
     private SymbolTable symbolTable;
+    private VMWriter vmWriter;
     private FileWriter fileWriter;
     private BufferedWriter bufferedWriter;
     private FileWriter tokenFileWriter;
@@ -11,11 +12,12 @@ public class CompilationEngine {
 
     private int tabSize;
 
-    public CompilationEngine(File inFile, File outFile, File outTokenFile) {
+    public CompilationEngine(File inFile, File outFile, File outTokenFile, File outVMFile) {
         tabSize = 1;
         try {
             tokenizer = new JackTokenizer(inFile);
             symbolTable = new SymbolTable();
+            vmWriter = new VMWriter(outVMFile);
             fileWriter = new FileWriter(outFile);
             bufferedWriter = new BufferedWriter(fileWriter);
             tokenFileWriter = new FileWriter(outTokenFile);
