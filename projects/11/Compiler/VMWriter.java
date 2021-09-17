@@ -41,33 +41,42 @@ public class VMWriter {
     }
 
     public void writeArithmetic(String command) {
-        switch(command) {
-            case "ADD":
+        switch (command) {
+            case "+":
                 write("add");
                 break;
-            case "SUB":
+            case "-":
                 write("sub");
                 break;
-            case "NEG":
+            case "--":
                 write("neg");
                 break;
-            case "EQ":
+            case "=":
                 write("eq");
                 break;
-            case "GT":
+            case ">":
+            case "&gt;":
                 write("gt");
                 break;
-            case "LT":
+            case "<":
+            case "&lt;":
                 write("lt");
                 break;
-            case "AND":
+            case "&":
+            case "&amp;":
                 write("and");
                 break;
-            case "OR":
+            case "|":
                 write("or");
                 break;
-            case "NOT":
+            case "~":
                 write("not");
+                break;
+            case "*":
+                writeCall("Math.multiply", 2);
+                break;
+            case "/":
+                writeCall("Math.divide", 2);
                 break;
             default:
                 throw new NoSuchFieldError("no such command");

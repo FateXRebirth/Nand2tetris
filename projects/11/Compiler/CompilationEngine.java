@@ -11,9 +11,11 @@ public class CompilationEngine {
     private BufferedWriter tokenBufferedWriter;
 
     private int tabSize;
+    private String className;
 
     public CompilationEngine(File inFile, File outFile, File outTokenFile, File outVMFile) {
         tabSize = 1;
+        className = outVMFile.getName().substring(0, outVMFile.getName().lastIndexOf("."));
         try {
             tokenizer = new JackTokenizer(inFile);
             symbolTable = new SymbolTable();
@@ -131,6 +133,7 @@ public class CompilationEngine {
 
         end();
         symbolTable.showSymbolTable();
+        vmWriter.close();
     }
 
     public void compileClassVarDec() {
@@ -221,6 +224,8 @@ public class CompilationEngine {
         }
         write(tokenizer.getToken());
 
+        vmWriter.writeFunction(String.format("%s.%s", className, tokenizer.getValue()), 0);
+
         expect("(");
         writeTag("start", "parameterList");
         compileParameterList();
@@ -243,11 +248,13 @@ public class CompilationEngine {
     }
 
     public void compileSubroutineCall() {
+        String functionName = "";
         tokenizer.advance();
         if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
             exception("Identifier");
         }
         write(tokenizer.getToken());
+        functionName += tokenizer.getValue();
         tokenizer.advance();
         if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "(")) {
             write(tokenizer.getToken());
@@ -255,17 +262,20 @@ public class CompilationEngine {
             expect(")");
         } else if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ".")) {
             write(tokenizer.getToken());
+            functionName += tokenizer.getValue();
             tokenizer.advance();
             if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
                 exception("Identifier");
             }
             write(tokenizer.getToken());
+            functionName += tokenizer.getValue();
             expect("(");
             compileExpressionList();
             expect(")");
         } else {
             exception("'(' or '.'");
         }
+        vmWriter.writeCall(functionName, 1);
     }
 
     public void compileParameterList() {
@@ -429,6 +439,9 @@ public class CompilationEngine {
         tokenizer.advance();
         if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ";")) {
             write(tokenizer.getToken());
+            vmWriter.writePop("temp", 0);
+            vmWriter.writePush("constant", 0);
+            vmWriter.writeReturn();
             writeTag("end", "returnStatement");
             return;
         }
@@ -472,7 +485,9 @@ public class CompilationEngine {
             tokenizer.advance();
             if (equal(tokenizer.getType(), tokenizer.SYMBOL) && tokenizer.isOperator()) {
                 write(tokenizer.getToken());
+                String operator = tokenizer.getValue();
                 compileTerm();
+                vmWriter.writeArithmetic(operator);
             } else {
                 tokenizer.back();
                 break;
@@ -504,6 +519,7 @@ public class CompilationEngine {
         } else {
             if (equal(tokenizer.getType(), tokenizer.INT_CONST)) {
                 write(tokenizer.getToken());
+                vmWriter.writePush("constant", Integer.valueOf(tokenizer.getValue()));
             } else if (equal(tokenizer.getType(), tokenizer.STRING_CONST)) {
                 write(tokenizer.getToken());
             } else if (equal(tokenizer.getType(), tokenizer.KEYWORD) && (equal(tokenizer.getValue(), tokenizer.TRUE)
@@ -517,7 +533,9 @@ public class CompilationEngine {
             } else if (equal(tokenizer.getType(), tokenizer.SYMBOL)
                     && (equal(tokenizer.getValue(), "-") || equal(tokenizer.getValue(), "~"))) {
                 write(tokenizer.getToken());
+                String operator = equal(tokenizer.getValue(), "~") ? tokenizer.getValue() : "--";
                 compileTerm();
+                vmWriter.writeArithmetic(operator);
             } else {
                 exception("IntegerConstant | StringConstant | KeywordConstant| '(' expression ')' | unaryOp term");
             }
