@@ -21,18 +21,19 @@ public class SymbolTable {
     }
 
     public void define(String name, String type, String kind) {
+        System.out.println(String.format("name: %s, type: %s, kind: %s", name, type, kind));
         switch (kind) {
             case "static":
-                classScope.put(name, new Symbol(type, kind, staticIndex++));
+                classScope.put(name, new Symbol(type, "static", staticIndex++));
                 break;
             case "field":
-                classScope.put(name, new Symbol(type, kind, fieldIndex++));
+                classScope.put(name, new Symbol(type, "this", fieldIndex++));
                 break;
             case "argument":
-                subroutineScope.put(name, new Symbol(type, kind, argumentIndex++));
+                subroutineScope.put(name, new Symbol(type, "argument", argumentIndex++));
                 break;
             case "var":
-                subroutineScope.put(name, new Symbol(type, kind, localIndex++));
+                subroutineScope.put(name, new Symbol(type, "local", localIndex++));
                 break;
             default:
                 throw new NoSuchFieldError("no such kind");
@@ -65,6 +66,16 @@ public class SymbolTable {
 
     public String getCurrentKind() {
         return currentKind;
+    }
+
+    public Symbol getSymbolByName(String name) {
+        if (subroutineScope.containsKey(name)) {
+            return subroutineScope.get(name);
+        }
+        if (classScope.containsKey(name)) {
+            return classScope.get(name);
+        }
+        throw new NoSuchFieldError("no such name in scope");
     }
 
     // Development Tool for Developer

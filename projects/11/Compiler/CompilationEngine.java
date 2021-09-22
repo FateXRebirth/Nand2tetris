@@ -12,10 +12,11 @@ public class CompilationEngine {
 
     private int tabSize;
     private String className;
+    private String functionName;
+    private int parametersCount;
+    private int labelCount;
 
     public CompilationEngine(File inFile, File outFile, File outTokenFile, File outVMFile) {
-        tabSize = 1;
-        className = outVMFile.getName().substring(0, outVMFile.getName().lastIndexOf("."));
         try {
             tokenizer = new JackTokenizer(inFile);
             symbolTable = new SymbolTable();
@@ -27,6 +28,11 @@ public class CompilationEngine {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        tabSize = 1;
+        className = outVMFile.getName().substring(0, outVMFile.getName().lastIndexOf("."));
+        functionName = "";
+        parametersCount = 0;
+        labelCount = 0;
     }
 
     public void start() {
@@ -90,19 +96,18 @@ public class CompilationEngine {
     public void compileType() {
         tokenizer.advance();
 
+        symbolTable.setCurrentType(tokenizer.getValue());
+
         if (equal(tokenizer.getType(), tokenizer.KEYWORD) && equal(tokenizer.getValue(), tokenizer.INT)
                 || equal(tokenizer.getValue(), tokenizer.CHAR) || equal(tokenizer.getValue(), tokenizer.BOOLEAN)) {
             write(tokenizer.getToken());
-            symbolTable.setCurrentType(tokenizer.getValue());
             return;
         }
         if (equal(tokenizer.getType(), tokenizer.IDENTIFIER)) {
             write(tokenizer.getToken());
-            symbolTable.setCurrentType(tokenizer.getValue());
             return;
         }
         exception("Int | Char | Boolean | ClassName");
-        return;
     }
 
     public void compileClass() {
@@ -132,7 +137,6 @@ public class CompilationEngine {
         }
 
         end();
-        symbolTable.showSymbolTable();
         vmWriter.close();
     }
 
@@ -223,14 +227,16 @@ public class CompilationEngine {
             exception("SubroutineName");
         }
         write(tokenizer.getToken());
-
-        vmWriter.writeFunction(String.format("%s.%s", className, tokenizer.getValue()), 0);
+        functionName = tokenizer.getValue();
 
         expect("(");
         writeTag("start", "parameterList");
         compileParameterList();
         writeTag("end", "parameterList");
         expect(")");
+
+        vmWriter.writeFunction(String.format("%s.%s", className, functionName), parametersCount);
+
         compileSubRoutineBody();
         writeTag("end", "subroutineDec");
         compileSubRoutineDec();
@@ -248,13 +254,13 @@ public class CompilationEngine {
     }
 
     public void compileSubroutineCall() {
-        String functionName = "";
         tokenizer.advance();
         if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
             exception("Identifier");
         }
         write(tokenizer.getToken());
-        functionName += tokenizer.getValue();
+        functionName = tokenizer.getValue();
+
         tokenizer.advance();
         if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "(")) {
             write(tokenizer.getToken());
@@ -275,7 +281,8 @@ public class CompilationEngine {
         } else {
             exception("'(' or '.'");
         }
-        vmWriter.writeCall(functionName, 1);
+        vmWriter.writeCall(functionName, parametersCount);
+        parametersCount = 0;
     }
 
     public void compileParameterList() {
@@ -297,6 +304,8 @@ public class CompilationEngine {
             write(tokenizer.getToken());
 
             symbolTable.define(tokenizer.getValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
+
+            parametersCount++;
 
             tokenizer.advance();
             if (notEqual(tokenizer.getType(), tokenizer.SYMBOL)
@@ -321,7 +330,7 @@ public class CompilationEngine {
         writeTag("start", "varDec");
         write(tokenizer.getToken());
 
-        symbolTable.setCurrentKind(tokenizer.getValue());
+        symbolTable.setCurrentKind("var");
 
         compileType();
         do {
