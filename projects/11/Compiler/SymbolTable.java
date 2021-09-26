@@ -3,9 +3,6 @@ import java.util.HashMap;
 
 public class SymbolTable {
 
-    private String currentType;
-    private String currentKind;
-
     private Map<String, Symbol> classScope;
     private Map<String, Symbol> subroutineScope;
     private int staticIndex = 0;
@@ -52,22 +49,6 @@ public class SymbolTable {
         localIndex = 0;
     }
 
-    public void setCurrentType(String type) {
-        currentType = type;
-    }
-
-    public String getCurrentType() {
-        return currentType;
-    }
-
-    public void setCurrentKind(String kind) {
-        currentKind = kind;
-    }
-
-    public String getCurrentKind() {
-        return currentKind;
-    }
-
     public Symbol getSymbolByName(String name) {
         if (subroutineScope.containsKey(name)) {
             return subroutineScope.get(name);
@@ -76,16 +57,5 @@ public class SymbolTable {
             return classScope.get(name);
         }
         throw new NoSuchFieldError("no such name in scope");
-    }
-
-    // Development Tool for Developer
-    public void showSymbolTable() {
-        System.out.println("------SymbolTable-------");
-        classScope.forEach((name, symbol) -> {
-            System.out.println(name + " --- > " + symbol.getInfo());
-        });
-        subroutineScope.forEach((name, symbol) -> {
-            System.out.println(name + " --- > " + symbol.getInfo());
-        });
     }
 }

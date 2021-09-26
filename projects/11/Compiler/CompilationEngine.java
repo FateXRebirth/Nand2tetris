@@ -10,9 +10,12 @@ public class CompilationEngine {
     private FileWriter tokenFileWriter;
     private BufferedWriter tokenBufferedWriter;
 
-    private int tabSize;
     private String className;
     private String functionName;
+    private String currentType;
+    private String returnType;
+    private String currentKind;
+    private int tabSize;
     private int parametersCount;
     private int labelCount;
 
@@ -28,9 +31,12 @@ public class CompilationEngine {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        tabSize = 1;
         className = outVMFile.getName().substring(0, outVMFile.getName().lastIndexOf("."));
         functionName = "";
+        currentType = "";
+        returnType = "";
+        currentKind = "";
+        tabSize = 1;
         parametersCount = 0;
         labelCount = 0;
     }
@@ -96,7 +102,24 @@ public class CompilationEngine {
     public void compileType() {
         tokenizer.advance();
 
-        symbolTable.setCurrentType(tokenizer.getValue());
+        currentType = tokenizer.getValue();
+
+        if (equal(tokenizer.getType(), tokenizer.KEYWORD) && equal(tokenizer.getValue(), tokenizer.INT)
+                || equal(tokenizer.getValue(), tokenizer.CHAR) || equal(tokenizer.getValue(), tokenizer.BOOLEAN)) {
+            write(tokenizer.getToken());
+            return;
+        }
+        if (equal(tokenizer.getType(), tokenizer.IDENTIFIER)) {
+            write(tokenizer.getToken());
+            return;
+        }
+        exception("Int | Char | Boolean | ClassName");
+    }
+
+    public void compileReturnType() {
+        tokenizer.advance();
+
+        returnType = tokenizer.getValue();
 
         if (equal(tokenizer.getType(), tokenizer.KEYWORD) && equal(tokenizer.getValue(), tokenizer.INT)
                 || equal(tokenizer.getValue(), tokenizer.CHAR) || equal(tokenizer.getValue(), tokenizer.BOOLEAN)) {
@@ -166,7 +189,7 @@ public class CompilationEngine {
 
         write(tokenizer.getToken());
 
-        symbolTable.setCurrentKind(tokenizer.getValue());
+        currentKind = tokenizer.getValue();
 
         compileType();
 
@@ -177,7 +200,7 @@ public class CompilationEngine {
             }
             write(tokenizer.getToken());
 
-            symbolTable.define(tokenizer.getValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
+            symbolTable.define(tokenizer.getValue(), currentType, currentKind);
 
             tokenizer.advance();
             if (notEqual(tokenizer.getType(), tokenizer.SYMBOL)
@@ -198,6 +221,9 @@ public class CompilationEngine {
     }
 
     public void compileSubRoutineDec() {
+
+        symbolTable.resetSubroutineScope();
+
         tokenizer.advance();
 
         if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "}")) {
@@ -217,6 +243,7 @@ public class CompilationEngine {
         tokenizer.advance();
         if (equal(tokenizer.getType(), tokenizer.KEYWORD) && equal(tokenizer.getValue(), tokenizer.VOID)) {
             write(tokenizer.getToken());
+            returnType = tokenizer.getValue();
         } else {
             tokenizer.back();
             compileType();
@@ -236,6 +263,7 @@ public class CompilationEngine {
         expect(")");
 
         vmWriter.writeFunction(String.format("%s.%s", className, functionName), parametersCount);
+        parametersCount = 0;
 
         compileSubRoutineBody();
         writeTag("end", "subroutineDec");
@@ -283,6 +311,9 @@ public class CompilationEngine {
         }
         vmWriter.writeCall(functionName, parametersCount);
         parametersCount = 0;
+        if (equal(returnType, tokenizer.VOID)) {
+            vmWriter.writePop("temp", 0);
+        }
     }
 
     public void compileParameterList() {
@@ -293,7 +324,7 @@ public class CompilationEngine {
         }
         tokenizer.back();
         do {
-            symbolTable.setCurrentKind("argument");
+            currentKind = tokenizer.ARGUMENT;
 
             compileType();
 
@@ -303,7 +334,7 @@ public class CompilationEngine {
             }
             write(tokenizer.getToken());
 
-            symbolTable.define(tokenizer.getValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
+            symbolTable.define(tokenizer.getValue(), currentType, currentKind);
 
             parametersCount++;
 
@@ -330,7 +361,7 @@ public class CompilationEngine {
         writeTag("start", "varDec");
         write(tokenizer.getToken());
 
-        symbolTable.setCurrentKind("var");
+        currentKind = tokenizer.VAR;
 
         compileType();
         do {
@@ -340,7 +371,7 @@ public class CompilationEngine {
             }
             write(tokenizer.getToken());
 
-            symbolTable.define(tokenizer.getValue(), symbolTable.getCurrentType(), symbolTable.getCurrentKind());
+            symbolTable.define(tokenizer.getValue(), currentType, currentKind);
 
             tokenizer.advance();
             if (notEqual(tokenizer.getType(), tokenizer.SYMBOL)
@@ -391,6 +422,8 @@ public class CompilationEngine {
         compileSubroutineCall();
         expect(";");
         writeTag("end", "doStatement");
+
+        vmWriter.writePop("temp", 0);
     }
 
     public void compileLet() {
@@ -400,7 +433,11 @@ public class CompilationEngine {
         if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
             exception("VarName");
         }
+
         write(tokenizer.getToken());
+        String name = tokenizer.getValue();
+        Symbol symbol = symbolTable.getSymbolByName(name);
+
         tokenizer.advance();
         if (notEqual(tokenizer.getType(), tokenizer.SYMBOL)
                 || (notEqual(tokenizer.getValue(), "[") && notEqual(tokenizer.getValue(), "="))) {
@@ -426,19 +463,38 @@ public class CompilationEngine {
         compileExpression();
         expect(";");
         writeTag("end", "letStatement");
+
+        vmWriter.writePop(symbol.getKind(), symbol.getIndex());
     }
 
     public void compileWhile() {
         writeTag("start", "whileStatement");
+
+        String startLabel = String.format("%s_LABEL_%d_START", functionName, labelCount);
+        String endLabel = String.format("%s_LABEL_%d_END", functionName, labelCount);
+        labelCount++;
+
         write(tokenizer.getToken());
+        vmWriter.writeLabel(startLabel);
+
         expect("(");
+
         compileExpression();
+
         expect(")");
+
+        vmWriter.writeArithmetic("~");
+        vmWriter.writeIf(endLabel);
+
         expect("{");
         writeTag("start", "statements");
         compileStatements();
         writeTag("end", "statements");
         expect("}");
+
+        vmWriter.writeGoto(startLabel);
+        vmWriter.writeLabel(endLabel);
+
         writeTag("end", "whileStatement");
     }
 
@@ -448,30 +504,41 @@ public class CompilationEngine {
         tokenizer.advance();
         if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ";")) {
             write(tokenizer.getToken());
-            vmWriter.writePop("temp", 0);
-            vmWriter.writePush("constant", 0);
-            vmWriter.writeReturn();
-            writeTag("end", "returnStatement");
-            return;
+            if (equal(returnType, tokenizer.VOID)) {
+                vmWriter.writePush("constant", 0);
+            }
+        } else {
+            tokenizer.back();
+            compileExpression();
+            expect(";");
         }
-
-        tokenizer.back();
-        compileExpression();
-        expect(";");
+        vmWriter.writeReturn();
         writeTag("end", "returnStatement");
     }
 
     public void compileIf() {
         writeTag("start", "ifStatement");
+
+        String startLabel = String.format("%s_LABEL_%d_START", functionName, labelCount);
+        String endLabel = String.format("%s_LABEL_%d_END", functionName, labelCount);
+        labelCount++;
+
         write(tokenizer.getToken());
         expect("(");
         compileExpression();
         expect(")");
+
+        vmWriter.writeArithmetic("~");
+        vmWriter.writeIf(startLabel);
+
         expect("{");
         writeTag("start", "statements");
         compileStatements();
         writeTag("end", "statements");
         expect("}");
+
+        vmWriter.writeGoto(endLabel);
+        vmWriter.writeLabel(startLabel);
 
         tokenizer.advance();
         if (equal(tokenizer.getType(), tokenizer.KEYWORD) && equal(tokenizer.getValue(), tokenizer.ELSE)) {
@@ -484,6 +551,9 @@ public class CompilationEngine {
         } else {
             tokenizer.back();
         }
+
+        vmWriter.writeLabel(endLabel);
+
         writeTag("end", "ifStatement");
     }
 
@@ -523,6 +593,9 @@ public class CompilationEngine {
                 compileSubroutineCall();
             } else {
                 write(identifier);
+                String name = identifier.getValue();
+                Symbol symbol = symbolTable.getSymbolByName(name);
+                vmWriter.writePush(symbol.getKind(), symbol.getIndex());
                 tokenizer.back();
             }
         } else {
@@ -535,6 +608,18 @@ public class CompilationEngine {
                     || equal(tokenizer.getValue(), tokenizer.FALSE) || equal(tokenizer.getValue(), tokenizer.NULL)
                     || equal(tokenizer.getValue(), tokenizer.THIS))) {
                 write(tokenizer.getToken());
+                switch (tokenizer.getValue()) {
+                    case "true":
+                        vmWriter.writePush("constant", 1);
+                        vmWriter.writeArithmetic("--");
+                        break;
+                    case "false":
+                    case "null":
+                        vmWriter.writePush("constant", 0);
+                        break;
+                    case "this":
+                        break;
+                }
             } else if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "(")) {
                 write(tokenizer.getToken());
                 compileExpression();
@@ -560,11 +645,13 @@ public class CompilationEngine {
         } else {
             tokenizer.back();
             compileExpression();
+            parametersCount++;
             do {
                 tokenizer.advance();
                 if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ",")) {
                     write(tokenizer.getToken());
                     compileExpression();
+                    parametersCount++;
                 } else {
                     tokenizer.back();
                     break;
