@@ -121,8 +121,9 @@ public class CompilationEngine {
 
         returnType = tokenizer.getValue();
 
-        if (equal(tokenizer.getType(), tokenizer.KEYWORD) && equal(tokenizer.getValue(), tokenizer.INT)
-                || equal(tokenizer.getValue(), tokenizer.CHAR) || equal(tokenizer.getValue(), tokenizer.BOOLEAN)) {
+        if (equal(tokenizer.getType(), tokenizer.KEYWORD) && (equal(tokenizer.getValue(), tokenizer.VOID)
+                || equal(tokenizer.getValue(), tokenizer.INT) || equal(tokenizer.getValue(), tokenizer.CHAR)
+                || equal(tokenizer.getValue(), tokenizer.BOOLEAN))) {
             write(tokenizer.getToken());
             return;
         }
@@ -130,7 +131,7 @@ public class CompilationEngine {
             write(tokenizer.getToken());
             return;
         }
-        exception("Int | Char | Boolean | ClassName");
+        exception("Void | Int | Char | Boolean | ClassName");
     }
 
     public void compileClass() {
@@ -240,14 +241,8 @@ public class CompilationEngine {
         writeTag("start", "subroutineDec");
 
         write(tokenizer.getToken());
-        tokenizer.advance();
-        if (equal(tokenizer.getType(), tokenizer.KEYWORD) && equal(tokenizer.getValue(), tokenizer.VOID)) {
-            write(tokenizer.getToken());
-            returnType = tokenizer.getValue();
-        } else {
-            tokenizer.back();
-            compileType();
-        }
+
+        compileReturnType();
 
         tokenizer.advance();
         if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
@@ -262,9 +257,6 @@ public class CompilationEngine {
         writeTag("end", "parameterList");
         expect(")");
 
-        vmWriter.writeFunction(String.format("%s.%s", className, functionName), parametersCount);
-        parametersCount = 0;
-
         compileSubRoutineBody();
         writeTag("end", "subroutineDec");
         compileSubRoutineDec();
@@ -274,6 +266,9 @@ public class CompilationEngine {
         writeTag("start", "subroutineBody");
         expect("{");
         compileVarDec();
+
+        vmWriter.writeFunction(String.format("%s.%s", className, functionName), symbolTable.getLocalIndex());
+
         writeTag("start", "statements");
         compileStatements();
         writeTag("end", "statements");
@@ -311,9 +306,6 @@ public class CompilationEngine {
         }
         vmWriter.writeCall(functionName, parametersCount);
         parametersCount = 0;
-        if (equal(returnType, tokenizer.VOID)) {
-            vmWriter.writePop("temp", 0);
-        }
     }
 
     public void compileParameterList() {
@@ -335,8 +327,6 @@ public class CompilationEngine {
             write(tokenizer.getToken());
 
             symbolTable.define(tokenizer.getValue(), currentType, currentKind);
-
-            parametersCount++;
 
             tokenizer.advance();
             if (notEqual(tokenizer.getType(), tokenizer.SYMBOL)
@@ -422,7 +412,6 @@ public class CompilationEngine {
         compileSubroutineCall();
         expect(";");
         writeTag("end", "doStatement");
-
         vmWriter.writePop("temp", 0);
     }
 

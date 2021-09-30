@@ -49,6 +49,14 @@ public class SymbolTable {
         localIndex = 0;
     }
 
+    public int getLocalIndex() {
+        return localIndex;
+    }
+
+    public int getArgumentIndex() {
+        return argumentIndex;
+    }
+
     public Symbol getSymbolByName(String name) {
         if (subroutineScope.containsKey(name)) {
             return subroutineScope.get(name);
