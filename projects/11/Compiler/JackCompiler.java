@@ -11,8 +11,8 @@ public class JackCompiler {
         }
 
         File fileIn = new File(args[0]);
-        File fileOut, tokenFileOut, vmFileOut;
-        String fileOutPath, tokenFileOutPath, vmFileOutPath;
+        File fileOut;
+        String fileOutPath;
         ArrayList<File> files = new ArrayList<File>();
 
         if (fileIn.isFile()) {
@@ -31,13 +31,9 @@ public class JackCompiler {
         }
 
         for (File file : files) {
-            fileOutPath = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")) + ".xml";
-            tokenFileOutPath = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")) + "T.xml";
-            vmFileOutPath = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")) + ".vm";
+            fileOutPath = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf(".")) + ".vm";
             fileOut = new File(fileOutPath);
-            tokenFileOut = new File(tokenFileOutPath);
-            vmFileOut = new File(vmFileOutPath);
-            CompilationEngine compilationEngine = new CompilationEngine(file, fileOut, tokenFileOut, vmFileOut);
+            CompilationEngine compilationEngine = new CompilationEngine(file, fileOut);
             compilationEngine.compileClass();
         }
     }
@@ -63,5 +59,4 @@ public class JackCompiler {
         }
         return result;
     }
-
 }
