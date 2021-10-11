@@ -5,56 +5,47 @@ public class SymbolTable {
 
     private Map<String, Symbol> classScope;
     private Map<String, Symbol> subroutineScope;
-    private int staticIndex = 0;
-    private int fieldIndex = 0;
-    private int argumentIndex = 0;
-    private int localIndex = 0;
+    private Map<String, Integer> indices;
 
     public SymbolTable() {
         classScope = new HashMap<String, Symbol>();
         subroutineScope = new HashMap<String, Symbol>();
-        resetClassScope();
-        resetSubroutineScope();
+        indices = new HashMap<String, Integer>();
+        indices.put("static", 0);
+        indices.put("field", 0);
+        indices.put("argument", 0);
+        indices.put("var", 0);
     }
 
     public void define(String name, String type, String kind) {
-        System.out.println(String.format("name: %s, type: %s, kind: %s", name, type, kind));
+        int index = indices.get(kind);
         switch (kind) {
             case "static":
-                classScope.put(name, new Symbol(type, "static", staticIndex++));
+                classScope.put(name, new Symbol(type, "static", index));
                 break;
             case "field":
-                classScope.put(name, new Symbol(type, "this", fieldIndex++));
+                classScope.put(name, new Symbol(type, "this", index));
                 break;
             case "argument":
-                subroutineScope.put(name, new Symbol(type, "argument", argumentIndex++));
+                subroutineScope.put(name, new Symbol(type, "argument", index));
                 break;
             case "var":
-                subroutineScope.put(name, new Symbol(type, "local", localIndex++));
+                subroutineScope.put(name, new Symbol(type, "local", index));
                 break;
             default:
                 throw new NoSuchFieldError("no such kind");
         }
+        indices.put(kind, index + 1);
     }
 
-    public void resetClassScope() {
-        classScope.clear();
-        staticIndex = 0;
-        fieldIndex = 0;
-    }
-
-    public void resetSubroutineScope() {
+    public void startSubroutine() {
         subroutineScope.clear();
-        argumentIndex = 0;
-        localIndex = 0;
+        indices.put("argument", 0);
+        indices.put("var", 0);
     }
 
-    public int getLocalIndex() {
-        return localIndex;
-    }
-
-    public int getArgumentIndex() {
-        return argumentIndex;
+    public int indexOf(String kind) {
+        return indices.get(kind);
     }
 
     public Symbol getSymbolByName(String name) {

@@ -1,0 +1,190 @@
+function SquareGame.new 0
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push constant 0
+push constant 0
+push constant 30
+call Square.new 3
+pop this 0
+push constant 0
+pop this 1
+push pointer 0
+return
+function SquareGame.dispose 0
+push argument 0
+pop pointer 0
+push this 0
+call Square.dispose 1
+pop temp 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return
+function SquareGame.moveSquare 0
+push argument 0
+pop pointer 0
+push this 1
+push constant 1
+eq
+not
+if-goto moveSquare_LABEL_0_START
+push this 0
+call Square.moveUp 1
+pop temp 0
+goto moveSquare_LABEL_0_END
+label moveSquare_LABEL_0_START
+label moveSquare_LABEL_0_END
+push this 1
+push constant 2
+eq
+not
+if-goto Square.moveUp_LABEL_1_START
+push this 0
+call Square.moveDown 1
+pop temp 0
+goto Square.moveUp_LABEL_1_END
+label Square.moveUp_LABEL_1_START
+label Square.moveUp_LABEL_1_END
+push this 1
+push constant 3
+eq
+not
+if-goto Square.moveDown_LABEL_2_START
+push this 0
+call Square.moveLeft 1
+pop temp 0
+goto Square.moveDown_LABEL_2_END
+label Square.moveDown_LABEL_2_START
+label Square.moveDown_LABEL_2_END
+push this 1
+push constant 4
+eq
+not
+if-goto Square.moveLeft_LABEL_3_START
+push this 0
+call Square.moveRight 1
+pop temp 0
+goto Square.moveLeft_LABEL_3_END
+label Square.moveLeft_LABEL_3_START
+label Square.moveLeft_LABEL_3_END
+push constant 5
+call Sys.wait 1
+pop temp 0
+push constant 0
+return
+function SquareGame.run 2
+push argument 0
+pop pointer 0
+push constant 0
+pop local 1
+label run_LABEL_4_START
+push local 1
+not
+not
+if-goto run_LABEL_4_END
+label run_LABEL_5_START
+push local 0
+push constant 0
+eq
+not
+if-goto run_LABEL_5_END
+call Keyboard.keyPressed 0
+pop local 0
+push pointer 0
+call SquareGame.moveSquare 1
+pop temp 0
+goto run_LABEL_5_START
+label run_LABEL_5_END
+push local 0
+push constant 81
+eq
+not
+if-goto SquareGame.moveSquare_LABEL_6_START
+push constant 1
+neg
+pop local 1
+goto SquareGame.moveSquare_LABEL_6_END
+label SquareGame.moveSquare_LABEL_6_START
+label SquareGame.moveSquare_LABEL_6_END
+push local 0
+push constant 90
+eq
+not
+if-goto SquareGame.moveSquare_LABEL_7_START
+push this 0
+call Square.decSize 1
+pop temp 0
+goto SquareGame.moveSquare_LABEL_7_END
+label SquareGame.moveSquare_LABEL_7_START
+label SquareGame.moveSquare_LABEL_7_END
+push local 0
+push constant 88
+eq
+not
+if-goto Square.decSize_LABEL_8_START
+push this 0
+call Square.incSize 1
+pop temp 0
+goto Square.decSize_LABEL_8_END
+label Square.decSize_LABEL_8_START
+label Square.decSize_LABEL_8_END
+push local 0
+push constant 131
+eq
+not
+if-goto Square.incSize_LABEL_9_START
+push constant 1
+pop this 1
+goto Square.incSize_LABEL_9_END
+label Square.incSize_LABEL_9_START
+label Square.incSize_LABEL_9_END
+push local 0
+push constant 133
+eq
+not
+if-goto Square.incSize_LABEL_10_START
+push constant 2
+pop this 1
+goto Square.incSize_LABEL_10_END
+label Square.incSize_LABEL_10_START
+label Square.incSize_LABEL_10_END
+push local 0
+push constant 130
+eq
+not
+if-goto Square.incSize_LABEL_11_START
+push constant 3
+pop this 1
+goto Square.incSize_LABEL_11_END
+label Square.incSize_LABEL_11_START
+label Square.incSize_LABEL_11_END
+push local 0
+push constant 132
+eq
+not
+if-goto Square.incSize_LABEL_12_START
+push constant 4
+pop this 1
+goto Square.incSize_LABEL_12_END
+label Square.incSize_LABEL_12_START
+label Square.incSize_LABEL_12_END
+label Square.incSize_LABEL_13_START
+push local 0
+push constant 0
+eq
+not
+not
+if-goto Square.incSize_LABEL_13_END
+call Keyboard.keyPressed 0
+pop local 0
+push pointer 0
+call SquareGame.moveSquare 1
+pop temp 0
+goto Square.incSize_LABEL_13_START
+label Square.incSize_LABEL_13_END
+goto run_LABEL_4_START
+label run_LABEL_4_END
+push constant 0
+return

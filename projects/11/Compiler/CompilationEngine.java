@@ -8,6 +8,7 @@ public class CompilationEngine {
 
     private String className;
     private String functionName;
+    private String functionType;
     private String currentType;
     private String returnType;
     private String currentKind;
@@ -20,6 +21,7 @@ public class CompilationEngine {
         vmWriter = new VMWriter(outFile);
         className = outFile.getName().substring(0, outFile.getName().lastIndexOf("."));
         functionName = "";
+        functionType = "";
         currentType = "";
         returnType = "";
         currentKind = "";
@@ -136,9 +138,11 @@ public class CompilationEngine {
 
     public void compileSubRoutineDec() {
 
-        symbolTable.resetSubroutineScope();
+        symbolTable.startSubroutine();
 
         tokenizer.advance();
+
+        functionType = tokenizer.getValue();
 
         if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "}")) {
             tokenizer.back();
@@ -172,7 +176,18 @@ public class CompilationEngine {
         expect("{");
         compileVarDec();
 
-        vmWriter.writeFunction(String.format("%s.%s", className, functionName), symbolTable.getLocalIndex());
+        vmWriter.writeFunction(String.format("%s.%s", className, functionName), symbolTable.indexOf(tokenizer.VAR));
+
+        if (equal(functionType, tokenizer.CONSTRUCTOR)) {
+            vmWriter.writePush("constant", symbolTable.indexOf("field"));
+            vmWriter.writeCall("Memory.alloc", 1);
+            vmWriter.writePop("pointer", 0);
+        }
+
+        if (equal(functionType, tokenizer.METHOD)) {
+            vmWriter.writePush("argument", 0);
+            vmWriter.writePop("pointer", 0);
+        }
 
         compileStatements();
         expect("}");
@@ -184,10 +199,20 @@ public class CompilationEngine {
             exception("Identifier");
         }
 
-        functionName = tokenizer.getValue();
+        try {
+            Symbol symbol = symbolTable.getSymbolByName(tokenizer.getValue());
+            vmWriter.writePush(symbol.getKind(), symbol.getIndex());
+            functionName = symbol.getType();
+            parametersCount += 1;
+        } catch (NoSuchFieldError error) {
+            functionName = tokenizer.getValue();
+        }
 
         tokenizer.advance();
         if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "(")) {
+            vmWriter.writePush("pointer", 0);
+            functionName = String.format("%s.%s", className, functionName);
+            parametersCount += 1;
             compileExpressionList();
             expect(")");
         } else if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ".")) {
@@ -215,7 +240,7 @@ public class CompilationEngine {
         }
         tokenizer.back();
         do {
-            currentKind = tokenizer.ARGUMENT;
+            currentKind = "argument";
 
             compileType();
 
@@ -457,6 +482,7 @@ public class CompilationEngine {
                         vmWriter.writePush("constant", 0);
                         break;
                     case "this":
+                        vmWriter.writePush("pointer", 0);
                         break;
                 }
             } else if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "(")) {

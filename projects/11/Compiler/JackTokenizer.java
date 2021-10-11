@@ -50,7 +50,6 @@ public class JackTokenizer {
     public String FALSE = "false";
     public String NULL = "null";
     public String THIS = "this";
-    public String ARGUMENT = "argument";
 
     public JackTokenizer(File file) {
         index = 0;
@@ -59,8 +58,8 @@ public class JackTokenizer {
         keywords = new ArrayList<String>();
         symbols = new ArrayList<String>();
         operators = new ArrayList<String>();
-        String[] KEYWORDS = { "class", "constructor", "function", "method", "field", "static", "var", "int", "char",
-                "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
+        String[] KEYWORDS = { CLASS, CONSTRUCTOR, FUNCTION, METHOD, FIELD, STATIC, VAR, INT, CHAR, BOOLEAN, VOID, TRUE,
+                FALSE, NULL, THIS, LET, DO, IF, ELSE, WHILE, RETURN };
         String[] SYMBOLS = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<", ">", "=",
                 "~" };
         String[] OPERATORS = { "+", "-", "*", "/", "&", "|", "<", ">", "=", "&lt;", "&gt;", "&amp;", "&quot;" };
