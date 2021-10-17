@@ -14,6 +14,8 @@ public class CompilationEngine {
     private String currentKind;
     private int parametersCount;
     private int labelCount;
+    private int index;
+    private boolean handleArray;
 
     public CompilationEngine(File inFile, File outFile) {
         tokenizer = new JackTokenizer(inFile);
@@ -27,6 +29,8 @@ public class CompilationEngine {
         currentKind = "";
         parametersCount = 0;
         labelCount = 0;
+        index = 0;
+        handleArray = false;
     }
 
     public void compileType() {
@@ -127,8 +131,7 @@ public class CompilationEngine {
                     || (notEqual(tokenizer.getValue(), ",") && notEqual(tokenizer.getValue(), ";"))) {
                 exception("',' or ';'");
             }
-            if (equal(tokenizer.getValue(), ",")) {
-            } else {
+            if (notEqual(tokenizer.getValue(), ",")) {
                 break;
             }
         } while (true);
@@ -256,8 +259,7 @@ public class CompilationEngine {
                     || (notEqual(tokenizer.getValue(), ",") && notEqual(tokenizer.getValue(), ")"))) {
                 exception("',' or ')'");
             }
-            if (equal(tokenizer.getValue(), ",")) {
-            } else {
+            if (notEqual(tokenizer.getValue(), ",")) {
                 tokenizer.back();
                 break;
             }
@@ -287,8 +289,7 @@ public class CompilationEngine {
                     || (notEqual(tokenizer.getValue(), ",") && notEqual(tokenizer.getValue(), ";"))) {
                 exception("',' or ';'");
             }
-            if (equal(tokenizer.getValue(), ",")) {
-            } else {
+            if (notEqual(tokenizer.getValue(), ",")) {
                 break;
             }
         } while (true);
@@ -343,23 +344,28 @@ public class CompilationEngine {
             exception("'[' or '='");
         }
 
-        boolean keepGoing = false;
         if (equal(tokenizer.getValue(), "[")) {
-            keepGoing = true;
+            handleArray = true;
+            vmWriter.writePush(symbol.getKind(), symbol.getIndex());
             compileExpression();
+            vmWriter.writeArithmetic("+");
+            vmWriter.writePop("pointer", 1);
             tokenizer.advance();
-            if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "]")) {
-            } else {
+            if (!(equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "]"))) {
                 exception("']");
             }
-        }
-        if (keepGoing)
             tokenizer.advance();
+        }
 
         compileExpression();
         expect(";");
 
-        vmWriter.writePop(symbol.getKind(), symbol.getIndex());
+        if (handleArray) {
+            vmWriter.writePop("that", 0);
+            handleArray = false;
+        } else {
+            vmWriter.writePop(symbol.getKind(), symbol.getIndex());
+        }
     }
 
     public void compileWhile() {
@@ -388,10 +394,9 @@ public class CompilationEngine {
 
     public void compileReturn() {
         tokenizer.advance();
-        if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ";")) {
-            if (equal(returnType, tokenizer.VOID)) {
-                vmWriter.writePush("constant", 0);
-            }
+        if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ";")
+                && equal(returnType, tokenizer.VOID)) {
+            vmWriter.writePush("constant", 0);
         } else {
             tokenizer.back();
             compileExpression();
@@ -448,11 +453,16 @@ public class CompilationEngine {
 
     public void compileTerm() {
         tokenizer.advance();
+        Token token = tokenizer.getToken();
         if (equal(tokenizer.getType(), tokenizer.IDENTIFIER)) {
-            Token identifier = tokenizer.getToken();
             tokenizer.advance();
             if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "[")) {
+                Symbol symbol = symbolTable.getSymbolByName(token.getValue());
+                vmWriter.writePush(symbol.getKind(), symbol.getIndex());
                 compileExpression();
+                vmWriter.writeArithmetic("+");
+                vmWriter.writePop("pointer", 1);
+                vmWriter.writePush("that", 0);
                 expect("]");
             } else if (equal(tokenizer.getType(), tokenizer.SYMBOL)
                     && (equal(tokenizer.getValue(), "(") || equal(tokenizer.getValue(), "."))) {
@@ -460,8 +470,7 @@ public class CompilationEngine {
                 tokenizer.back();
                 compileSubroutineCall();
             } else {
-                String name = identifier.getValue();
-                Symbol symbol = symbolTable.getSymbolByName(name);
+                Symbol symbol = symbolTable.getSymbolByName(token.getValue());
                 vmWriter.writePush(symbol.getKind(), symbol.getIndex());
                 tokenizer.back();
             }
@@ -469,6 +478,14 @@ public class CompilationEngine {
             if (equal(tokenizer.getType(), tokenizer.INT_CONST)) {
                 vmWriter.writePush("constant", Integer.valueOf(tokenizer.getValue()));
             } else if (equal(tokenizer.getType(), tokenizer.STRING_CONST)) {
+                String string = token.getValue();
+                int stringLength = string.length();
+                vmWriter.writePush("constant", stringLength);
+                vmWriter.writeCall("String.new", 1);
+                for (int asciiCode : string.toCharArray()) {
+                    vmWriter.writePush("constant", asciiCode);
+                    vmWriter.writeCall("String.appendChar", 2);
+                }
             } else if (equal(tokenizer.getType(), tokenizer.KEYWORD) && (equal(tokenizer.getValue(), tokenizer.TRUE)
                     || equal(tokenizer.getValue(), tokenizer.FALSE) || equal(tokenizer.getValue(), tokenizer.NULL)
                     || equal(tokenizer.getValue(), tokenizer.THIS))) {
