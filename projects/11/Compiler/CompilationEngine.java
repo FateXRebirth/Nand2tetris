@@ -81,7 +81,7 @@ public class CompilationEngine {
         expect("{");
 
         compileClassVarDec();
-        compileSubRoutineDec();
+        compileSubroutineDec();
 
         expect("}");
 
@@ -139,7 +139,7 @@ public class CompilationEngine {
         compileClassVarDec();
     }
 
-    public void compileSubRoutineDec() {
+    public void compileSubroutineDec() {
 
         symbolTable.startSubroutine();
 
@@ -158,6 +158,10 @@ public class CompilationEngine {
             exception("Constructor | Function | Method");
         }
 
+        if (equal(tokenizer.getValue(), tokenizer.METHOD)) {
+            symbolTable.define(className, className, "argument");
+        }
+
         compileReturnType();
 
         tokenizer.advance();
@@ -171,11 +175,11 @@ public class CompilationEngine {
         compileParameterList();
         expect(")");
 
-        compileSubRoutineBody();
-        compileSubRoutineDec();
+        compileSubroutineBody();
+        compileSubroutineDec();
     }
 
-    public void compileSubRoutineBody() {
+    public void compileSubroutineBody() {
         expect("{");
         compileVarDec();
 
@@ -188,7 +192,8 @@ public class CompilationEngine {
         }
 
         if (equal(functionType, tokenizer.METHOD)) {
-            vmWriter.writePush("argument", 0);
+            Symbol symbol = symbolTable.getSymbolByName(className);
+            vmWriter.writePush(symbol.getKind(), symbol.getIndex());
             vmWriter.writePop("pointer", 0);
         }
 
