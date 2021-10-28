@@ -14,7 +14,6 @@ public class CompilationEngine {
     private String currentKind;
     private int parametersCount;
     private int labelCount;
-    private int index;
     private boolean handleArray;
 
     public CompilationEngine(File inFile, File outFile) {
@@ -29,7 +28,6 @@ public class CompilationEngine {
         currentKind = "";
         parametersCount = 0;
         labelCount = 0;
-        index = 0;
         handleArray = false;
     }
 
@@ -354,7 +352,6 @@ public class CompilationEngine {
             vmWriter.writePush(symbol.getKind(), symbol.getIndex());
             compileExpression();
             vmWriter.writeArithmetic("+");
-            vmWriter.writePop("pointer", 1);
             tokenizer.advance();
             if (!(equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "]"))) {
                 exception("']");
@@ -366,6 +363,9 @@ public class CompilationEngine {
         expect(";");
 
         if (handleArray) {
+            vmWriter.writePop("temp", 0);
+            vmWriter.writePop("pointer", 1);
+            vmWriter.writePush("temp", 0);
             vmWriter.writePop("that", 0);
             handleArray = false;
         } else {

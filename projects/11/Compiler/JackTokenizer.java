@@ -118,7 +118,7 @@ public class JackTokenizer {
                                 input.add(value);
                             } else {
                                 fragment = fragment + value;
-                                if (keywords.contains(fragment)) {
+                                if (keywords.contains(fragment) && next.equals(" ")) {
                                     input.add(fragment);
                                     fragment = "";
                                 } else if (next.equals(" ")) {
