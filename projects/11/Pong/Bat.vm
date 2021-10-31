@@ -102,7 +102,7 @@ push this 4
 push constant 1
 eq
 not
-if-goto move_LABEL_0_START
+if-goto IF_0_START
 push this 0
 push constant 4
 sub
@@ -111,12 +111,12 @@ push this 0
 push constant 0
 lt
 not
-if-goto move_LABEL_1_START
+if-goto IF_1_START
 push constant 0
 pop this 0
-goto move_LABEL_1_END
-label move_LABEL_1_START
-label move_LABEL_1_END
+goto IF_1_END
+label IF_1_START
+label IF_1_END
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -150,8 +150,8 @@ push this 3
 add
 call Screen.drawRectangle 4
 pop temp 0
-goto move_LABEL_0_END
-label move_LABEL_0_START
+goto IF_0_END
+label IF_0_START
 push this 0
 push constant 4
 add
@@ -162,14 +162,14 @@ add
 push constant 511
 gt
 not
-if-goto Screen.drawRectangle_LABEL_2_START
+if-goto IF_2_START
 push constant 511
 push this 2
 sub
 pop this 0
-goto Screen.drawRectangle_LABEL_2_END
-label Screen.drawRectangle_LABEL_2_START
-label Screen.drawRectangle_LABEL_2_END
+goto IF_2_END
+label IF_2_START
+label IF_2_END
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -203,6 +203,6 @@ push this 3
 add
 call Screen.drawRectangle 4
 pop temp 0
-label move_LABEL_0_END
+label IF_0_END
 push constant 0
 return

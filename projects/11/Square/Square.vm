@@ -73,7 +73,7 @@ push constant 510
 lt
 and
 not
-if-goto incSize_LABEL_0_START
+if-goto IF_0_START
 push pointer 0
 call Square.erase 1
 pop temp 0
@@ -84,9 +84,9 @@ pop this 2
 push pointer 0
 call Square.draw 1
 pop temp 0
-goto incSize_LABEL_0_END
-label incSize_LABEL_0_START
-label incSize_LABEL_0_END
+goto IF_0_END
+label IF_0_START
+label IF_0_END
 push constant 0
 return
 function Square.decSize 0
@@ -96,7 +96,7 @@ push this 2
 push constant 2
 gt
 not
-if-goto decSize_LABEL_1_START
+if-goto IF_1_START
 push pointer 0
 call Square.erase 1
 pop temp 0
@@ -107,9 +107,9 @@ pop this 2
 push pointer 0
 call Square.draw 1
 pop temp 0
-goto decSize_LABEL_1_END
-label decSize_LABEL_1_START
-label decSize_LABEL_1_END
+goto IF_1_END
+label IF_1_START
+label IF_1_END
 push constant 0
 return
 function Square.moveUp 0
@@ -119,7 +119,7 @@ push this 1
 push constant 1
 gt
 not
-if-goto moveUp_LABEL_2_START
+if-goto IF_2_START
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -155,9 +155,9 @@ push constant 1
 add
 call Screen.drawRectangle 4
 pop temp 0
-goto moveUp_LABEL_2_END
-label moveUp_LABEL_2_START
-label moveUp_LABEL_2_END
+goto IF_2_END
+label IF_2_START
+label IF_2_END
 push constant 0
 return
 function Square.moveDown 0
@@ -169,7 +169,7 @@ add
 push constant 254
 lt
 not
-if-goto moveDown_LABEL_3_START
+if-goto IF_3_START
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -205,9 +205,9 @@ push this 2
 add
 call Screen.drawRectangle 4
 pop temp 0
-goto moveDown_LABEL_3_END
-label moveDown_LABEL_3_START
-label moveDown_LABEL_3_END
+goto IF_3_END
+label IF_3_START
+label IF_3_END
 push constant 0
 return
 function Square.moveLeft 0
@@ -217,7 +217,7 @@ push this 0
 push constant 1
 gt
 not
-if-goto moveLeft_LABEL_4_START
+if-goto IF_4_START
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -253,9 +253,9 @@ push this 2
 add
 call Screen.drawRectangle 4
 pop temp 0
-goto moveLeft_LABEL_4_END
-label moveLeft_LABEL_4_START
-label moveLeft_LABEL_4_END
+goto IF_4_END
+label IF_4_START
+label IF_4_END
 push constant 0
 return
 function Square.moveRight 0
@@ -267,7 +267,7 @@ add
 push constant 510
 lt
 not
-if-goto moveRight_LABEL_5_START
+if-goto IF_5_START
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -303,8 +303,8 @@ push this 2
 add
 call Screen.drawRectangle 4
 pop temp 0
-goto moveRight_LABEL_5_END
-label moveRight_LABEL_5_START
-label moveRight_LABEL_5_END
+goto IF_5_END
+label IF_5_START
+label IF_5_END
 push constant 0
 return

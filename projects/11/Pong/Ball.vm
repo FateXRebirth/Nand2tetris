@@ -106,7 +106,7 @@ lt
 pop this 7
 push this 7
 not
-if-goto Math.abs_LABEL_0_START
+if-goto IF_0_START
 push local 0
 pop local 2
 push local 1
@@ -121,8 +121,8 @@ push this 0
 push argument 1
 lt
 pop this 9
-goto Math.abs_LABEL_0_END
-label Math.abs_LABEL_0_START
+goto IF_0_END
+label IF_0_START
 push this 0
 push argument 1
 lt
@@ -131,7 +131,7 @@ push this 1
 push argument 2
 lt
 pop this 9
-label Math.abs_LABEL_0_END
+label IF_0_END
 push constant 2
 push local 1
 call Math.multiply 2
@@ -160,138 +160,138 @@ push this 4
 push constant 0
 lt
 not
-if-goto Ball.hide_LABEL_1_START
+if-goto IF_1_START
 push this 4
 push this 5
 add
 pop this 4
-goto Ball.hide_LABEL_1_END
-label Ball.hide_LABEL_1_START
+goto IF_1_END
+label IF_1_START
 push this 4
 push this 6
 add
 pop this 4
 push this 9
 not
-if-goto Ball.hide_LABEL_2_START
+if-goto IF_2_START
 push this 7
 not
-if-goto Ball.hide_LABEL_3_START
+if-goto IF_3_START
 push this 0
 push constant 4
 add
 pop this 0
-goto Ball.hide_LABEL_3_END
-label Ball.hide_LABEL_3_START
+goto IF_3_END
+label IF_3_START
 push this 1
 push constant 4
 add
 pop this 1
-label Ball.hide_LABEL_3_END
-goto Ball.hide_LABEL_2_END
-label Ball.hide_LABEL_2_START
+label IF_3_END
+goto IF_2_END
+label IF_2_START
 push this 7
 not
-if-goto Ball.hide_LABEL_4_START
+if-goto IF_4_START
 push this 0
 push constant 4
 sub
 pop this 0
-goto Ball.hide_LABEL_4_END
-label Ball.hide_LABEL_4_START
+goto IF_4_END
+label IF_4_START
 push this 1
 push constant 4
 sub
 pop this 1
-label Ball.hide_LABEL_4_END
-label Ball.hide_LABEL_2_END
-label Ball.hide_LABEL_1_END
+label IF_4_END
+label IF_2_END
+label IF_1_END
 push this 8
 not
-if-goto Ball.hide_LABEL_5_START
+if-goto IF_5_START
 push this 7
 not
-if-goto Ball.hide_LABEL_6_START
+if-goto IF_6_START
 push this 1
 push constant 4
 add
 pop this 1
-goto Ball.hide_LABEL_6_END
-label Ball.hide_LABEL_6_START
+goto IF_6_END
+label IF_6_START
 push this 0
 push constant 4
 add
 pop this 0
-label Ball.hide_LABEL_6_END
-goto Ball.hide_LABEL_5_END
-label Ball.hide_LABEL_5_START
+label IF_6_END
+goto IF_5_END
+label IF_5_START
 push this 7
 not
-if-goto Ball.hide_LABEL_7_START
+if-goto IF_7_START
 push this 1
 push constant 4
 sub
 pop this 1
-goto Ball.hide_LABEL_7_END
-label Ball.hide_LABEL_7_START
+goto IF_7_END
+label IF_7_START
 push this 0
 push constant 4
 sub
 pop this 0
-label Ball.hide_LABEL_7_END
-label Ball.hide_LABEL_5_END
+label IF_7_END
+label IF_5_END
 push this 0
 push this 10
 gt
 not
 not
-if-goto Ball.hide_LABEL_8_START
+if-goto IF_8_START
 push constant 1
 pop this 14
 push this 10
 pop this 0
-goto Ball.hide_LABEL_8_END
-label Ball.hide_LABEL_8_START
-label Ball.hide_LABEL_8_END
+goto IF_8_END
+label IF_8_START
+label IF_8_END
 push this 0
 push this 11
 lt
 not
 not
-if-goto Ball.hide_LABEL_9_START
+if-goto IF_9_START
 push constant 2
 pop this 14
 push this 11
 pop this 0
-goto Ball.hide_LABEL_9_END
-label Ball.hide_LABEL_9_START
-label Ball.hide_LABEL_9_END
+goto IF_9_END
+label IF_9_START
+label IF_9_END
 push this 1
 push this 12
 gt
 not
 not
-if-goto Ball.hide_LABEL_10_START
+if-goto IF_10_START
 push constant 3
 pop this 14
 push this 12
 pop this 1
-goto Ball.hide_LABEL_10_END
-label Ball.hide_LABEL_10_START
-label Ball.hide_LABEL_10_END
+goto IF_10_END
+label IF_10_START
+label IF_10_END
 push this 1
 push this 13
 lt
 not
 not
-if-goto Ball.hide_LABEL_11_START
+if-goto IF_11_START
 push constant 4
 pop this 14
 push this 13
 pop this 1
-goto Ball.hide_LABEL_11_END
-label Ball.hide_LABEL_11_START
-label Ball.hide_LABEL_11_END
+goto IF_11_END
+label IF_11_START
+label IF_11_END
 push pointer 0
 call Ball.show 1
 pop temp 0
@@ -312,11 +312,11 @@ push argument 1
 push constant 0
 eq
 not
-if-goto bounce_LABEL_12_START
+if-goto IF_12_START
 push constant 10
 pop local 4
-goto bounce_LABEL_12_END
-label bounce_LABEL_12_START
+goto IF_12_END
+label IF_12_START
 push this 2
 push constant 0
 lt
@@ -335,20 +335,20 @@ eq
 and
 or
 not
-if-goto bounce_LABEL_13_START
+if-goto IF_13_START
 push constant 20
 pop local 4
-goto bounce_LABEL_13_END
-label bounce_LABEL_13_START
+goto IF_13_END
+label IF_13_START
 push constant 5
 pop local 4
-label bounce_LABEL_13_END
-label bounce_LABEL_12_END
+label IF_13_END
+label IF_12_END
 push this 14
 push constant 1
 eq
 not
-if-goto bounce_LABEL_14_START
+if-goto IF_14_START
 push constant 506
 pop local 0
 push local 3
@@ -364,13 +364,13 @@ push local 4
 call Math.multiply 2
 add
 pop local 1
-goto bounce_LABEL_14_END
-label bounce_LABEL_14_START
+goto IF_14_END
+label IF_14_START
 push this 14
 push constant 2
 eq
 not
-if-goto bounce_LABEL_15_START
+if-goto IF_15_START
 push constant 0
 pop local 0
 push local 3
@@ -385,13 +385,13 @@ push local 4
 call Math.multiply 2
 add
 pop local 1
-goto bounce_LABEL_15_END
-label bounce_LABEL_15_START
+goto IF_15_END
+label IF_15_START
 push this 14
 push constant 3
 eq
 not
-if-goto bounce_LABEL_16_START
+if-goto IF_16_START
 push constant 250
 pop local 1
 push local 2
@@ -407,8 +407,8 @@ push local 4
 call Math.multiply 2
 add
 pop local 0
-goto bounce_LABEL_16_END
-label bounce_LABEL_16_START
+goto IF_16_END
+label IF_16_START
 push constant 0
 pop local 1
 push local 2
@@ -423,9 +423,9 @@ push local 4
 call Math.multiply 2
 add
 pop local 0
-label bounce_LABEL_16_END
-label bounce_LABEL_15_END
-label bounce_LABEL_14_END
+label IF_16_END
+label IF_15_END
+label IF_14_END
 push pointer 0
 push local 0
 push local 1

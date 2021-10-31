@@ -14,7 +14,6 @@ public class CompilationEngine {
     private String currentKind;
     private int parametersCount;
     private int labelCount;
-    private boolean handleArray;
 
     public CompilationEngine(File inFile, File outFile) {
         tokenizer = new JackTokenizer(inFile);
@@ -28,7 +27,6 @@ public class CompilationEngine {
         currentKind = "";
         parametersCount = 0;
         labelCount = 0;
-        handleArray = false;
     }
 
     public void compileType() {
@@ -41,7 +39,6 @@ public class CompilationEngine {
             return;
         }
         if (equal(tokenizer.getType(), tokenizer.IDENTIFIER)) {
-
             return;
         }
         exception("Int | Char | Boolean | ClassName");
@@ -333,6 +330,7 @@ public class CompilationEngine {
     }
 
     public void compileLet() {
+        boolean handleArray = false;
         tokenizer.advance();
         if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
             exception("VarName");
@@ -374,8 +372,8 @@ public class CompilationEngine {
     }
 
     public void compileWhile() {
-        String startLabel = String.format("%s_LABEL_%d_START", functionName, labelCount);
-        String endLabel = String.format("%s_LABEL_%d_END", functionName, labelCount);
+        String startLabel = String.format("WHILE_%d_START", labelCount);
+        String endLabel = String.format("WHILE_%d_END", labelCount);
         labelCount++;
 
         vmWriter.writeLabel(startLabel);
@@ -411,8 +409,8 @@ public class CompilationEngine {
     }
 
     public void compileIf() {
-        String startLabel = String.format("%s_LABEL_%d_START", functionName, labelCount);
-        String endLabel = String.format("%s_LABEL_%d_END", functionName, labelCount);
+        String startLabel = String.format("IF_%d_START", labelCount);
+        String endLabel = String.format("IF_%d_END", labelCount);
         labelCount++;
 
         expect("(");

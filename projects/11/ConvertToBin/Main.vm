@@ -17,10 +17,10 @@ function Main.convert 3
 push constant 1
 neg
 pop local 2
-label convert_LABEL_0_START
+label WHILE_0_START
 push local 2
 not
-if-goto convert_LABEL_0_END
+if-goto WHILE_0_END
 push local 1
 push constant 1
 add
@@ -33,7 +33,7 @@ push constant 16
 gt
 not
 not
-if-goto Main.nextMask_LABEL_1_START
+if-goto IF_1_START
 push argument 0
 push local 0
 and
@@ -41,29 +41,29 @@ push constant 0
 eq
 not
 not
-if-goto Main.nextMask_LABEL_2_START
+if-goto IF_2_START
 push constant 8000
 push local 1
 add
 push constant 1
 call Memory.poke 2
 pop temp 0
-goto Main.nextMask_LABEL_2_END
-label Main.nextMask_LABEL_2_START
+goto IF_2_END
+label IF_2_START
 push constant 8000
 push local 1
 add
 push constant 0
 call Memory.poke 2
 pop temp 0
-label Main.nextMask_LABEL_2_END
-goto Main.nextMask_LABEL_1_END
-label Main.nextMask_LABEL_1_START
+label IF_2_END
+goto IF_1_END
+label IF_1_START
 push constant 0
 pop local 2
-label Main.nextMask_LABEL_1_END
-goto convert_LABEL_0_START
-label convert_LABEL_0_END
+label IF_1_END
+goto WHILE_0_START
+label WHILE_0_END
 push constant 0
 return
 function Main.nextMask 0
@@ -71,23 +71,23 @@ push argument 0
 push constant 0
 eq
 not
-if-goto nextMask_LABEL_3_START
+if-goto IF_3_START
 push constant 1
 return
-goto nextMask_LABEL_3_END
-label nextMask_LABEL_3_START
+goto IF_3_END
+label IF_3_START
 push argument 0
 push constant 2
 call Math.multiply 2
 return
-label nextMask_LABEL_3_END
+label IF_3_END
 function Main.fillMemory 0
-label fillMemory_LABEL_4_START
+label WHILE_4_START
 push argument 1
 push constant 0
 gt
 not
-if-goto fillMemory_LABEL_4_END
+if-goto WHILE_4_END
 push argument 0
 push argument 2
 call Memory.poke 2
@@ -100,7 +100,7 @@ push argument 0
 push constant 1
 add
 pop argument 0
-goto fillMemory_LABEL_4_START
-label fillMemory_LABEL_4_END
+goto WHILE_4_START
+label WHILE_4_END
 push constant 0
 return

@@ -406,7 +406,7 @@ push local 2
 push constant 0
 eq
 not
-if-goto Output.println_LABEL_0_START
+if-goto IF_0_START
 push local 0
 push constant 10
 call Main.fill 2
@@ -463,9 +463,9 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-goto Output.println_LABEL_0_END
-label Output.println_LABEL_0_START
-label Output.println_LABEL_0_END
+goto IF_0_END
+label IF_0_START
+label IF_0_END
 push constant 44
 call String.new 1
 push constant 84
@@ -678,12 +678,12 @@ push constant 2
 call Math.multiply 2
 return
 function Main.fill 0
-label fill_LABEL_1_START
+label WHILE_1_START
 push argument 1
 push constant 0
 gt
 not
-if-goto fill_LABEL_1_END
+if-goto WHILE_1_END
 push argument 1
 push constant 1
 sub
@@ -697,7 +697,7 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-goto fill_LABEL_1_START
-label fill_LABEL_1_END
+goto WHILE_1_START
+label WHILE_1_END
 push constant 0
 return

@@ -41,11 +41,7 @@ public class JackCompiler {
     // Get File's Extension
     public static String getExtension(String fileName) {
         int index = fileName.lastIndexOf('.');
-        if (index != -1) {
-            return fileName.substring(index);
-        } else {
-            return "";
-        }
+        return index != -1 ? fileName.substring(index) : "";
     }
 
     // Get Files in Directory

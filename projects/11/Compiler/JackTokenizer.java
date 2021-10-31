@@ -199,8 +199,9 @@ public class JackTokenizer {
     }
 
     public void back() {
-        if (index > 0)
+        if (index > 0) {
             index = index - 1;
+        }
     }
 
     public boolean isOperator() {

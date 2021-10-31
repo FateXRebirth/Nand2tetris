@@ -29,46 +29,46 @@ push this 1
 push constant 1
 eq
 not
-if-goto moveSquare_LABEL_0_START
+if-goto IF_0_START
 push this 0
 call Square.moveUp 1
 pop temp 0
-goto moveSquare_LABEL_0_END
-label moveSquare_LABEL_0_START
-label moveSquare_LABEL_0_END
+goto IF_0_END
+label IF_0_START
+label IF_0_END
 push this 1
 push constant 2
 eq
 not
-if-goto Square.moveUp_LABEL_1_START
+if-goto IF_1_START
 push this 0
 call Square.moveDown 1
 pop temp 0
-goto Square.moveUp_LABEL_1_END
-label Square.moveUp_LABEL_1_START
-label Square.moveUp_LABEL_1_END
+goto IF_1_END
+label IF_1_START
+label IF_1_END
 push this 1
 push constant 3
 eq
 not
-if-goto Square.moveDown_LABEL_2_START
+if-goto IF_2_START
 push this 0
 call Square.moveLeft 1
 pop temp 0
-goto Square.moveDown_LABEL_2_END
-label Square.moveDown_LABEL_2_START
-label Square.moveDown_LABEL_2_END
+goto IF_2_END
+label IF_2_START
+label IF_2_END
 push this 1
 push constant 4
 eq
 not
-if-goto Square.moveLeft_LABEL_3_START
+if-goto IF_3_START
 push this 0
 call Square.moveRight 1
 pop temp 0
-goto Square.moveLeft_LABEL_3_END
-label Square.moveLeft_LABEL_3_START
-label Square.moveLeft_LABEL_3_END
+goto IF_3_END
+label IF_3_START
+label IF_3_END
 push constant 5
 call Sys.wait 1
 pop temp 0
@@ -79,112 +79,112 @@ push argument 0
 pop pointer 0
 push constant 0
 pop local 1
-label run_LABEL_4_START
+label WHILE_4_START
 push local 1
 not
 not
-if-goto run_LABEL_4_END
-label run_LABEL_5_START
+if-goto WHILE_4_END
+label WHILE_5_START
 push local 0
 push constant 0
 eq
 not
-if-goto run_LABEL_5_END
+if-goto WHILE_5_END
 call Keyboard.keyPressed 0
 pop local 0
 push pointer 0
 call SquareGame.moveSquare 1
 pop temp 0
-goto run_LABEL_5_START
-label run_LABEL_5_END
+goto WHILE_5_START
+label WHILE_5_END
 push local 0
 push constant 81
 eq
 not
-if-goto SquareGame.moveSquare_LABEL_6_START
+if-goto IF_6_START
 push constant 1
 neg
 pop local 1
-goto SquareGame.moveSquare_LABEL_6_END
-label SquareGame.moveSquare_LABEL_6_START
-label SquareGame.moveSquare_LABEL_6_END
+goto IF_6_END
+label IF_6_START
+label IF_6_END
 push local 0
 push constant 90
 eq
 not
-if-goto SquareGame.moveSquare_LABEL_7_START
+if-goto IF_7_START
 push this 0
 call Square.decSize 1
 pop temp 0
-goto SquareGame.moveSquare_LABEL_7_END
-label SquareGame.moveSquare_LABEL_7_START
-label SquareGame.moveSquare_LABEL_7_END
+goto IF_7_END
+label IF_7_START
+label IF_7_END
 push local 0
 push constant 88
 eq
 not
-if-goto Square.decSize_LABEL_8_START
+if-goto IF_8_START
 push this 0
 call Square.incSize 1
 pop temp 0
-goto Square.decSize_LABEL_8_END
-label Square.decSize_LABEL_8_START
-label Square.decSize_LABEL_8_END
+goto IF_8_END
+label IF_8_START
+label IF_8_END
 push local 0
 push constant 131
 eq
 not
-if-goto Square.incSize_LABEL_9_START
+if-goto IF_9_START
 push constant 1
 pop this 1
-goto Square.incSize_LABEL_9_END
-label Square.incSize_LABEL_9_START
-label Square.incSize_LABEL_9_END
+goto IF_9_END
+label IF_9_START
+label IF_9_END
 push local 0
 push constant 133
 eq
 not
-if-goto Square.incSize_LABEL_10_START
+if-goto IF_10_START
 push constant 2
 pop this 1
-goto Square.incSize_LABEL_10_END
-label Square.incSize_LABEL_10_START
-label Square.incSize_LABEL_10_END
+goto IF_10_END
+label IF_10_START
+label IF_10_END
 push local 0
 push constant 130
 eq
 not
-if-goto Square.incSize_LABEL_11_START
+if-goto IF_11_START
 push constant 3
 pop this 1
-goto Square.incSize_LABEL_11_END
-label Square.incSize_LABEL_11_START
-label Square.incSize_LABEL_11_END
+goto IF_11_END
+label IF_11_START
+label IF_11_END
 push local 0
 push constant 132
 eq
 not
-if-goto Square.incSize_LABEL_12_START
+if-goto IF_12_START
 push constant 4
 pop this 1
-goto Square.incSize_LABEL_12_END
-label Square.incSize_LABEL_12_START
-label Square.incSize_LABEL_12_END
-label Square.incSize_LABEL_13_START
+goto IF_12_END
+label IF_12_START
+label IF_12_END
+label WHILE_13_START
 push local 0
 push constant 0
 eq
 not
 not
-if-goto Square.incSize_LABEL_13_END
+if-goto WHILE_13_END
 call Keyboard.keyPressed 0
 pop local 0
 push pointer 0
 call SquareGame.moveSquare 1
 pop temp 0
-goto Square.incSize_LABEL_13_START
-label Square.incSize_LABEL_13_END
-goto run_LABEL_4_START
-label run_LABEL_4_END
+goto WHILE_13_START
+label WHILE_13_END
+goto WHILE_4_START
+label WHILE_4_END
 push constant 0
 return
