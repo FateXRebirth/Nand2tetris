@@ -13,7 +13,8 @@ public class CompilationEngine {
     private String returnType;
     private String currentKind;
     private int parametersCount;
-    private int labelCount;
+    private int whileCount;
+    private int ifCount;
 
     public CompilationEngine(File inFile, File outFile) {
         tokenizer = new JackTokenizer(inFile);
@@ -26,7 +27,8 @@ public class CompilationEngine {
         returnType = "";
         currentKind = "";
         parametersCount = 0;
-        labelCount = 0;
+        whileCount = 0;
+        ifCount = 0;
     }
 
     public void compileType() {
@@ -137,6 +139,8 @@ public class CompilationEngine {
     public void compileSubroutineDec() {
 
         symbolTable.startSubroutine();
+        whileCount = 0;
+        ifCount = 0;
 
         tokenizer.advance();
 
@@ -165,6 +169,7 @@ public class CompilationEngine {
         }
 
         functionName = tokenizer.getValue();
+        System.out.println(functionName);
 
         expect("(");
         compileParameterList();
@@ -203,10 +208,14 @@ public class CompilationEngine {
         }
 
         try {
-            Symbol symbol = symbolTable.getSymbolByName(tokenizer.getValue());
-            vmWriter.writePush(symbol.getKind(), symbol.getIndex());
-            functionName = symbol.getType();
-            parametersCount += 1;
+            if (equal(tokenizer.getValue(), className)) {
+                functionName = className;
+            } else {
+                Symbol symbol = symbolTable.getSymbolByName(tokenizer.getValue());
+                vmWriter.writePush(symbol.getKind(), symbol.getIndex());
+                functionName = symbol.getType();
+                parametersCount += 1;
+            }
         } catch (NoSuchFieldError error) {
             functionName = tokenizer.getValue();
         }
@@ -347,8 +356,8 @@ public class CompilationEngine {
 
         if (equal(tokenizer.getValue(), "[")) {
             handleArray = true;
-            vmWriter.writePush(symbol.getKind(), symbol.getIndex());
             compileExpression();
+            vmWriter.writePush(symbol.getKind(), symbol.getIndex());
             vmWriter.writeArithmetic("+");
             tokenizer.advance();
             if (!(equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "]"))) {
@@ -372,9 +381,9 @@ public class CompilationEngine {
     }
 
     public void compileWhile() {
-        String startLabel = String.format("WHILE_%d_START", labelCount);
-        String endLabel = String.format("WHILE_%d_END", labelCount);
-        labelCount++;
+        String startLabel = String.format("WHILE_EXP%d", whileCount);
+        String endLabel = String.format("WHILE_END%d", whileCount);
+        whileCount++;
 
         vmWriter.writeLabel(startLabel);
 
@@ -409,34 +418,35 @@ public class CompilationEngine {
     }
 
     public void compileIf() {
-        String startLabel = String.format("IF_%d_START", labelCount);
-        String endLabel = String.format("IF_%d_END", labelCount);
-        labelCount++;
+        String trueLabel = String.format("IF_TRUE%d", ifCount);
+        String falseLabel = String.format("IF_FALSE%d", ifCount);
+        String endLabel = String.format("IF_END%d", ifCount);
+        ifCount++;
 
         expect("(");
         compileExpression();
         expect(")");
 
-        vmWriter.writeArithmetic("~");
-        vmWriter.writeIf(startLabel);
+        vmWriter.writeIf(trueLabel);
+        vmWriter.writeGoto(falseLabel);
+        vmWriter.writeLabel(trueLabel);
 
         expect("{");
         compileStatements();
         expect("}");
 
-        vmWriter.writeGoto(endLabel);
-        vmWriter.writeLabel(startLabel);
-
         tokenizer.advance();
         if (equal(tokenizer.getType(), tokenizer.KEYWORD) && equal(tokenizer.getValue(), tokenizer.ELSE)) {
+            vmWriter.writeGoto(endLabel);
+            vmWriter.writeLabel(falseLabel);
             expect("{");
             compileStatements();
             expect("}");
+            vmWriter.writeLabel(endLabel);
         } else {
+            vmWriter.writeLabel(falseLabel);
             tokenizer.back();
         }
-
-        vmWriter.writeLabel(endLabel);
     }
 
     public void compileExpression() {
@@ -461,8 +471,8 @@ public class CompilationEngine {
             tokenizer.advance();
             if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "[")) {
                 Symbol symbol = symbolTable.getSymbolByName(token.getValue());
-                vmWriter.writePush(symbol.getKind(), symbol.getIndex());
                 compileExpression();
+                vmWriter.writePush(symbol.getKind(), symbol.getIndex());
                 vmWriter.writeArithmetic("+");
                 vmWriter.writePop("pointer", 1);
                 vmWriter.writePush("that", 0);
@@ -494,8 +504,8 @@ public class CompilationEngine {
                     || equal(tokenizer.getValue(), tokenizer.THIS))) {
                 switch (tokenizer.getValue()) {
                     case "true":
-                        vmWriter.writePush("constant", 1);
-                        vmWriter.writeArithmetic("--");
+                        vmWriter.writePush("constant", 0);
+                        vmWriter.writeArithmetic("~");
                         break;
                     case "false":
                     case "null":
