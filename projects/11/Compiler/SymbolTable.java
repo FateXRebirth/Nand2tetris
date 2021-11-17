@@ -1,4 +1,5 @@
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SymbolTable {
@@ -6,6 +7,7 @@ public class SymbolTable {
     private Map<String, Symbol> classScope;
     private Map<String, Symbol> subroutineScope;
     private Map<String, Integer> indices;
+    static ArrayList<String> functions;
 
     public SymbolTable() {
         classScope = new HashMap<String, Symbol>();
@@ -15,6 +17,7 @@ public class SymbolTable {
         indices.put("field", 0);
         indices.put("argument", 0);
         indices.put("var", 0);
+        functions = new ArrayList<String>();
     }
 
     public void define(String name, String type, String kind) {
@@ -25,6 +28,9 @@ public class SymbolTable {
                 break;
             case "field":
                 classScope.put(name, new Symbol(type, "this", index));
+                break;
+            case "function":
+                classScope.put(name, new Symbol(type, "function", index));
                 break;
             case "argument":
                 subroutineScope.put(name, new Symbol(type, "argument", index));
@@ -56,5 +62,13 @@ public class SymbolTable {
             return classScope.get(name);
         }
         throw new NoSuchFieldError("no such name in scope");
+    }
+
+    public void addFunction(String name) {
+        functions.add(name);
+    }
+
+    public boolean isFunction(String name) {
+        return functions.contains(name);
     }
 }

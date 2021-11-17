@@ -12,7 +12,6 @@ public class CompilationEngine {
     private String currentType;
     private String returnType;
     private String currentKind;
-    private int parametersCount;
     private int whileCount;
     private int ifCount;
 
@@ -26,7 +25,6 @@ public class CompilationEngine {
         currentType = "";
         returnType = "";
         currentKind = "";
-        parametersCount = 0;
         whileCount = 0;
         ifCount = 0;
     }
@@ -169,7 +167,7 @@ public class CompilationEngine {
         }
 
         functionName = tokenizer.getValue();
-        System.out.println(functionName);
+        symbolTable.addFunction(functionName);
 
         expect("(");
         compileParameterList();
@@ -202,46 +200,50 @@ public class CompilationEngine {
     }
 
     public void compileSubroutineCall() {
+        String _functionName = "";
+        int _parametersCount = 0;
+
         tokenizer.advance();
         if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
             exception("Identifier");
         }
 
         try {
-            if (equal(tokenizer.getValue(), className)) {
-                functionName = className;
+            if (symbolTable.isFunction(tokenizer.getValue())) {
+                _functionName = tokenizer.getValue();
+            } else if (equal(tokenizer.getValue(), className)) {
+                _functionName = className;
             } else {
                 Symbol symbol = symbolTable.getSymbolByName(tokenizer.getValue());
                 vmWriter.writePush(symbol.getKind(), symbol.getIndex());
-                functionName = symbol.getType();
-                parametersCount += 1;
+                _functionName = symbol.getType();
+                _parametersCount += 1;
             }
         } catch (NoSuchFieldError error) {
-            functionName = tokenizer.getValue();
+            _functionName = tokenizer.getValue();
         }
 
         tokenizer.advance();
         if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "(")) {
             vmWriter.writePush("pointer", 0);
-            functionName = String.format("%s.%s", className, functionName);
-            parametersCount += 1;
-            compileExpressionList();
+            _functionName = String.format("%s.%s", className, _functionName);
+            _parametersCount += 1;
+            _parametersCount += compileExpressionList();
             expect(")");
         } else if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ".")) {
-            functionName += tokenizer.getValue();
+            _functionName += tokenizer.getValue();
             tokenizer.advance();
             if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
                 exception("Identifier");
             }
-            functionName += tokenizer.getValue();
+            _functionName += tokenizer.getValue();
             expect("(");
-            compileExpressionList();
+            _parametersCount += compileExpressionList();
             expect(")");
         } else {
             exception("'(' or '.'");
         }
-        vmWriter.writeCall(functionName, parametersCount);
-        parametersCount = 0;
+        vmWriter.writeCall(_functionName, _parametersCount);
     }
 
     public void compileParameterList() {
@@ -492,6 +494,10 @@ public class CompilationEngine {
                 vmWriter.writePush("constant", Integer.valueOf(tokenizer.getValue()));
             } else if (equal(tokenizer.getType(), tokenizer.STRING_CONST)) {
                 String string = token.getValue();
+                // filter escape character "\"
+                if (string.contains("\\")) {
+                    string = string.replaceAll("\\\\", "");
+                }
                 int stringLength = string.length();
                 vmWriter.writePush("constant", stringLength);
                 vmWriter.writeCall("String.new", 1);
@@ -529,25 +535,29 @@ public class CompilationEngine {
         }
     }
 
-    public void compileExpressionList() {
+    public int compileExpressionList() {
+        int _parametersCount = 0;
         tokenizer.advance();
         if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ")")) {
+            _parametersCount = 0;
             tokenizer.back();
         } else {
             tokenizer.back();
             compileExpression();
-            parametersCount++;
+            _parametersCount++;
             do {
                 tokenizer.advance();
                 if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ",")) {
                     compileExpression();
-                    parametersCount++;
+                    _parametersCount++;
                 } else {
                     tokenizer.back();
                     break;
                 }
             } while (true);
         }
+
+        return _parametersCount;
     }
 
     public boolean equal(String value1, String value2) {
