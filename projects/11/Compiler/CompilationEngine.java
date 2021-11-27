@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 
 public class CompilationEngine {
 
@@ -7,11 +8,10 @@ public class CompilationEngine {
     private VMWriter vmWriter;
 
     private String className;
-    private String functionName;
-    private String functionType;
-    private String currentType;
     private String returnType;
+    private String currentType;
     private String currentKind;
+    private ArrayList<String> functionList;
     private int whileCount;
     private int ifCount;
 
@@ -20,11 +20,10 @@ public class CompilationEngine {
         symbolTable = new SymbolTable();
         vmWriter = new VMWriter(outFile);
         className = outFile.getName().substring(0, outFile.getName().lastIndexOf("."));
-        functionName = "";
-        functionType = "";
-        currentType = "";
         returnType = "";
+        currentType = "";
         currentKind = "";
+        functionList = new ArrayList<String>();
         whileCount = 0;
         ifCount = 0;
     }
@@ -135,7 +134,9 @@ public class CompilationEngine {
     }
 
     public void compileSubroutineDec() {
-
+        // reset when new subroutine starts
+        String functionName = "";
+        String functionType = "";
         symbolTable.startSubroutine();
         whileCount = 0;
         ifCount = 0;
@@ -167,17 +168,17 @@ public class CompilationEngine {
         }
 
         functionName = tokenizer.getValue();
-        symbolTable.addFunction(functionName);
+        functionList.add(functionName);
 
         expect("(");
         compileParameterList();
         expect(")");
 
-        compileSubroutineBody();
+        compileSubroutineBody(functionName, functionType);
         compileSubroutineDec();
     }
 
-    public void compileSubroutineBody() {
+    public void compileSubroutineBody(String functionName, String functionType) {
         expect("{");
         compileVarDec();
 
@@ -200,8 +201,8 @@ public class CompilationEngine {
     }
 
     public void compileSubroutineCall() {
-        String _functionName = "";
-        int _parametersCount = 0;
+        String functionName = "";
+        int parametersCount = 0;
 
         tokenizer.advance();
         if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
@@ -209,41 +210,41 @@ public class CompilationEngine {
         }
 
         try {
-            if (symbolTable.isFunction(tokenizer.getValue())) {
-                _functionName = tokenizer.getValue();
+            if (functionList.contains(tokenizer.getValue())) {
+                functionName = tokenizer.getValue();
             } else if (equal(tokenizer.getValue(), className)) {
-                _functionName = className;
+                functionName = className;
             } else {
                 Symbol symbol = symbolTable.getSymbolByName(tokenizer.getValue());
                 vmWriter.writePush(symbol.getKind(), symbol.getIndex());
-                _functionName = symbol.getType();
-                _parametersCount += 1;
+                functionName = symbol.getType();
+                parametersCount += 1;
             }
         } catch (NoSuchFieldError error) {
-            _functionName = tokenizer.getValue();
+            functionName = tokenizer.getValue();
         }
 
         tokenizer.advance();
         if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), "(")) {
             vmWriter.writePush("pointer", 0);
-            _functionName = String.format("%s.%s", className, _functionName);
-            _parametersCount += 1;
-            _parametersCount += compileExpressionList();
+            functionName = String.format("%s.%s", className, functionName);
+            parametersCount += 1;
+            parametersCount += compileExpressionList();
             expect(")");
         } else if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ".")) {
-            _functionName += tokenizer.getValue();
+            functionName += tokenizer.getValue();
             tokenizer.advance();
             if (notEqual(tokenizer.getType(), tokenizer.IDENTIFIER)) {
                 exception("Identifier");
             }
-            _functionName += tokenizer.getValue();
+            functionName += tokenizer.getValue();
             expect("(");
-            _parametersCount += compileExpressionList();
+            parametersCount += compileExpressionList();
             expect(")");
         } else {
             exception("'(' or '.'");
         }
-        vmWriter.writeCall(_functionName, _parametersCount);
+        vmWriter.writeCall(functionName, parametersCount);
     }
 
     public void compileParameterList() {
@@ -254,7 +255,7 @@ public class CompilationEngine {
         }
         tokenizer.back();
         do {
-            currentKind = "argument";
+            currentKind = tokenizer.ARGUMENT;
 
             compileType();
 
@@ -536,20 +537,19 @@ public class CompilationEngine {
     }
 
     public int compileExpressionList() {
-        int _parametersCount = 0;
+        int parametersCount = 0;
         tokenizer.advance();
         if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ")")) {
-            _parametersCount = 0;
             tokenizer.back();
         } else {
             tokenizer.back();
             compileExpression();
-            _parametersCount++;
+            parametersCount++;
             do {
                 tokenizer.advance();
                 if (equal(tokenizer.getType(), tokenizer.SYMBOL) && equal(tokenizer.getValue(), ",")) {
                     compileExpression();
-                    _parametersCount++;
+                    parametersCount++;
                 } else {
                     tokenizer.back();
                     break;
@@ -557,7 +557,7 @@ public class CompilationEngine {
             } while (true);
         }
 
-        return _parametersCount;
+        return parametersCount;
     }
 
     public boolean equal(String value1, String value2) {

@@ -50,6 +50,7 @@ public class JackTokenizer {
     public String FALSE = "false";
     public String NULL = "null";
     public String THIS = "this";
+    public String ARGUMENT = "argument";
 
     public JackTokenizer(File file) {
         index = 0;
