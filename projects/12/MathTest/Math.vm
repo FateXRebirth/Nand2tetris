@@ -1,0 +1,213 @@
+function Math.init 0
+push constant 16
+call Array.new 1
+pop static 0
+push static 0
+push constant 0
+add
+push constant 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 1
+add
+push constant 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 2
+add
+push constant 4
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 3
+add
+push constant 8
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 4
+add
+push constant 16
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 5
+add
+push constant 32
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 6
+add
+push constant 64
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 7
+add
+push constant 128
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 8
+add
+push constant 256
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 9
+add
+push constant 512
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 10
+add
+push constant 1024
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 11
+add
+push constant 2048
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 12
+add
+push constant 4096
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 13
+add
+push constant 8192
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 14
+add
+push constant 16384
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 0
+push constant 15
+add
+push constant 16384
+push constant 16384
+add
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+function Math.abs 0
+function Math.multiply 3
+push constant 0
+pop local 0
+push constant 0
+pop local 1
+push argument 0
+pop local 2
+label WHILE_0_START
+push local 0
+push constant 16
+lt
+not
+if-goto WHILE_0_END
+push argument 1
+push local 0
+call Math.bit 2
+not
+if-goto IF_1_START
+push local 1
+push local 2
+add
+pop local 1
+goto IF_1_END
+label IF_1_START
+label IF_1_END
+push local 2
+push local 2
+add
+pop local 2
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_0_START
+label WHILE_0_END
+push local 1
+return
+function Math.divide 0
+function Math.sqrt 0
+function Math.max 0
+push argument 0
+push argument 1
+gt
+not
+if-goto IF_2_START
+push argument 0
+return
+goto IF_2_END
+label IF_2_START
+push argument 1
+return
+label IF_2_END
+function Math.min 0
+push argument 0
+push argument 1
+lt
+not
+if-goto IF_3_START
+push argument 0
+return
+goto IF_3_END
+label IF_3_START
+push argument 1
+return
+label IF_3_END
+function Math.bit 0
+push argument 0
+push static 0
+push argument 1
+add
+pop pointer 1
+push that 0
+and
+push constant 0
+gt
+return
