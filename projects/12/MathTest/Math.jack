@@ -34,6 +34,11 @@ class Math {
 
     /** Returns the absolute value of x. */
     function int abs(int x) {
+        if(x < 0) {
+            return -x;
+        } else {
+            return x;
+        }
     }
 
     /** Returns the product of x and y. 
@@ -43,7 +48,12 @@ class Math {
      */
     function int multiply(int x, int y) {
         var int index, sum, shiftedX;
-        
+        var boolean positive;
+
+        let positive = ((x > 0) = (y > 0));
+        let x = Math.abs(x);
+        let y = Math.abs(y);
+
         let index = 0;
         let sum = 0;
         let shiftedX = x;
@@ -55,7 +65,12 @@ class Math {
             let shiftedX = shiftedX + shiftedX;
             let index = index + 1;
         }
-        return sum;
+        
+        if(positive) {
+            return sum;
+        } else {
+            return -sum;
+        }
     }
 
     /** Returns the integer part of x/y.
@@ -64,10 +79,48 @@ class Math {
      *  the Jack expressions x/y and divide(x,y) return the same value.
      */
     function int divide(int x, int y) {
+        var int q, result;
+        var boolean positive;
+
+        let positive = ((x > 0) = (y > 0));
+        let x = Math.abs(x);
+        let y = Math.abs(y);
+
+        if(y > x) {
+            return 0;
+        }
+
+        let q = Math.divide(x, (y + y));
+
+        if(( x - (2 * q * y)) < y) {
+            let result = q + q;
+        } else {
+            let result = q + q + 1;
+        }
+
+        if(positive) {
+            return result;
+        } else {
+            return -result;
+        }
     }
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {
+        var int y, j, value, result;
+
+        let y = 0;
+        let j = 7; // j=n/2-1...0, n is max bits that jack language can handle, which is 16.
+
+        while(~(j < 0)) {
+            let value = y + twoToThe[j];
+            let result = value * value;
+            if (~(result > x) & (result > 0)) {
+                let y = value;
+            }
+            let j = j - 1;
+        }
+        return y;
     }
 
     /** Returns the greater number. */
