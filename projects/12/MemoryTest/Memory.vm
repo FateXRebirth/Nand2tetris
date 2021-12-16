@@ -1,0 +1,227 @@
+function Memory.init 1
+push constant 0
+pop static 0
+push constant 2048
+pop static 1
+push constant 16384
+pop static 2
+push constant 0
+pop static 3
+push constant 1
+pop static 4
+push constant 2
+pop static 5
+push static 1
+pop local 0
+push local 0
+push static 3
+add
+push constant 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+push static 4
+add
+push static 2
+push static 1
+sub
+push static 5
+sub
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+pop static 6
+push constant 0
+pop static 7
+push constant 0
+return
+function Memory.peek 0
+push static 0
+push argument 0
+add
+pop pointer 1
+push that 0
+return
+function Memory.poke 0
+push static 0
+push argument 0
+add
+push argument 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+function Memory.firstFit 2
+push static 6
+pop local 0
+push constant 1
+neg
+pop local 1
+label WHILE_0_START
+push local 1
+not
+if-goto WHILE_0_END
+push local 0
+push static 4
+add
+pop pointer 1
+push that 0
+push argument 0
+lt
+not
+not
+if-goto IF_1_START
+push local 0
+return
+goto IF_1_END
+label IF_1_START
+label IF_1_END
+push local 0
+pop static 7
+push local 0
+push static 3
+add
+pop pointer 1
+push that 0
+pop local 0
+push local 0
+push constant 0
+eq
+not
+if-goto IF_2_START
+push constant 0
+return
+goto IF_2_END
+label IF_2_START
+label IF_2_END
+goto WHILE_0_START
+label WHILE_0_END
+function Memory.alloc 2
+push argument 0
+call Memory.firstFit 1
+pop local 0
+push local 0
+push constant 0
+eq
+not
+if-goto IF_3_START
+push constant 0
+return
+goto IF_3_END
+label IF_3_START
+label IF_3_END
+push local 0
+push static 4
+add
+pop pointer 1
+push that 0
+push argument 0
+eq
+not
+if-goto IF_4_START
+push static 7
+push constant 0
+eq
+not
+not
+if-goto IF_5_START
+push static 7
+push static 3
+add
+push local 0
+push static 3
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+goto IF_5_END
+label IF_5_START
+label IF_5_END
+goto IF_4_END
+label IF_4_START
+push local 0
+push argument 0
+push static 5
+add
+add
+pop local 1
+push local 1
+push static 4
+add
+push local 0
+push static 4
+add
+pop pointer 1
+push that 0
+push argument 0
+push static 5
+add
+sub
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push static 7
+push constant 0
+eq
+not
+not
+if-goto IF_6_START
+push local 1
+push static 3
+add
+push local 0
+push static 3
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+goto IF_6_END
+label IF_6_START
+push local 1
+push static 3
+add
+push constant 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 1
+pop static 6
+label IF_6_END
+label IF_4_END
+push local 0
+push static 3
+add
+push constant 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+push static 4
+add
+push argument 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+push static 5
+add
+return
+function Memory.deAlloc 0
+push constant 0
+return
