@@ -155,6 +155,18 @@ add
 add
 pop local 1
 push local 1
+push static 3
+add
+push local 0
+push static 3
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 1
 push static 4
 add
 push local 0
@@ -176,28 +188,16 @@ eq
 not
 not
 if-goto IF_6_START
+push static 7
+push static 3
+add
 push local 1
-push static 3
-add
-push local 0
-push static 3
-add
-pop pointer 1
-push that 0
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
 goto IF_6_END
 label IF_6_START
-push local 1
-push static 3
-add
-push constant 0
-pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
 push local 1
 pop static 6
 label IF_6_END
@@ -222,6 +222,89 @@ push local 0
 push static 5
 add
 return
-function Memory.deAlloc 0
+function Memory.deAlloc 3
+push argument 0
+push static 5
+sub
+pop local 2
+push static 6
+pop local 0
+push local 0
+push static 3
+add
+pop pointer 1
+push that 0
+pop local 1
+label WHILE_7_START
+push local 1
+push constant 0
+eq
+not
+push local 1
+push local 2
+lt
+and
+not
+if-goto WHILE_7_END
+push local 1
+pop local 0
+push local 0
+push static 3
+add
+pop pointer 1
+push that 0
+pop local 1
+goto WHILE_7_START
+label WHILE_7_END
+push local 0
+push local 2
+gt
+not
+if-goto IF_8_START
+push local 2
+push static 3
+add
+push local 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 2
+pop static 6
+goto IF_8_END
+label IF_8_START
+push local 1
+push constant 0
+eq
+not
+if-goto IF_9_START
+push local 0
+push static 3
+add
+push local 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+goto IF_9_END
+label IF_9_START
+push local 0
+push static 3
+add
+push local 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 2
+push static 3
+add
+push local 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+label IF_9_END
+label IF_8_END
 push constant 0
 return

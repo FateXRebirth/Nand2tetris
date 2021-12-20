@@ -14,10 +14,10 @@ class Memory {
     static int HEAP_TAIL;
     static int NEXT;
     static int SIZE;
-    static int SEGMENT_HEADER_SIZE;
+    static int BLOCK_HEADER_SIZE;
 
     static int freeList;
-    static int lastSegment;
+    static int lastBlock;
 
     /** Initializes the class. */
     function void init() {
@@ -28,13 +28,13 @@ class Memory {
         let HEAP_TAIL = 16384;
         let NEXT = 0;
         let SIZE = 1;
-        let SEGMENT_HEADER_SIZE = 2;
+        let BLOCK_HEADER_SIZE = 2;
 
         let block = HEAP_BASE;
         let block[NEXT] = null;
-        let block[SIZE] = HEAP_TAIL - HEAP_BASE - SEGMENT_HEADER_SIZE;
+        let block[SIZE] = HEAP_TAIL - HEAP_BASE - BLOCK_HEADER_SIZE;
         let freeList = block;
-        let lastSegment = null;
+        let lastBlock = null;
 
         return;
     }
@@ -62,7 +62,7 @@ class Memory {
             if(~(block[SIZE] < size)) {
                 return block;
             }
-            let lastSegment = block;
+            let lastBlock = block;
             let block = block[NEXT];
             if(block = null) {
                 return null;
@@ -82,28 +82,51 @@ class Memory {
         }
 
         if(foundBlock[SIZE] = size) {
-            if(~(lastSegment = null)) {
-                let lastSegment[NEXT] = foundBlock[NEXT];  
+            if(~(lastBlock = null)) {
+                let lastBlock[NEXT] = foundBlock[NEXT];  
             }
         } else { 
-            let block = foundBlock + (size + SEGMENT_HEADER_SIZE);
-            let block[SIZE] = foundBlock[SIZE] - (size + SEGMENT_HEADER_SIZE);
-            if(~(lastSegment = null)) {
-               let block[NEXT] = foundBlock[NEXT];
+            let block = foundBlock + (size + BLOCK_HEADER_SIZE);
+            let block[NEXT] = foundBlock[NEXT];
+            let block[SIZE] = foundBlock[SIZE] - (size + BLOCK_HEADER_SIZE);
+            if(~(lastBlock = null)) {
+                let lastBlock[NEXT] = block;
             }  else {
-               let block[NEXT] = null;
-               let freeList = block;
+                let freeList = block;
             }
         }
 
         let foundBlock[NEXT] = null;
         let foundBlock[SIZE] = size;
-        return foundBlock + SEGMENT_HEADER_SIZE;
+        return foundBlock + BLOCK_HEADER_SIZE;
     }
 
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {
+        var Array previousBlock, nextBlock, deAllocateBlock;
+
+        let deAllocateBlock = o - BLOCK_HEADER_SIZE;
+        let previousBlock = freeList;
+        let nextBlock = previousBlock[NEXT];
+
+        while(~(nextBlock = null) & (nextBlock < deAllocateBlock)) {
+            let previousBlock = nextBlock;
+            let nextBlock = previousBlock[NEXT];
+        }
+
+        if(previousBlock > deAllocateBlock) {
+            let deAllocateBlock[NEXT] = previousBlock;
+            let freeList = deAllocateBlock;
+        } else {
+            if(nextBlock = null) {
+                let previousBlock[NEXT] = deAllocateBlock;
+            } else {
+                let previousBlock[NEXT] = deAllocateBlock;
+                let deAllocateBlock[NEXT] = nextBlock;
+            }
+        }
+
         return;
     }
 }
