@@ -70,12 +70,51 @@ class Memory {
         }
     }
 
+    /** best-fit algorithm */
+    function Array bestFit(int size) {
+        var Array block, bestBlock, previousBlock;
+
+        let block = freeList;
+        let bestBlock = null;
+        let previousBlock = null;
+        
+        while(~(block[NEXT] = null)) {
+            if(~(block[SIZE] < size)) {
+                if(~(bestBlock = null)) {
+                    if(~(block[SIZE] > bestBlock[SIZE])) {
+                        let lastBlock = previousBlock;
+                        let bestBlock = block;
+                    }
+                } else {
+                    let lastBlock = previousBlock;
+                    let bestBlock = block;
+                }
+            }
+            let previousBlock = block;
+            let block = block[NEXT];
+        }
+
+        if(~(block[SIZE] < size)) {
+            if(~(bestBlock = null)) {
+                if(~(block[SIZE] > bestBlock[SIZE])) {
+                    let lastBlock = previousBlock;
+                    let bestBlock = block;
+                }
+            } else {
+                let lastBlock = previousBlock;
+                let bestBlock = block;
+            }
+        }
+
+        return bestBlock;
+    }
+
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
         var Array foundBlock, block;
 
-        let foundBlock = Memory.firstFit(size);
+        let foundBlock = Memory.bestFit(size);
 
         if(foundBlock = null) {
             return 0;
@@ -84,6 +123,8 @@ class Memory {
         if(foundBlock[SIZE] = size) {
             if(~(lastBlock = null)) {
                 let lastBlock[NEXT] = foundBlock[NEXT];  
+            } else {
+                let freeList = foundBlock[NEXT];
             }
         } else { 
             let block = foundBlock + (size + BLOCK_HEADER_SIZE);
@@ -96,6 +137,7 @@ class Memory {
             }
         }
 
+        let lastBlock = null;
         let foundBlock[NEXT] = null;
         let foundBlock[SIZE] = size;
         return foundBlock + BLOCK_HEADER_SIZE;
