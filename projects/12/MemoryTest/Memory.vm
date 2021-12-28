@@ -403,6 +403,10 @@ push temp 0
 pop that 0
 push local 2
 pop static 6
+push local 2
+push local 0
+call Memory.defragment 2
+pop temp 0
 goto IF_15_END
 label IF_15_START
 push local 1
@@ -418,6 +422,10 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+push local 0
+push local 2
+call Memory.defragment 2
+pop temp 0
 goto IF_16_END
 label IF_16_START
 push local 0
@@ -436,7 +444,66 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+push local 2
+push local 1
+call Memory.defragment 2
+pop temp 0
+push local 0
+push local 2
+call Memory.defragment 2
+pop temp 0
 label IF_16_END
 label IF_15_END
+push constant 0
+return
+function Memory.defragment 0
+push argument 0
+push argument 0
+push static 4
+add
+pop pointer 1
+push that 0
+add
+push static 5
+add
+push argument 1
+eq
+not
+if-goto IF_17_START
+push argument 0
+push static 4
+add
+push argument 0
+push static 4
+add
+pop pointer 1
+push that 0
+push argument 1
+push static 4
+add
+pop pointer 1
+push that 0
+add
+push static 5
+add
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push argument 0
+push static 3
+add
+push argument 1
+push static 3
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+goto IF_17_END
+label IF_17_START
+label IF_17_END
 push constant 0
 return

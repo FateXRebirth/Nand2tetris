@@ -47,6 +47,7 @@ class Memory {
     /** Sets the RAM value at the given address to the given value. */
     function void poke(int address, int value) {
         let RAM[address] = value;
+
         return;
     }
 
@@ -140,6 +141,7 @@ class Memory {
         let lastBlock = null;
         let foundBlock[NEXT] = null;
         let foundBlock[SIZE] = size;
+
         return foundBlock + BLOCK_HEADER_SIZE;
     }
 
@@ -160,13 +162,27 @@ class Memory {
         if(previousBlock > deAllocateBlock) {
             let deAllocateBlock[NEXT] = previousBlock;
             let freeList = deAllocateBlock;
+            do Memory.defragment(deAllocateBlock, previousBlock);
         } else {
             if(nextBlock = null) {
                 let previousBlock[NEXT] = deAllocateBlock;
+                do Memory.defragment(previousBlock, deAllocateBlock);
             } else {
                 let previousBlock[NEXT] = deAllocateBlock;
                 let deAllocateBlock[NEXT] = nextBlock;
+                do Memory.defragment(deAllocateBlock, nextBlock);
+                do Memory.defragment(previousBlock, deAllocateBlock);
             }
+        }
+
+        return;
+    }
+
+    /** Defragmentation, combine block and next block if they are contiguous */
+    function void defragment(Array block, Array nextBlock) {
+        if((block + block[SIZE] + BLOCK_HEADER_SIZE) = nextBlock) {
+            let block[SIZE] = block[SIZE] + nextBlock[SIZE] + BLOCK_HEADER_SIZE;
+            let block[NEXT] = nextBlock[NEXT];
         }
 
         return;
