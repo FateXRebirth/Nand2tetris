@@ -1,0 +1,61 @@
+function Screen.init 0
+push constant 16384
+pop static 0
+push constant 24576
+pop static 1
+push constant 1
+neg
+pop static 2
+push constant 0
+return
+function Screen.clearScreen 0
+function Screen.setColor 0
+push argument 0
+pop static 2
+push constant 0
+return
+function Screen.drawPixel 4
+push argument 1
+push constant 32
+call Math.multiply 2
+push argument 0
+push constant 16
+call Math.divide 2
+add
+push static 0
+add
+pop local 0
+push local 0
+call Memory.peek 1
+pop local 1
+push argument 0
+push constant 16
+call Math.mod 2
+pop local 2
+push local 2
+call Math.twoToThe 1
+pop local 3
+push static 2
+not
+if-goto IF_0_START
+push local 1
+push local 3
+or
+pop local 1
+goto IF_0_END
+label IF_0_START
+push local 1
+push local 3
+not
+and
+pop local 1
+label IF_0_END
+push local 0
+push local 1
+call Memory.poke 2
+pop temp 0
+push constant 0
+return
+function Screen.drawLine 0
+function Screen.drawRectangle 0
+function Screen.drawCircle 0
