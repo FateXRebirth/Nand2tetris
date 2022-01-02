@@ -9,6 +9,8 @@ pop static 2
 push constant 0
 return
 function Screen.clearScreen 0
+push constant 0
+return
 function Screen.setColor 0
 push argument 0
 pop static 2
@@ -56,6 +58,257 @@ call Memory.poke 2
 pop temp 0
 push constant 0
 return
-function Screen.drawLine 0
+function Screen.drawLine 7
+push constant 0
+pop local 0
+push constant 0
+pop local 1
+push argument 2
+push argument 0
+sub
+pop local 2
+push argument 3
+push argument 1
+sub
+pop local 3
+push constant 0
+pop local 6
+push local 2
+push constant 0
+eq
+not
+if-goto IF_1_START
+label WHILE_2_START
+push local 1
+push local 3
+call Math.abs 1
+gt
+not
+not
+if-goto WHILE_2_END
+push local 3
+push constant 0
+gt
+not
+if-goto IF_3_START
+push argument 0
+push argument 1
+push local 1
+add
+call Screen.drawPixel 2
+pop temp 0
+goto IF_3_END
+label IF_3_START
+push argument 0
+push argument 1
+push local 1
+sub
+call Screen.drawPixel 2
+pop temp 0
+label IF_3_END
+push local 1
+push constant 1
+add
+pop local 1
+goto WHILE_2_START
+label WHILE_2_END
+push constant 0
+return
+goto IF_1_END
+label IF_1_START
+label IF_1_END
+push local 3
+push constant 0
+eq
+not
+if-goto IF_4_START
+label WHILE_5_START
+push local 0
+push local 2
+call Math.abs 1
+gt
+not
+not
+if-goto WHILE_5_END
+push local 2
+push constant 0
+gt
+not
+if-goto IF_6_START
+push argument 0
+push local 0
+add
+push argument 1
+call Screen.drawPixel 2
+pop temp 0
+goto IF_6_END
+label IF_6_START
+push argument 0
+push local 0
+sub
+push argument 1
+call Screen.drawPixel 2
+pop temp 0
+label IF_6_END
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_5_START
+label WHILE_5_END
+push constant 0
+return
+goto IF_4_END
+label IF_4_START
+label IF_4_END
+push local 2
+push constant 0
+gt
+not
+if-goto IF_7_START
+push local 3
+call Math.abs 1
+pop local 5
+label WHILE_8_START
+push local 0
+push local 2
+gt
+not
+push local 1
+push local 5
+gt
+not
+and
+not
+if-goto WHILE_8_END
+push local 3
+push constant 0
+gt
+not
+if-goto IF_9_START
+push argument 0
+push local 0
+add
+push argument 1
+push local 1
+add
+call Screen.drawPixel 2
+pop temp 0
+goto IF_9_END
+label IF_9_START
+push argument 0
+push local 0
+add
+push argument 1
+push local 1
+sub
+call Screen.drawPixel 2
+pop temp 0
+label IF_9_END
+push local 6
+push constant 0
+lt
+not
+if-goto IF_10_START
+push local 0
+push constant 1
+add
+pop local 0
+push local 6
+push local 5
+add
+pop local 6
+goto IF_10_END
+label IF_10_START
+push local 1
+push constant 1
+add
+pop local 1
+push local 6
+push local 2
+sub
+pop local 6
+label IF_10_END
+goto WHILE_8_START
+label WHILE_8_END
+push constant 0
+return
+goto IF_7_END
+label IF_7_START
+push local 2
+call Math.abs 1
+pop local 4
+push local 3
+call Math.abs 1
+pop local 5
+label WHILE_11_START
+push local 0
+push local 4
+gt
+not
+push local 1
+push local 5
+gt
+not
+and
+not
+if-goto WHILE_11_END
+push local 3
+push constant 0
+gt
+not
+if-goto IF_12_START
+push argument 0
+push local 0
+sub
+push argument 1
+push local 1
+add
+call Screen.drawPixel 2
+pop temp 0
+goto IF_12_END
+label IF_12_START
+push argument 0
+push local 0
+sub
+push argument 1
+push local 1
+sub
+call Screen.drawPixel 2
+pop temp 0
+label IF_12_END
+push local 6
+push constant 0
+lt
+not
+if-goto IF_13_START
+push local 0
+push constant 1
+add
+pop local 0
+push local 6
+push local 5
+add
+pop local 6
+goto IF_13_END
+label IF_13_START
+push local 1
+push constant 1
+add
+pop local 1
+push local 6
+push local 4
+sub
+pop local 6
+label IF_13_END
+goto WHILE_11_START
+label WHILE_11_END
+push constant 0
+return
+label IF_7_END
 function Screen.drawRectangle 0
+push constant 0
+return
 function Screen.drawCircle 0
+push constant 0
+return
