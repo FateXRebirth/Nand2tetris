@@ -25,6 +25,16 @@ class Screen {
 
     /** Erases the entire screen. */
     function void clearScreen() {
+        var int screen;
+
+        let screen = SCREEN_BASE;
+
+        do Screen.setColor(false);
+        while(~(screen > SCREEN_TAIL)) {
+            do Memory.poke(screen, color);
+            let screen = screen + 1;
+        }
+
         return;
     }
 
@@ -130,11 +140,32 @@ class Screen {
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      * and bottom right corner is (x2,y2), using the current color. */
     function void drawRectangle(int x1, int y1, int x2, int y2) {
+        var int y, dy;
+
+        let y = 0;
+        let dy = y2 - y1;
+
+        while(~(y > dy)) {
+            do Screen.drawLine(x1, y1 + y, x2, y1 + y);
+            let y = y + 1;
+        }
+
         return;
     }
 
     /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
     function void drawCircle(int x, int y, int r) {
+        var int dy, value;
+
+        if(~(r > 181)) {
+            let dy = -r;
+            while(~(dy > r)) {
+                let value = Math.sqrt((r * r) - (dy * dy));
+                do Screen.drawLine((x - value), (y + dy), (x + value), (y + dy));
+                let dy = dy + 1;                
+            }
+        }
+
         return;
     }
 }

@@ -8,7 +8,29 @@ neg
 pop static 2
 push constant 0
 return
-function Screen.clearScreen 0
+function Screen.clearScreen 1
+push static 0
+pop local 0
+push constant 0
+call Screen.setColor 1
+pop temp 0
+label WHILE_0_START
+push local 0
+push static 1
+gt
+not
+not
+if-goto WHILE_0_END
+push local 0
+push static 2
+call Memory.poke 2
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_0_START
+label WHILE_0_END
 push constant 0
 return
 function Screen.setColor 0
@@ -39,19 +61,19 @@ call Math.twoToThe 1
 pop local 3
 push static 2
 not
-if-goto IF_0_START
+if-goto IF_1_START
 push local 1
 push local 3
 or
 pop local 1
-goto IF_0_END
-label IF_0_START
+goto IF_1_END
+label IF_1_START
 push local 1
 push local 3
 not
 and
 pop local 1
-label IF_0_END
+label IF_1_END
 push local 0
 push local 1
 call Memory.poke 2
@@ -77,99 +99,99 @@ push local 2
 push constant 0
 eq
 not
-if-goto IF_1_START
-label WHILE_2_START
+if-goto IF_2_START
+label WHILE_3_START
 push local 1
 push local 3
 call Math.abs 1
 gt
 not
 not
-if-goto WHILE_2_END
+if-goto WHILE_3_END
 push local 3
 push constant 0
 gt
 not
-if-goto IF_3_START
+if-goto IF_4_START
 push argument 0
 push argument 1
 push local 1
 add
 call Screen.drawPixel 2
 pop temp 0
-goto IF_3_END
-label IF_3_START
+goto IF_4_END
+label IF_4_START
 push argument 0
 push argument 1
 push local 1
 sub
 call Screen.drawPixel 2
 pop temp 0
-label IF_3_END
+label IF_4_END
 push local 1
 push constant 1
 add
 pop local 1
-goto WHILE_2_START
-label WHILE_2_END
+goto WHILE_3_START
+label WHILE_3_END
 push constant 0
 return
-goto IF_1_END
-label IF_1_START
-label IF_1_END
+goto IF_2_END
+label IF_2_START
+label IF_2_END
 push local 3
 push constant 0
 eq
 not
-if-goto IF_4_START
-label WHILE_5_START
+if-goto IF_5_START
+label WHILE_6_START
 push local 0
 push local 2
 call Math.abs 1
 gt
 not
 not
-if-goto WHILE_5_END
-push local 2
-push constant 0
-gt
-not
-if-goto IF_6_START
-push argument 0
-push local 0
-add
-push argument 1
-call Screen.drawPixel 2
-pop temp 0
-goto IF_6_END
-label IF_6_START
-push argument 0
-push local 0
-sub
-push argument 1
-call Screen.drawPixel 2
-pop temp 0
-label IF_6_END
-push local 0
-push constant 1
-add
-pop local 0
-goto WHILE_5_START
-label WHILE_5_END
-push constant 0
-return
-goto IF_4_END
-label IF_4_START
-label IF_4_END
+if-goto WHILE_6_END
 push local 2
 push constant 0
 gt
 not
 if-goto IF_7_START
+push argument 0
+push local 0
+add
+push argument 1
+call Screen.drawPixel 2
+pop temp 0
+goto IF_7_END
+label IF_7_START
+push argument 0
+push local 0
+sub
+push argument 1
+call Screen.drawPixel 2
+pop temp 0
+label IF_7_END
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_6_START
+label WHILE_6_END
+push constant 0
+return
+goto IF_5_END
+label IF_5_START
+label IF_5_END
+push local 2
+push constant 0
+gt
+not
+if-goto IF_8_START
 push local 3
 call Math.abs 1
 pop local 5
-label WHILE_8_START
+label WHILE_9_START
 push local 0
 push local 2
 gt
@@ -180,12 +202,12 @@ gt
 not
 and
 not
-if-goto WHILE_8_END
+if-goto WHILE_9_END
 push local 3
 push constant 0
 gt
 not
-if-goto IF_9_START
+if-goto IF_10_START
 push argument 0
 push local 0
 add
@@ -194,8 +216,8 @@ push local 1
 add
 call Screen.drawPixel 2
 pop temp 0
-goto IF_9_END
-label IF_9_START
+goto IF_10_END
+label IF_10_START
 push argument 0
 push local 0
 add
@@ -204,12 +226,12 @@ push local 1
 sub
 call Screen.drawPixel 2
 pop temp 0
-label IF_9_END
+label IF_10_END
 push local 6
 push constant 0
 lt
 not
-if-goto IF_10_START
+if-goto IF_11_START
 push local 0
 push constant 1
 add
@@ -218,8 +240,8 @@ push local 6
 push local 5
 add
 pop local 6
-goto IF_10_END
-label IF_10_START
+goto IF_11_END
+label IF_11_START
 push local 1
 push constant 1
 add
@@ -228,20 +250,20 @@ push local 6
 push local 2
 sub
 pop local 6
-label IF_10_END
-goto WHILE_8_START
-label WHILE_8_END
+label IF_11_END
+goto WHILE_9_START
+label WHILE_9_END
 push constant 0
 return
-goto IF_7_END
-label IF_7_START
+goto IF_8_END
+label IF_8_START
 push local 2
 call Math.abs 1
 pop local 4
 push local 3
 call Math.abs 1
 pop local 5
-label WHILE_11_START
+label WHILE_12_START
 push local 0
 push local 4
 gt
@@ -252,12 +274,12 @@ gt
 not
 and
 not
-if-goto WHILE_11_END
+if-goto WHILE_12_END
 push local 3
 push constant 0
 gt
 not
-if-goto IF_12_START
+if-goto IF_13_START
 push argument 0
 push local 0
 sub
@@ -266,8 +288,8 @@ push local 1
 add
 call Screen.drawPixel 2
 pop temp 0
-goto IF_12_END
-label IF_12_START
+goto IF_13_END
+label IF_13_START
 push argument 0
 push local 0
 sub
@@ -276,12 +298,12 @@ push local 1
 sub
 call Screen.drawPixel 2
 pop temp 0
-label IF_12_END
+label IF_13_END
 push local 6
 push constant 0
 lt
 not
-if-goto IF_13_START
+if-goto IF_14_START
 push local 0
 push constant 1
 add
@@ -290,8 +312,8 @@ push local 6
 push local 5
 add
 pop local 6
-goto IF_13_END
-label IF_13_START
+goto IF_14_END
+label IF_14_START
 push local 1
 push constant 1
 add
@@ -300,15 +322,92 @@ push local 6
 push local 4
 sub
 pop local 6
-label IF_13_END
-goto WHILE_11_START
-label WHILE_11_END
+label IF_14_END
+goto WHILE_12_START
+label WHILE_12_END
 push constant 0
 return
-label IF_7_END
-function Screen.drawRectangle 0
+label IF_8_END
+function Screen.drawRectangle 2
+push constant 0
+pop local 0
+push argument 3
+push argument 1
+sub
+pop local 1
+label WHILE_15_START
+push local 0
+push local 1
+gt
+not
+not
+if-goto WHILE_15_END
+push argument 0
+push argument 1
+push local 0
+add
+push argument 2
+push argument 1
+push local 0
+add
+call Screen.drawLine 4
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_15_START
+label WHILE_15_END
 push constant 0
 return
-function Screen.drawCircle 0
+function Screen.drawCircle 2
+push argument 2
+push constant 181
+gt
+not
+not
+if-goto IF_16_START
+push argument 2
+neg
+pop local 0
+label WHILE_17_START
+push local 0
+push argument 2
+gt
+not
+not
+if-goto WHILE_17_END
+push argument 2
+push argument 2
+call Math.multiply 2
+push local 0
+push local 0
+call Math.multiply 2
+sub
+call Math.sqrt 1
+pop local 1
+push argument 0
+push local 1
+sub
+push argument 1
+push local 0
+add
+push argument 0
+push local 1
+add
+push argument 1
+push local 0
+add
+call Screen.drawLine 4
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_17_START
+label WHILE_17_END
+goto IF_16_END
+label IF_16_START
+label IF_16_END
 push constant 0
 return
