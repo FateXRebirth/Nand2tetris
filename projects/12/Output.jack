@@ -17,6 +17,10 @@
 class Output {
     static int cursorX;
     static int cursorY;
+    static int WIDTH_PER_FRAME;
+    static int HEIGHT_PER_FRAME;
+    static int MAX_X;
+    static Int MAX_Y;
     static int SCREEN;
 
     // Character map for displaying characters
@@ -26,6 +30,10 @@ class Output {
     function void init() {
         let cursorX = 0;
         let cursorY = 0;
+        let WIDTH_PER_FRAME = 8;
+        let HEIGHT_PER_FRAME = 11;
+        let MAX_X = 63;
+        let MAX_Y = 22;
         let SCREEN = 16384;
         do Output.initMap();
 
@@ -185,8 +193,8 @@ class Output {
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
-        let cursorX = cursorX + i;
-        let cursorY = cursorY + j;
+        let cursorX = j;
+        let cursorY = i;
 
         return;
     }
@@ -199,10 +207,10 @@ class Output {
         
         let i = 0;
         let map = Output.getMap(c);
-        let address = (cursorY * 32) + (cursorX / 16);
+        let address = (cursorY * HEIGHT_PER_FRAME * 32) + (cursorX * WIDTH_PER_FRAME / 16);
 
         while(~(i > 10)) {
-            let bitmap = map[i];      
+            let bitmap = map[i];
             if((cursorX & 15) = 0) {
                 let SCREEN[address] = SCREEN[address] & 255 | bitmap;
             } else {
@@ -212,7 +220,11 @@ class Output {
             let i = i + 1;
         }
 
-        let cursorX = cursorX + 8;
+        if(cursorX = MAX_X) {
+            do Output.println();
+        } else {
+            do Output.moveCursor(cursorY, cursorX + 1);
+        }
 
         return;
     }
@@ -229,9 +241,25 @@ class Output {
 
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
+        if(cursorY = MAX_Y) {
+            do Output.moveCursor(0, 0);
+        } else {
+            do Output.moveCursor(cursorY + 1, 0);
+        }
+
+        return;
     }
 
     /** Moves the cursor one column back. */
     function void backSpace() {
+        if(cursorX = 0) {
+            if(~(cursorY = 0)) {
+                do Output.moveCursor(cursorY - 1, MAX_X);
+            }
+        } else {
+            do Output.moveCursor(cursorY, cursorX - 1);
+        }
+        
+        return;
     }
 }
