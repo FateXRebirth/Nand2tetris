@@ -211,10 +211,10 @@ class Output {
 
         while(~(i > 10)) {
             let bitmap = map[i];
-            if((cursorX & 15) = 0) {
-                let SCREEN[address] = SCREEN[address] & 255 | bitmap;
+            if((cursorX & 1) = 1) {
+                let SCREEN[address] = SCREEN[address] & 255 | (bitmap * 256);
             } else {
-                let SCREEN[address] = SCREEN[address] & (-1 & 255) | (bitmap * 256);
+                let SCREEN[address] = bitmap;
             }
             let address = address + 32;
             let i = i + 1;
@@ -232,11 +232,30 @@ class Output {
     /** displays the given string starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printString(String s) {
+        var int i;
+        var char c;
+
+        let i = 0;
+        while(i < s.length()) {
+            let c = s.charAt(i);
+            do Output.printChar(c);
+            let i = i + 1;
+        }
+
+        return;
     }
 
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
+        var String s;
+
+        let s = String.new(6);
+        do s.setInt(i);
+        do Output.printString(s);
+        do s.dispose();
+        
+        return;
     }
 
     /** Advances the cursor to the beginning of the next line. */
