@@ -1,0 +1,36 @@
+function Keyboard.init 0
+push constant 24576
+pop static 0
+push constant 0
+return
+function Keyboard.keyPressed 0
+push static 0
+call Memory.peek 1
+return
+function Keyboard.readChar 1
+label WHILE_0_START
+call Keyboard.keyPressed 0
+push constant 0
+eq
+not
+if-goto WHILE_0_END
+goto WHILE_0_START
+label WHILE_0_END
+call Keyboard.keyPressed 0
+pop local 0
+label WHILE_1_START
+call Keyboard.keyPressed 0
+not
+push constant 0
+eq
+not
+if-goto WHILE_1_END
+goto WHILE_1_START
+label WHILE_1_END
+push local 0
+call Output.printChar 1
+pop temp 0
+push local 0
+return
+function Keyboard.readLine 0
+function Keyboard.readInt 0
