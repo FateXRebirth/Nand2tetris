@@ -20,9 +20,9 @@ call Keyboard.keyPressed 0
 pop local 0
 label WHILE_1_START
 call Keyboard.keyPressed 0
-not
 push constant 0
 eq
+not
 not
 if-goto WHILE_1_END
 goto WHILE_1_START
@@ -32,5 +32,47 @@ call Output.printChar 1
 pop temp 0
 push local 0
 return
-function Keyboard.readLine 0
-function Keyboard.readInt 0
+function Keyboard.readLine 2
+push argument 0
+call Output.printString 1
+pop temp 0
+push constant 50
+call String.new 1
+pop local 0
+call Keyboard.readChar 0
+pop local 1
+label WHILE_2_START
+push local 1
+push constant 128
+eq
+not
+not
+if-goto WHILE_2_END
+push local 1
+push constant 129
+eq
+not
+if-goto IF_3_START
+push local 0
+call String.eraseLastChar 1
+pop temp 0
+goto IF_3_END
+label IF_3_START
+push local 0
+push local 1
+call String.appendChar 2
+pop temp 0
+label IF_3_END
+call Keyboard.readChar 0
+pop local 1
+goto WHILE_2_START
+label WHILE_2_END
+push local 0
+return
+function Keyboard.readInt 1
+push argument 0
+call Keyboard.readLine 1
+pop local 0
+push local 0
+call String.intValue 1
+return
