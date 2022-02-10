@@ -13,16 +13,16 @@ push constant 2
 pop static 5
 push static 1
 pop local 0
-push local 0
 push static 3
+push local 0
 add
 push constant 0
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push static 4
+push local 0
 add
 push static 2
 push static 1
@@ -40,15 +40,15 @@ pop static 7
 push constant 0
 return
 function Memory.peek 0
-push static 0
 push argument 0
+push static 0
 add
 pop pointer 1
 push that 0
 return
 function Memory.poke 0
-push static 0
 push argument 0
+push static 0
 add
 push argument 1
 pop temp 0
@@ -60,32 +60,31 @@ return
 function Memory.firstFit 2
 push static 6
 pop local 0
-push constant 1
-neg
+push constant 0
+not
 pop local 1
-label WHILE_0_START
+label WHILE_EXP0
 push local 1
 not
-if-goto WHILE_0_END
-push local 0
+if-goto WHILE_END0
 push static 4
+push local 0
 add
 pop pointer 1
 push that 0
 push argument 0
 lt
 not
-not
-if-goto IF_1_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push local 0
 return
-goto IF_1_END
-label IF_1_START
-label IF_1_END
+label IF_FALSE0
 push local 0
 pop static 7
-push local 0
 push static 3
+push local 0
 add
 pop pointer 1
 push that 0
@@ -93,15 +92,16 @@ pop local 0
 push local 0
 push constant 0
 eq
-not
-if-goto IF_2_START
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push constant 0
 return
-goto IF_2_END
-label IF_2_START
-label IF_2_END
-goto WHILE_0_START
-label WHILE_0_END
+label IF_FALSE1
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
 function Memory.bestFit 3
 push static 6
 pop local 0
@@ -109,9 +109,9 @@ push constant 0
 pop local 1
 push constant 0
 pop local 2
-label WHILE_3_START
-push local 0
+label WHILE_EXP0
 push static 3
+push local 0
 add
 pop pointer 1
 push that 0
@@ -119,111 +119,109 @@ push constant 0
 eq
 not
 not
-if-goto WHILE_3_END
-push local 0
+if-goto WHILE_END0
 push static 4
+push local 0
 add
 pop pointer 1
 push that 0
 push argument 0
 lt
 not
-not
-if-goto IF_4_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push local 1
 push constant 0
 eq
 not
-not
-if-goto IF_5_START
-push local 0
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push static 4
+push local 0
 add
 pop pointer 1
 push that 0
-push local 1
 push static 4
+push local 1
 add
 pop pointer 1
 push that 0
 gt
 not
-not
-if-goto IF_6_START
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
 push local 2
 pop static 7
 push local 0
 pop local 1
-goto IF_6_END
-label IF_6_START
-label IF_6_END
-goto IF_5_END
-label IF_5_START
+label IF_FALSE2
+goto IF_END1
+label IF_FALSE1
 push local 2
 pop static 7
 push local 0
 pop local 1
-label IF_5_END
-goto IF_4_END
-label IF_4_START
-label IF_4_END
+label IF_END1
+label IF_FALSE0
 push local 0
 pop local 2
-push local 0
 push static 3
+push local 0
 add
 pop pointer 1
 push that 0
 pop local 0
-goto WHILE_3_START
-label WHILE_3_END
-push local 0
+goto WHILE_EXP0
+label WHILE_END0
 push static 4
+push local 0
 add
 pop pointer 1
 push that 0
 push argument 0
 lt
 not
-not
-if-goto IF_7_START
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
 push local 1
 push constant 0
 eq
 not
-not
-if-goto IF_8_START
-push local 0
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
 push static 4
+push local 0
 add
 pop pointer 1
 push that 0
-push local 1
 push static 4
+push local 1
 add
 pop pointer 1
 push that 0
 gt
 not
-not
-if-goto IF_9_START
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
 push local 2
 pop static 7
 push local 0
 pop local 1
-goto IF_9_END
-label IF_9_START
-label IF_9_END
-goto IF_8_END
-label IF_8_START
+label IF_FALSE5
+goto IF_END4
+label IF_FALSE4
 push local 2
 pop static 7
 push local 0
 pop local 1
-label IF_8_END
-goto IF_7_END
-label IF_7_START
-label IF_7_END
+label IF_END4
+label IF_FALSE3
 push local 1
 return
 function Memory.alloc 2
@@ -233,33 +231,34 @@ pop local 0
 push local 0
 push constant 0
 eq
-not
-if-goto IF_10_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push constant 0
 return
-goto IF_10_END
-label IF_10_START
-label IF_10_END
-push local 0
+label IF_FALSE0
 push static 4
+push local 0
 add
 pop pointer 1
 push that 0
 push argument 0
 eq
-not
-if-goto IF_11_START
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push static 7
 push constant 0
 eq
 not
-not
-if-goto IF_12_START
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push static 3
 push static 7
-push static 3
 add
-push local 0
 push static 3
+push local 0
 add
 pop pointer 1
 push that 0
@@ -267,28 +266,28 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-goto IF_12_END
-label IF_12_START
-push local 0
+goto IF_END2
+label IF_FALSE2
 push static 3
+push local 0
 add
 pop pointer 1
 push that 0
 pop static 6
-label IF_12_END
-goto IF_11_END
-label IF_11_START
+label IF_END2
+goto IF_END1
+label IF_FALSE1
 push local 0
 push argument 0
 push static 5
 add
 add
 pop local 1
+push static 3
 push local 1
-push static 3
 add
-push local 0
 push static 3
+push local 0
 add
 pop pointer 1
 push that 0
@@ -296,11 +295,11 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+push static 4
 push local 1
-push static 4
 add
-push local 0
 push static 4
+push local 0
 add
 pop pointer 1
 push that 0
@@ -316,34 +315,35 @@ push static 7
 push constant 0
 eq
 not
-not
-if-goto IF_13_START
-push static 7
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
 push static 3
+push static 7
 add
 push local 1
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-goto IF_13_END
-label IF_13_START
+goto IF_END3
+label IF_FALSE3
 push local 1
 pop static 6
-label IF_13_END
-label IF_11_END
+label IF_END3
+label IF_END1
 push constant 0
 pop static 7
-push local 0
 push static 3
+push local 0
 add
 push constant 0
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push static 4
+push local 0
 add
 push argument 0
 pop temp 0
@@ -361,13 +361,13 @@ sub
 pop local 2
 push static 6
 pop local 0
-push local 0
 push static 3
+push local 0
 add
 pop pointer 1
 push that 0
 pop local 1
-label WHILE_14_START
+label WHILE_EXP0
 push local 1
 push constant 0
 eq
@@ -377,24 +377,25 @@ push local 2
 lt
 and
 not
-if-goto WHILE_14_END
+if-goto WHILE_END0
 push local 1
 pop local 0
-push local 0
 push static 3
+push local 0
 add
 pop pointer 1
 push that 0
 pop local 1
-goto WHILE_14_START
-label WHILE_14_END
+goto WHILE_EXP0
+label WHILE_END0
 push local 0
 push local 2
 gt
-not
-if-goto IF_15_START
-push local 2
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push static 3
+push local 2
 add
 push local 0
 pop temp 0
@@ -407,15 +408,16 @@ push local 2
 push local 0
 call Memory.defragment 2
 pop temp 0
-goto IF_15_END
-label IF_15_START
+goto IF_END0
+label IF_FALSE0
 push local 1
 push constant 0
 eq
-not
-if-goto IF_16_START
-push local 0
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push static 3
+push local 0
 add
 push local 2
 pop temp 0
@@ -426,18 +428,18 @@ push local 0
 push local 2
 call Memory.defragment 2
 pop temp 0
-goto IF_16_END
-label IF_16_START
-push local 0
+goto IF_END1
+label IF_FALSE1
 push static 3
+push local 0
 add
 push local 2
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 2
 push static 3
+push local 2
 add
 push local 1
 pop temp 0
@@ -452,14 +454,14 @@ push local 0
 push local 2
 call Memory.defragment 2
 pop temp 0
-label IF_16_END
-label IF_15_END
+label IF_END1
+label IF_END0
 push constant 0
 return
 function Memory.defragment 0
 push argument 0
-push argument 0
 push static 4
+push argument 0
 add
 pop pointer 1
 push that 0
@@ -468,18 +470,19 @@ push static 5
 add
 push argument 1
 eq
-not
-if-goto IF_17_START
-push argument 0
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push static 4
+push argument 0
 add
-push argument 0
 push static 4
+push argument 0
 add
 pop pointer 1
 push that 0
-push argument 1
 push static 4
+push argument 1
 add
 pop pointer 1
 push that 0
@@ -490,11 +493,11 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+push static 3
 push argument 0
-push static 3
 add
-push argument 1
 push static 3
+push argument 1
 add
 pop pointer 1
 push that 0
@@ -502,8 +505,6 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-goto IF_17_END
-label IF_17_START
-label IF_17_END
+label IF_FALSE0
 push constant 0
 return

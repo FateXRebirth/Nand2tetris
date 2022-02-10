@@ -2,128 +2,128 @@ function Math.init 0
 push constant 16
 call Array.new 1
 pop static 0
-push static 0
 push constant 0
+push static 0
 add
 push constant 1
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 1
+push static 0
 add
 push constant 2
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 2
+push static 0
 add
 push constant 4
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 3
+push static 0
 add
 push constant 8
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 4
+push static 0
 add
 push constant 16
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 5
+push static 0
 add
 push constant 32
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 6
+push static 0
 add
 push constant 64
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 7
+push static 0
 add
 push constant 128
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 8
+push static 0
 add
 push constant 256
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 9
+push static 0
 add
 push constant 512
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 10
+push static 0
 add
 push constant 1024
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 11
+push static 0
 add
 push constant 2048
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 12
+push static 0
 add
 push constant 4096
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 13
+push static 0
 add
 push constant 8192
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 14
+push static 0
 add
 push constant 16384
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push static 0
 push constant 15
+push static 0
 add
 push constant 16384
 push constant 16384
@@ -138,16 +138,17 @@ function Math.abs 0
 push argument 0
 push constant 0
 lt
-not
-if-goto IF_0_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push argument 0
 neg
 return
-goto IF_0_END
-label IF_0_START
+goto IF_END0
+label IF_FALSE0
 push argument 0
 return
-label IF_0_END
+label IF_END0
 function Math.multiply 4
 push argument 0
 push constant 0
@@ -169,24 +170,23 @@ push constant 0
 pop local 1
 push argument 0
 pop local 2
-label WHILE_1_START
+label WHILE_EXP0
 push local 0
 push constant 16
 lt
 not
-if-goto WHILE_1_END
+if-goto WHILE_END0
 push argument 1
 push local 0
 call Math.bit 2
-not
-if-goto IF_2_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push local 1
 push local 2
 add
 pop local 1
-goto IF_2_END
-label IF_2_START
-label IF_2_END
+label IF_FALSE0
 push local 2
 push local 2
 add
@@ -195,19 +195,20 @@ push local 0
 push constant 1
 add
 pop local 0
-goto WHILE_1_START
-label WHILE_1_END
+goto WHILE_EXP0
+label WHILE_END0
 push local 3
-not
-if-goto IF_3_START
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push local 1
 return
-goto IF_3_END
-label IF_3_START
+goto IF_END1
+label IF_FALSE1
 push local 1
 neg
 return
-label IF_3_END
+label IF_END1
 function Math.divide 3
 push argument 0
 push constant 0
@@ -226,13 +227,12 @@ pop argument 1
 push argument 1
 push argument 0
 gt
-not
-if-goto IF_4_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push constant 0
 return
-goto IF_4_END
-label IF_4_START
-label IF_4_END
+label IF_FALSE0
 push argument 0
 push argument 1
 push argument 1
@@ -248,47 +248,49 @@ call Math.multiply 2
 sub
 push argument 1
 lt
-not
-if-goto IF_5_START
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push local 0
 push local 0
 add
 pop local 1
-goto IF_5_END
-label IF_5_START
+goto IF_END1
+label IF_FALSE1
 push local 0
 push local 0
 add
 push constant 1
 add
 pop local 1
-label IF_5_END
+label IF_END1
 push local 2
-not
-if-goto IF_6_START
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
 push local 1
 return
-goto IF_6_END
-label IF_6_START
+goto IF_END2
+label IF_FALSE2
 push local 1
 neg
 return
-label IF_6_END
+label IF_END2
 function Math.sqrt 4
 push constant 0
 pop local 0
 push constant 7
 pop local 1
-label WHILE_7_START
+label WHILE_EXP0
 push local 1
 push constant 0
 lt
 not
 not
-if-goto WHILE_7_END
+if-goto WHILE_END0
 push local 0
-push static 0
 push local 1
+push static 0
 add
 pop pointer 1
 push that 0
@@ -306,51 +308,52 @@ push local 3
 push constant 0
 gt
 and
-not
-if-goto IF_8_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push local 2
 pop local 0
-goto IF_8_END
-label IF_8_START
-label IF_8_END
+label IF_FALSE0
 push local 1
 push constant 1
 sub
 pop local 1
-goto WHILE_7_START
-label WHILE_7_END
+goto WHILE_EXP0
+label WHILE_END0
 push local 0
 return
 function Math.max 0
 push argument 0
 push argument 1
 gt
-not
-if-goto IF_9_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push argument 0
 return
-goto IF_9_END
-label IF_9_START
+goto IF_END0
+label IF_FALSE0
 push argument 1
 return
-label IF_9_END
+label IF_END0
 function Math.min 0
 push argument 0
 push argument 1
 lt
-not
-if-goto IF_10_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push argument 0
 return
-goto IF_10_END
-label IF_10_START
+goto IF_END0
+label IF_FALSE0
 push argument 1
 return
-label IF_10_END
+label IF_END0
 function Math.bit 0
 push argument 0
-push static 0
 push argument 1
+push static 0
 add
 pop pointer 1
 push that 0
@@ -368,8 +371,8 @@ call Math.multiply 2
 sub
 return
 function Math.twoToThe 0
-push static 0
 push argument 0
+push static 0
 add
 pop pointer 1
 push that 0

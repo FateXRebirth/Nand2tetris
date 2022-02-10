@@ -1371,96 +1371,96 @@ function Output.create 1
 push constant 11
 call Array.new 1
 pop local 0
-push static 7
 push argument 0
+push static 7
 add
 push local 0
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push constant 0
+push local 0
 add
 push argument 1
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push constant 1
+push local 0
 add
 push argument 2
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push constant 2
+push local 0
 add
 push argument 3
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push constant 3
+push local 0
 add
 push argument 4
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push constant 4
+push local 0
 add
 push argument 5
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push constant 5
+push local 0
 add
 push argument 6
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push constant 6
+push local 0
 add
 push argument 7
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push constant 7
+push local 0
 add
 push argument 8
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push constant 8
+push local 0
 add
 push argument 9
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push constant 9
+push local 0
 add
 push argument 10
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push local 0
 push constant 10
+push local 0
 add
 push argument 11
 pop temp 0
@@ -1477,15 +1477,14 @@ push argument 0
 push constant 126
 gt
 or
-not
-if-goto IF_0_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push constant 0
 pop argument 0
-goto IF_0_END
-label IF_0_START
-label IF_0_END
-push static 7
+label IF_FALSE0
 push argument 0
+push static 7
 add
 pop pointer 1
 push that 0
@@ -1515,15 +1514,15 @@ push constant 16
 call Math.divide 2
 add
 pop local 2
-label WHILE_1_START
+label WHILE_EXP0
 push local 0
 push constant 10
 gt
 not
 not
-if-goto WHILE_1_END
-push local 3
+if-goto WHILE_END0
 push local 0
+push local 3
 add
 pop pointer 1
 push that 0
@@ -1533,13 +1532,14 @@ push constant 1
 and
 push constant 1
 eq
-not
-if-goto IF_2_START
-push static 6
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push local 2
+push static 6
 add
-push static 6
 push local 2
+push static 6
 add
 pop pointer 1
 push that 0
@@ -1553,17 +1553,17 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-goto IF_2_END
-label IF_2_START
-push static 6
+goto IF_END0
+label IF_FALSE0
 push local 2
+push static 6
 add
 push local 1
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-label IF_2_END
+label IF_END0
 push local 2
 push constant 32
 add
@@ -1572,36 +1572,37 @@ push local 0
 push constant 1
 add
 pop local 0
-goto WHILE_1_START
-label WHILE_1_END
+goto WHILE_EXP0
+label WHILE_END0
 push static 0
 push static 4
 eq
-not
-if-goto IF_3_START
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 call Output.println 0
 pop temp 0
-goto IF_3_END
-label IF_3_START
+goto IF_END1
+label IF_FALSE1
 push static 1
 push static 0
 push constant 1
 add
 call Output.moveCursor 2
 pop temp 0
-label IF_3_END
+label IF_END1
 push constant 0
 return
 function Output.printString 2
 push constant 0
 pop local 0
-label WHILE_4_START
+label WHILE_EXP0
 push local 0
 push argument 0
 call String.length 1
 lt
 not
-if-goto WHILE_4_END
+if-goto WHILE_END0
 push argument 0
 push local 0
 call String.charAt 2
@@ -1613,8 +1614,8 @@ push local 0
 push constant 1
 add
 pop local 0
-goto WHILE_4_START
-label WHILE_4_END
+goto WHILE_EXP0
+label WHILE_END0
 push constant 0
 return
 function Output.printInt 1
@@ -1637,52 +1638,53 @@ function Output.println 0
 push static 1
 push static 5
 eq
-not
-if-goto IF_5_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push constant 0
 push constant 0
 call Output.moveCursor 2
 pop temp 0
-goto IF_5_END
-label IF_5_START
+goto IF_END0
+label IF_FALSE0
 push static 1
 push constant 1
 add
 push constant 0
 call Output.moveCursor 2
 pop temp 0
-label IF_5_END
+label IF_END0
 push constant 0
 return
 function Output.backSpace 0
 push static 0
 push constant 0
 eq
-not
-if-goto IF_6_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push static 1
 push constant 0
 eq
 not
-not
-if-goto IF_7_START
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push static 1
 push constant 1
 sub
 push static 4
 call Output.moveCursor 2
 pop temp 0
-goto IF_7_END
-label IF_7_START
-label IF_7_END
-goto IF_6_END
-label IF_6_START
+label IF_FALSE1
+goto IF_END0
+label IF_FALSE0
 push static 1
 push static 0
 push constant 1
 sub
 call Output.moveCursor 2
 pop temp 0
-label IF_6_END
+label IF_END0
 push constant 0
 return

@@ -8,25 +8,25 @@ push static 0
 call Memory.peek 1
 return
 function Keyboard.readChar 1
-label WHILE_0_START
+label WHILE_EXP0
 call Keyboard.keyPressed 0
 push constant 0
 eq
 not
-if-goto WHILE_0_END
-goto WHILE_0_START
-label WHILE_0_END
+if-goto WHILE_END0
+goto WHILE_EXP0
+label WHILE_END0
 call Keyboard.keyPressed 0
 pop local 0
-label WHILE_1_START
+label WHILE_EXP1
 call Keyboard.keyPressed 0
 push constant 0
 eq
 not
 not
-if-goto WHILE_1_END
-goto WHILE_1_START
-label WHILE_1_END
+if-goto WHILE_END1
+goto WHILE_EXP1
+label WHILE_END1
 push local 0
 call Output.printChar 1
 pop temp 0
@@ -41,32 +41,33 @@ call String.new 1
 pop local 0
 call Keyboard.readChar 0
 pop local 1
-label WHILE_2_START
+label WHILE_EXP0
 push local 1
 push constant 128
 eq
 not
 not
-if-goto WHILE_2_END
+if-goto WHILE_END0
 push local 1
 push constant 129
 eq
-not
-if-goto IF_3_START
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push local 0
 call String.eraseLastChar 1
 pop temp 0
-goto IF_3_END
-label IF_3_START
+goto IF_END0
+label IF_FALSE0
 push local 0
 push local 1
 call String.appendChar 2
 pop temp 0
-label IF_3_END
+label IF_END0
 call Keyboard.readChar 0
 pop local 1
-goto WHILE_2_START
-label WHILE_2_END
+goto WHILE_EXP0
+label WHILE_END0
 push local 0
 return
 function Keyboard.readInt 1

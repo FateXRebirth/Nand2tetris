@@ -31,10 +31,10 @@ class Memory {
         let BLOCK_HEADER_SIZE = 2;
 
         let block = HEAP_BASE;
-        let block[NEXT] = null;
+        let block[NEXT] = 0;
         let block[SIZE] = HEAP_TAIL - HEAP_BASE - BLOCK_HEADER_SIZE;
         let freeList = block;
-        let lastBlock = null;
+        let lastBlock = 0;
 
         return;
     }
@@ -65,10 +65,12 @@ class Memory {
             }
             let lastBlock = block;
             let block = block[NEXT];
-            if(block = null) {
-                return null;
+            if(block = 0) {
+                return 0;
             }
         }
+
+        return 0;
     }
 
     /** best-fit algorithm */
@@ -76,12 +78,12 @@ class Memory {
         var Array block, bestBlock, previousBlock;
 
         let block = freeList;
-        let bestBlock = null;
-        let previousBlock = null;
+        let bestBlock = 0;
+        let previousBlock = 0;
         
-        while(~(block[NEXT] = null)) {
+        while(~(block[NEXT] = 0)) {
             if(~(block[SIZE] < size)) {
-                if(~(bestBlock = null)) {
+                if(~(bestBlock = 0)) {
                     if(~(block[SIZE] > bestBlock[SIZE])) {
                         let lastBlock = previousBlock;
                         let bestBlock = block;
@@ -96,7 +98,7 @@ class Memory {
         }
 
         if(~(block[SIZE] < size)) {
-            if(~(bestBlock = null)) {
+            if(~(bestBlock = 0)) {
                 if(~(block[SIZE] > bestBlock[SIZE])) {
                     let lastBlock = previousBlock;
                     let bestBlock = block;
@@ -117,12 +119,12 @@ class Memory {
 
         let foundBlock = Memory.bestFit(size);
 
-        if(foundBlock = null) {
+        if(foundBlock = 0) {
             return 0;
         }
 
         if(foundBlock[SIZE] = size) {
-            if(~(lastBlock = null)) {
+            if(~(lastBlock = 0)) {
                 let lastBlock[NEXT] = foundBlock[NEXT];  
             } else {
                 let freeList = foundBlock[NEXT];
@@ -131,15 +133,15 @@ class Memory {
             let block = foundBlock + (size + BLOCK_HEADER_SIZE);
             let block[NEXT] = foundBlock[NEXT];
             let block[SIZE] = foundBlock[SIZE] - (size + BLOCK_HEADER_SIZE);
-            if(~(lastBlock = null)) {
+            if(~(lastBlock = 0)) {
                 let lastBlock[NEXT] = block;
             }  else {
                 let freeList = block;
             }
         }
 
-        let lastBlock = null;
-        let foundBlock[NEXT] = null;
+        let lastBlock = 0;
+        let foundBlock[NEXT] = 0;
         let foundBlock[SIZE] = size;
 
         return foundBlock + BLOCK_HEADER_SIZE;
@@ -154,7 +156,7 @@ class Memory {
         let previousBlock = freeList;
         let nextBlock = previousBlock[NEXT];
 
-        while(~(nextBlock = null) & (nextBlock < deAllocateBlock)) {
+        while(~(nextBlock = 0) & (nextBlock < deAllocateBlock)) {
             let previousBlock = nextBlock;
             let nextBlock = previousBlock[NEXT];
         }
@@ -164,7 +166,7 @@ class Memory {
             let freeList = deAllocateBlock;
             do Memory.defragment(deAllocateBlock, previousBlock);
         } else {
-            if(nextBlock = null) {
+            if(nextBlock = 0) {
                 let previousBlock[NEXT] = deAllocateBlock;
                 do Memory.defragment(previousBlock, deAllocateBlock);
             } else {
