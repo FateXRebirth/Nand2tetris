@@ -68,7 +68,7 @@ class String {
     /** Erases the last character from this string. */
     method void eraseLastChar() {
         if(index > 0) {
-            let str[index] = null;
+            let str[index] = 0;
             let index = index - 1;
         }
         
@@ -83,7 +83,37 @@ class String {
 
     /** Sets this string to hold a representation of the given value. */
     method void setInt(int val) {
+        let index = 0;
+        
+        if(val < 0) {
+            let val = -val;
+            do appendChar(45);
+        }
+
+        do int2String(val);
+
         return;
+    }
+
+    method String int2String(int val) {
+        var int nextVal;
+        var char c;
+
+        let nextVal = val / 10;
+        let c = String.toChar(val - (nextVal * 10));
+        if(val < 10) {
+            do appendChar(c);
+        } else {
+            do int2String(nextVal);
+            do appendChar(c);
+        }
+
+        return this;
+    }
+
+    /** Returns the char of val */
+    function char toChar(int val) {
+        return val + 48;
     }
 
     /** Returns the new line character. */

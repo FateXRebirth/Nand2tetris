@@ -113,12 +113,155 @@ return
 function String.intValue 0
 push argument 0
 pop pointer 0
+push this 1
 push constant 0
+gt
+push constant 0
+push this 0
+add
+pop pointer 1
+push that 0
+and
+push constant 45
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push pointer 0
+push this 0
+call String.string2Int 2
+neg
+return
+goto IF_END0
+label IF_FALSE0
+push pointer 0
+push this 0
+call String.string2Int 2
+return
+label IF_END0
+function String.string2Int 4
+push argument 0
+pop pointer 0
+push constant 0
+pop local 0
+push constant 0
+pop local 1
+label WHILE_EXP0
+push local 1
+push pointer 0
+call String.length 1
+lt
+not
+if-goto WHILE_END0
+push pointer 0
+push local 1
+call String.charAt 2
+pop local 3
+push local 3
+call String.isNumber 1
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 3
+call String.toVal 1
+pop local 2
+push local 0
+push constant 10
+call Math.multiply 2
+push local 2
+add
+pop local 0
+label IF_FALSE0
+push local 1
+push constant 1
+add
+pop local 1
+goto WHILE_EXP0
+label WHILE_END0
+push local 0
 return
 function String.setInt 0
 push argument 0
 pop pointer 0
 push constant 0
+pop this 1
+push argument 1
+push constant 0
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 1
+neg
+pop argument 1
+push pointer 0
+push constant 45
+call String.appendChar 2
+pop temp 0
+label IF_FALSE0
+push pointer 0
+push argument 1
+call String.int2String 2
+pop temp 0
+push constant 0
+return
+function String.int2String 2
+push argument 0
+pop pointer 0
+push argument 1
+push constant 10
+call Math.divide 2
+pop local 0
+push argument 1
+push local 0
+push constant 10
+call Math.multiply 2
+sub
+call String.toChar 1
+pop local 1
+push argument 1
+push constant 10
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push pointer 0
+push local 1
+call String.appendChar 2
+pop temp 0
+goto IF_END0
+label IF_FALSE0
+push pointer 0
+push local 0
+call String.int2String 2
+pop temp 0
+push pointer 0
+push local 1
+call String.appendChar 2
+pop temp 0
+label IF_END0
+push pointer 0
+return
+function String.isNumber 0
+push argument 0
+push constant 48
+lt
+not
+push argument 0
+push constant 57
+gt
+not
+and
+return
+function String.toVal 0
+push argument 0
+push constant 48
+sub
+return
+function String.toChar 0
+push argument 0
+push constant 48
+add
 return
 function String.newLine 0
 push constant 128
