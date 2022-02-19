@@ -78,14 +78,15 @@ class String {
     /** Returns the integer value of this string, 
      *  until a non-digit character is detected. */
     method int intValue() {
-        if(index > 0 & str[0] = 45) {
-            return -string2Int(str);
+        if((index > 0) & (str[0] = 45)) {
+            return -string2Int(this);
         } else {
-            return string2Int(str);
+            return string2Int(this);
         }
-        
     }
 
+     
+    /** Returns the integer value of a string of digit characters, assuming that str[0] represents the most significant digit. */
     method int string2Int(string str) {
         var int val, i, d;
         var char c;
@@ -107,17 +108,16 @@ class String {
     /** Sets this string to hold a representation of the given value. */
     method void setInt(int val) {
         let index = 0;
-        
         if(val < 0) {
             let val = -val;
             do appendChar(45);
         }
-
         do int2String(val);
 
         return;
     }
 
+    /** Returns the string representation of a non-negative integer */
     method String int2String(int val) {
         var int nextVal;
         var char c;

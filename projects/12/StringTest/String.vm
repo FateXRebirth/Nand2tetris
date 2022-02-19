@@ -121,21 +121,21 @@ push this 0
 add
 pop pointer 1
 push that 0
-and
 push constant 45
 eq
+and
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
 push pointer 0
-push this 0
+push pointer 0
 call String.string2Int 2
 neg
 return
 goto IF_END0
 label IF_FALSE0
 push pointer 0
-push this 0
+push pointer 0
 call String.string2Int 2
 return
 label IF_END0
