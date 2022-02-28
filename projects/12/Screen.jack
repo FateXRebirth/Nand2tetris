@@ -25,14 +25,13 @@ class Screen {
 
     /** Erases the entire screen. */
     function void clearScreen() {
-        var int screen;
-
-        let screen = SCREEN_BASE;
+        var int address;
 
         do Screen.setColor(false);
-        while(~(screen > SCREEN_TAIL)) {
-            do Memory.poke(screen, color);
-            let screen = screen + 1;
+        let address = 0;
+        while(~((SCREEN_BASE + address) > SCREEN_TAIL)) {
+            let SCREEN_BASE[address] = color;
+            let address = address + 1;
         }
 
         return;
@@ -48,19 +47,17 @@ class Screen {
 
     /** Draws the (x,y) pixel, using the current color. */
     function void drawPixel(int x, int y) {
-        var int address, value, index, twoToTheValue;
+        var int address, index, twoToTheValue;
 
-        let address = (y * 32) + (x / 16) + SCREEN_BASE;
-        let value = Memory.peek(address);
+        let address = (y * 32) + (x / 16);
         let index = Math.mod(x, 16);
         let twoToTheValue = Math.twoToThe(index);
 
         if(color) {
-            let value = value | twoToTheValue;
+            let SCREEN_BASE[address] = SCREEN_BASE[address] | twoToTheValue;
         } else {
-            let value = value & ~twoToTheValue;
+            let SCREEN_BASE[address] = SCREEN_BASE[address] & ~twoToTheValue;
         }
-        do Memory.poke(address, value);
 
         return;
     }
