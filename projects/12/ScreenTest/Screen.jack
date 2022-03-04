@@ -134,6 +134,78 @@ class Screen {
         }
     }
 
+    /** Draws a horizontal line from pixel (x1,y) to pixel (x2,y), using the current color. */
+    function void drawHorizontalLine(int x1, int x2, int y) {
+        var int start, start_index, end, end_index, diff, i;
+        var Array START_MASK, END_MASK;
+
+        let START_MASK = Array.new(16);
+        let START_MASK[0] = 32767 + 1 + 16384 + 8192 + 4096 + 2048 + 1024 + 512 + 256 + 128 + 64 + 32 + 16 + 8 + 4 + 2 + 1;     // 1111111111111111
+        let START_MASK[1] = 32767 + 1 + 16384 + 8192 + 4096 + 2048 + 1024 + 512 + 256 + 128 + 64 + 32 + 16 + 8 + 4 + 2;         // 1111111111111110
+        let START_MASK[2] = 32767 + 1 + 16384 + 8192 + 4096 + 2048 + 1024 + 512 + 256 + 128 + 64 + 32 + 16 + 8 + 4;             // 1111111111111100
+        let START_MASK[3] = 32767 + 1 + 16384 + 8192 + 4096 + 2048 + 1024 + 512 + 256 + 128 + 64 + 32 + 16 + 8;                 // 1111111111111000
+        let START_MASK[4] = 32767 + 1 + 16384 + 8192 + 4096 + 2048 + 1024 + 512 + 256 + 128 + 64 + 32 + 16;                     // 1111111111110000
+        let START_MASK[5] = 32767 + 1 + 16384 + 8192 + 4096 + 2048 + 1024 + 512 + 256 + 128 + 64 + 32;                          // 1111111111100000
+        let START_MASK[6] = 32767 + 1 + 16384 + 8192 + 4096 + 2048 + 1024 + 512 + 256 + 128 + 64;                               // 1111111111000000
+        let START_MASK[7] = 32767 + 1 + 16384 + 8192 + 4096 + 2048 + 1024 + 512 + 256 + 128;                                    // 1111111110000000
+        let START_MASK[8] = 32767 + 1 + 16384 + 8192 + 4096 + 2048 + 1024 + 512 + 256;                                          // 1111111100000000
+        let START_MASK[9] = 32767 + 1 + 16384 + 8192 + 4096 + 2048 + 1024 + 512;                                                // 1111111000000000
+        let START_MASK[10] = 32767 + 1 + 16384 + 8192 + 4096 + 2048 + 1024;                                                     // 1111110000000000
+        let START_MASK[11] = 32767 + 1 + 16384 + 8192 + 4096 + 2048;                                                            // 1111100000000000
+        let START_MASK[12] = 32767 + 1 + 16384 + 8192 + 4096;                                                                   // 1111000000000000
+        let START_MASK[13] = 32767 + 1 + 16384 + 8192;                                                                          // 1110000000000000
+        let START_MASK[14] = 32767 + 1 + 16384;                                                                                 // 1100000000000000
+        let START_MASK[15] = 32767 + 1;                                                                                         // 1000000000000000
+
+        let END_MASK = Array.new(16);        
+        let END_MASK[0] = 1;                    // 0000000000000001
+        let END_MASK[1] = 3;                    // 0000000000000011
+        let END_MASK[2] = 7;                    // 0000000000000111
+        let END_MASK[3] = 15;                   // 0000000000001111
+        let END_MASK[4] = 31;                   // 0000000000011111
+        let END_MASK[5] = 63;                   // 0000000000111111
+        let END_MASK[6] = 127;                  // 0000000001111111
+        let END_MASK[7] = 255;                  // 0000000011111111
+        let END_MASK[8] = 511;                  // 0000000111111111
+        let END_MASK[9] = 1023;                 // 0000001111111111
+        let END_MASK[10] = 2047;                // 0000011111111111
+        let END_MASK[11] = 4095;                // 0000111111111111
+        let END_MASK[12] = 8191;                // 0001111111111111
+        let END_MASK[13] = 16383;               // 0011111111111111
+        let END_MASK[14] = 32767;               // 0111111111111111
+        let END_MASK[15] = 32767 + 32767 + 1;   // 1111111111111111
+
+        let start = (y * 32) + (x1 / 16);
+        let start_index = Math.mod(x1, 16);
+        let end = (y * 32) + (x2 / 16);
+        let end_index = Math.mod(x2, 16);
+        let diff = end - start;
+
+        if(diff > 1) {
+            if(color) {
+                let SCREEN_BASE[start] = SCREEN_BASE[start] | START_MASK[start_index];
+                let i = 1;
+                while(i < diff) {
+                    let SCREEN_BASE[start + i] = SCREEN_BASE[start + i] | ~0;
+                    let i = i + 1;
+                }
+                let SCREEN_BASE[end] = SCREEN_BASE[end] | END_MASK[end_index];
+            } else {
+                let SCREEN_BASE[start] = SCREEN_BASE[start] & ~START_MASK[start_index];
+                let i = 1;
+                while(i < diff) {
+                    let SCREEN_BASE[start + i] = SCREEN_BASE[start + i] & 0;
+                    let i = i + 1;
+                }
+                let SCREEN_BASE[end] = SCREEN_BASE[end] & ~END_MASK[end_index];
+            }
+        } else {
+            do Screen.drawLine(x1, y, x2, y);
+        }
+
+        return;
+    }
+
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      * and bottom right corner is (x2,y2), using the current color. */
     function void drawRectangle(int x1, int y1, int x2, int y2) {
@@ -143,7 +215,7 @@ class Screen {
         let dy = y2 - y1;
 
         while(~(y > dy)) {
-            do Screen.drawLine(x1, y1 + y, x2, y1 + y);
+            do Screen.drawHorizontalLine(x1, x2, y1 + y);
             let y = y + 1;
         }
 
