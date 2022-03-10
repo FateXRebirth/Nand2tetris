@@ -47,16 +47,16 @@ class Screen {
 
     /** Draws the (x,y) pixel, using the current color. */
     function void drawPixel(int x, int y) {
-        var int address, index, twoToTheValue;
+        var int address, index, bitMask;
 
         let address = (y * 32) + (x / 16);
         let index = Math.mod(x, 16);
-        let twoToTheValue = Math.twoToThe(index);
+        let bitMask = Math.twoToThe(index);
 
         if(color) {
-            let SCREEN_BASE[address] = SCREEN_BASE[address] | twoToTheValue;
+            let SCREEN_BASE[address] = SCREEN_BASE[address] | bitMask;
         } else {
-            let SCREEN_BASE[address] = SCREEN_BASE[address] & ~twoToTheValue;
+            let SCREEN_BASE[address] = SCREEN_BASE[address] & ~bitMask;
         }
 
         return;
@@ -73,26 +73,20 @@ class Screen {
         let diff = 0;
 
         if(dx = 0) {
-            while(~(b > Math.abs(dy))) {
-                if(dy > 0) {
-                    do Screen.drawPixel(x1, y1 + b);
-                } else {
-                    do Screen.drawPixel(x1, y1 - b);
-                }
-                let b = b + 1;
+            if(dy > 0) {
+                do Screen.drawVerticalLine(y1, y2, x1);
+            } else {
+                do Screen.drawVerticalLine(y2, y1, x1);
             }
             return;
         }
 
         if(dy = 0) {
-            while(~(a > Math.abs(dx))) {
-                if(dx > 0) {
-                    do Screen.drawPixel(x1 + a, y1);
-                } else {
-                    do Screen.drawPixel(x1 - a, y1);
-                }
-                let a = a + 1;
-            }
+            if(dx > 0) {                
+                do Screen.drawHorizontalLine(x1, x2, y1);
+            } else {
+                do Screen.drawHorizontalLine(x2, x1, y1);
+            }   
             return;
         }
 
@@ -132,6 +126,28 @@ class Screen {
             }
             return;
         }
+    }
+
+    /** Draws a vertical line from pixel (x,y1) to pixel (x,y2), using the current color. */
+    function void drawVerticalLine(int y1, int y2, int x) {
+        var int start, end, diff, index, bitMask, i;
+
+        let start = (y1 * 32) + (x / 16);
+        let end = (y2 * 32) + (x / 16);
+        let diff = end - start;
+        let index = Math.mod(x, 16);
+        let bitMask = Math.twoToThe(index);
+        let i = 0;
+        while(i < diff) {
+            if(color) {
+                let SCREEN_BASE[start + i] = SCREEN_BASE[start + i] | bitMask;
+            } else {
+                let SCREEN_BASE[start + i] = SCREEN_BASE[start + i] & ~bitMask;
+            }
+            let i = i + 32;
+        }        
+
+        return;
     }
 
     /** Draws a horizontal line from pixel (x1,y) to pixel (x2,y), using the current color. */
