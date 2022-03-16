@@ -72,6 +72,10 @@ class Screen {
         let dy = y2 - y1;
         let diff = 0;
 
+        if((dx = 0) & (dy = 0)) {
+            return;
+        }
+
         if(dx = 0) {
             if(dy > 0) {
                 do Screen.drawVerticalLine(y1, y2, x1);
@@ -196,27 +200,35 @@ class Screen {
         let end = (y * 32) + (x2 / 16);
         let end_index = Math.mod(x2, 16);
         let diff = end - start;
-
-        if(diff > 1) {
+        
+        if(diff = 0) {
+            let i = x1;
+            while(~(i > x2)) {
+                do Screen.drawPixel(i, y);
+                let i = i + 1;
+            }          
+        } else {
             if(color) {
                 let SCREEN_BASE[start] = SCREEN_BASE[start] | START_MASK[start_index];
-                let i = 1;
-                while(i < diff) {
-                    let SCREEN_BASE[start + i] = SCREEN_BASE[start + i] | ~0;
-                    let i = i + 1;
+                if(diff > 1) {
+                    let i = 1;
+                    while(i < diff) {
+                        let SCREEN_BASE[start + i] = SCREEN_BASE[start + i] | ~0;
+                        let i = i + 1;
+                    }
                 }
                 let SCREEN_BASE[end] = SCREEN_BASE[end] | END_MASK[end_index];
             } else {
                 let SCREEN_BASE[start] = SCREEN_BASE[start] & ~START_MASK[start_index];
-                let i = 1;
-                while(i < diff) {
-                    let SCREEN_BASE[start + i] = SCREEN_BASE[start + i] & 0;
-                    let i = i + 1;
+                if(diff > 1) {
+                    let i = 1;
+                    while(i < diff) {
+                        let SCREEN_BASE[start + i] = SCREEN_BASE[start + i] & 0;
+                        let i = i + 1;
+                    }
                 }
                 let SCREEN_BASE[end] = SCREEN_BASE[end] & ~END_MASK[end_index];
             }
-        } else {
-            do Screen.drawLine(x1, y, x2, y);
         }
 
         return;
@@ -231,7 +243,7 @@ class Screen {
         let dy = y2 - y1;
 
         while(~(y > dy)) {
-            do Screen.drawHorizontalLine(x1, x2, y1 + y);
+            do Screen.drawLine(x1, y1 + y, x2, y1 + y);
             let y = y + 1;
         }
 

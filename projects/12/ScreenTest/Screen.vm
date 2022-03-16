@@ -116,65 +116,78 @@ pop local 6
 push local 2
 push constant 0
 eq
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
-push local 3
-push constant 0
-gt
-if-goto IF_TRUE1
-goto IF_FALSE1
-label IF_TRUE1
-push argument 1
-push argument 3
-push argument 0
-call Screen.drawVerticalLine 3
-pop temp 0
-goto IF_END1
-label IF_FALSE1
-push argument 3
-push argument 1
-push argument 0
-call Screen.drawVerticalLine 3
-pop temp 0
-label IF_END1
-push constant 0
-return
-label IF_FALSE0
 push local 3
 push constant 0
 eq
+and
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+return
+label IF_FALSE0
+push local 2
+push constant 0
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push local 3
+push constant 0
+gt
 if-goto IF_TRUE2
 goto IF_FALSE2
 label IF_TRUE2
-push local 2
+push argument 1
+push argument 3
+push argument 0
+call Screen.drawVerticalLine 3
+pop temp 0
+goto IF_END2
+label IF_FALSE2
+push argument 3
+push argument 1
+push argument 0
+call Screen.drawVerticalLine 3
+pop temp 0
+label IF_END2
 push constant 0
-gt
+return
+label IF_FALSE1
+push local 3
+push constant 0
+eq
 if-goto IF_TRUE3
 goto IF_FALSE3
 label IF_TRUE3
-push argument 0
-push argument 2
-push argument 1
-call Screen.drawHorizontalLine 3
-pop temp 0
-goto IF_END3
-label IF_FALSE3
-push argument 2
-push argument 0
-push argument 1
-call Screen.drawHorizontalLine 3
-pop temp 0
-label IF_END3
-push constant 0
-return
-label IF_FALSE2
 push local 2
 push constant 0
 gt
 if-goto IF_TRUE4
 goto IF_FALSE4
 label IF_TRUE4
+push argument 0
+push argument 2
+push argument 1
+call Screen.drawHorizontalLine 3
+pop temp 0
+goto IF_END4
+label IF_FALSE4
+push argument 2
+push argument 0
+push argument 1
+call Screen.drawHorizontalLine 3
+pop temp 0
+label IF_END4
+push constant 0
+return
+label IF_FALSE3
+push local 2
+push constant 0
+gt
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
 push local 3
 call Math.abs 1
 pop local 5
@@ -193,9 +206,9 @@ if-goto WHILE_END0
 push local 3
 push constant 0
 gt
-if-goto IF_TRUE5
-goto IF_FALSE5
-label IF_TRUE5
+if-goto IF_TRUE6
+goto IF_FALSE6
+label IF_TRUE6
 push argument 0
 push local 0
 add
@@ -204,8 +217,8 @@ push local 1
 add
 call Screen.drawPixel 2
 pop temp 0
-goto IF_END5
-label IF_FALSE5
+goto IF_END6
+label IF_FALSE6
 push argument 0
 push local 0
 add
@@ -214,13 +227,13 @@ push local 1
 sub
 call Screen.drawPixel 2
 pop temp 0
-label IF_END5
+label IF_END6
 push local 6
 push constant 0
 lt
-if-goto IF_TRUE6
-goto IF_FALSE6
-label IF_TRUE6
+if-goto IF_TRUE7
+goto IF_FALSE7
+label IF_TRUE7
 push local 0
 push constant 1
 add
@@ -229,8 +242,8 @@ push local 6
 push local 5
 add
 pop local 6
-goto IF_END6
-label IF_FALSE6
+goto IF_END7
+label IF_FALSE7
 push local 1
 push constant 1
 add
@@ -239,13 +252,13 @@ push local 6
 push local 2
 sub
 pop local 6
-label IF_END6
+label IF_END7
 goto WHILE_EXP0
 label WHILE_END0
 push constant 0
 return
-goto IF_END4
-label IF_FALSE4
+goto IF_END5
+label IF_FALSE5
 push local 2
 call Math.abs 1
 pop local 4
@@ -267,9 +280,9 @@ if-goto WHILE_END1
 push local 3
 push constant 0
 gt
-if-goto IF_TRUE7
-goto IF_FALSE7
-label IF_TRUE7
+if-goto IF_TRUE8
+goto IF_FALSE8
+label IF_TRUE8
 push argument 0
 push local 0
 sub
@@ -278,8 +291,8 @@ push local 1
 add
 call Screen.drawPixel 2
 pop temp 0
-goto IF_END7
-label IF_FALSE7
+goto IF_END8
+label IF_FALSE8
 push argument 0
 push local 0
 sub
@@ -288,13 +301,13 @@ push local 1
 sub
 call Screen.drawPixel 2
 pop temp 0
-label IF_END7
+label IF_END8
 push local 6
 push constant 0
 lt
-if-goto IF_TRUE8
-goto IF_FALSE8
-label IF_TRUE8
+if-goto IF_TRUE9
+goto IF_FALSE9
+label IF_TRUE9
 push local 0
 push constant 1
 add
@@ -303,8 +316,8 @@ push local 6
 push local 5
 add
 pop local 6
-goto IF_END8
-label IF_FALSE8
+goto IF_END9
+label IF_FALSE9
 push local 1
 push constant 1
 add
@@ -313,12 +326,12 @@ push local 6
 push local 4
 sub
 pop local 6
-label IF_END8
+label IF_END9
 goto WHILE_EXP1
 label WHILE_END1
 push constant 0
 return
-label IF_END4
+label IF_END5
 function Screen.drawVerticalLine 6
 push argument 0
 push constant 32
@@ -975,11 +988,32 @@ push local 0
 sub
 pop local 4
 push local 4
-push constant 1
-gt
+push constant 0
+eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
+push argument 0
+pop local 5
+label WHILE_EXP0
+push local 5
+push argument 1
+gt
+not
+not
+if-goto WHILE_END0
+push local 5
+push argument 2
+call Screen.drawPixel 2
+pop temp 0
+push local 5
+push constant 1
+add
+pop local 5
+goto WHILE_EXP0
+label WHILE_END0
+goto IF_END0
+label IF_FALSE0
 push static 2
 if-goto IF_TRUE1
 goto IF_FALSE1
@@ -1002,14 +1036,20 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+push local 4
+push constant 1
+gt
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
 push constant 1
 pop local 5
-label WHILE_EXP0
+label WHILE_EXP1
 push local 5
 push local 4
 lt
 not
-if-goto WHILE_END0
+if-goto WHILE_END1
 push local 0
 push local 5
 add
@@ -1033,8 +1073,9 @@ push local 5
 push constant 1
 add
 pop local 5
-goto WHILE_EXP0
-label WHILE_END0
+goto WHILE_EXP1
+label WHILE_END1
+label IF_FALSE2
 push local 2
 push static 0
 add
@@ -1074,14 +1115,20 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
+push local 4
+push constant 1
+gt
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
 push constant 1
 pop local 5
-label WHILE_EXP1
+label WHILE_EXP2
 push local 5
 push local 4
 lt
 not
-if-goto WHILE_END1
+if-goto WHILE_END2
 push local 0
 push local 5
 add
@@ -1104,8 +1151,9 @@ push local 5
 push constant 1
 add
 pop local 5
-goto WHILE_EXP1
-label WHILE_END1
+goto WHILE_EXP2
+label WHILE_END2
+label IF_FALSE3
 push local 2
 push static 0
 add
@@ -1126,14 +1174,6 @@ pop pointer 1
 push temp 0
 pop that 0
 label IF_END1
-goto IF_END0
-label IF_FALSE0
-push argument 0
-push argument 2
-push argument 1
-push argument 2
-call Screen.drawLine 4
-pop temp 0
 label IF_END0
 push constant 0
 return
@@ -1152,11 +1192,14 @@ not
 not
 if-goto WHILE_END0
 push argument 0
+push argument 1
+push local 0
+add
 push argument 2
 push argument 1
 push local 0
 add
-call Screen.drawHorizontalLine 3
+call Screen.drawLine 4
 pop temp 0
 push local 0
 push constant 1
