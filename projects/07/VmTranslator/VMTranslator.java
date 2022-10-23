@@ -1,13 +1,13 @@
 import java.io.*;
 import java.util.ArrayList;
 
-public class VmTranslator {
+public class VMTranslator {
 
     public static void main(String[] args) {
         
         // check if user provides argument to handle
         if(args.length < 1) {
-            throw new IllegalArgumentException("Missing argument! (e.g. java VmTranslator SimpleAdd.vm) ");
+            throw new IllegalArgumentException("Missing argument! (e.g. java VMTranslator SimpleAdd.vm) ");
         }
         
         // Debugger
@@ -36,53 +36,21 @@ public class VmTranslator {
 
         fileOut = new File(fileOutPath);
         CodeWriter codewriter = new CodeWriter(fileOut);
-
-        for( File file : files ) {
-            if(file.getName().equals("Sys.vm")) {
-                codewriter.WriteInit();
-            }
-        }
         
         for( File file : files ) {
             Parser parser = new Parser(file);
-            codewriter.SetFileName(file.getName());
             while(parser.HasMoreCommands()) {
                 parser.Advance();
                 String type = parser.CommandType();
                 if(type != "NULL") {
-                    parser.Handle();
-                    if(debug) codewriter.PrintOutCommand(parser.GetCurrentCommand());
-                    switch(type) {
-                        case "C_PUSH":                    
-                            codewriter.WritePushPop(parser.Type(), parser.Arg1(), parser.Arg2());
-                            break;
-                        case "C_POP":
-                            codewriter.WritePushPop(parser.Type(), parser.Arg1(), parser.Arg2());
-                            break;
-                        case "C_LABEL":
-                            codewriter.WriteLabel(parser.Arg1());
-                            break;
-                        case "C_GOTO":
-                            codewriter.WriteGoto(parser.Arg1());
-                            break;
-                        case "C_IF":
-                            codewriter.WriteIf(parser.Arg1());
-                            break;
-                        case "C_FUNCTION":
-                            codewriter.WriteFunction(parser.Arg1(), parser.Arg2());
-                            break;
-                        case "C_RETURN":
-                            codewriter.WriteReturn();
-                            break;
-                        case "C_CALL":
-                            codewriter.WriteCall(parser.Arg1(), parser.Arg2());
-                            break;
-                        case "C_ARITHMETIC":
-                            codewriter.WriteArithmetic(parser.Type());
-                            break;
-                        default:
-                            System.out.println("Unknown type");
-                            break;
+                    if(type == "C_PUSH" || type == "C_POP") {
+                        parser.Handle();
+                        if(debug) codewriter.PrintOutCommand(parser.GetCurrentCommand());
+                        codewriter.WritePushPop(parser.Type(), parser.Arg1(), parser.Arg2());
+                    } else {
+                        parser.Handle();
+                        if(debug) codewriter.PrintOutCommand(parser.GetCurrentCommand());
+                        codewriter.WriteArithmetic(parser.Type());
                     }
                 }
             }
@@ -95,7 +63,7 @@ public class VmTranslator {
         int index = fileName.lastIndexOf('.');
         if (index != -1 ){
             return fileName.substring(index);
-        } else {
+        }else {
             return "";
         }
     }
